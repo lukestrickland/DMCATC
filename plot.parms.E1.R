@@ -2,7 +2,8 @@
 # Running this top to bottom should correspond to my data analysis from the 
 # PMDC manuscript. 
 rm(list=ls())
-setwd("~/russ_model_analyses")
+# setwd("~/russ_model_analyses")
+setwd("D:/Software/DMC_ATCPMDC")
 source("dmc/dmc.R")
 load_model ("LBA","lbaN_B.R")
 # source("~/russ_model_analyses/dmc/dmc_sampling.R")
@@ -12,8 +13,9 @@ require("lme4")
 require("plyr")
 require("dplyr")
 
-load("~/E1.block.B.V_cond.B.V.PMV.samples.RData")
+load("data/samples/E1.block.B.V_cond.B.V.PMV.samples.RData")
 samples <- E1.block.B.V_cond.B.V.PMV.samples
+
 
 # Check how many runs it took to converge
 # If any say "FAIL" then it didn't converge
@@ -56,6 +58,30 @@ load("gelman.diag.E1.RData")
 
 # getgglist
 load("E1.PMV.PPs.RData")
+
+#Generate PPs that respect the fact some RTs will be truncated by the trial
+#deadline. 
+
+load("data/exp_data/okdats.E1.NR.RData")
+names(okdats)[length(okdats)] <- "trial.pos"
+levels(okdats$block)<- c("2", "3")
+
+for (i in 1:length(samples)) {
+  data <- okdats[okdats$s==levels(okdats$s)[i],]
+  data <-data[,c(2,3,4,5,6,7)]
+  attr(samples[[i]], "NRdata") <- data
+}
+
+testPP<-post.predict.dmc.MATCHORDER(samples, save.simulation=TRUE)
+require("data.table")
+
+testPP[, Cum.Sum := cumsum(RT), by=list(trial.pos)]
+
+perfstack[, RowNum := cumsum(Count), by=list(identifier, Trial)]
+
+hsamples<-samples
+samples <- samples[[1]];n.post=100;report=10
+
 sim <- do.call(rbind, PPs_save)
 # Do the same for the data
 data <- lapply(PPs_save, function(x) attr(x, "data"))
