@@ -5,17 +5,10 @@ rm(list=ls())
 # setwd("~/russ_model_analyses")
 setwd("D:/Software/DMC_ATCPMDC")
 source("dmc/dmc.R")
-load_model ("LBA","lbaN_B.R")
-# source("~/russ_model_analyses/dmc/dmc_sampling.R")
-# source("~/russ_model_analyses/dmc/dmc_plotting.R")
-# require("gridExtra")
-require("lme4")
-require("plyr")
-require("dplyr")
+source("dmc/dmc_ATC.R")
 
 load("data/samples/E1.block.B.V_cond.B.V.PMV.samples.RData")
 samples <- E1.block.B.V_cond.B.V.PMV.samples
-
 
 # Check how many runs it took to converge
 # If any say "FAIL" then it didn't converge
@@ -50,17 +43,11 @@ load("gelman.diag.E1.RData")
 # that you don't have huge prior influence
 # plot.dmc(samples[[1]], p.prior= samples[[1]]$p.prior)
 
-
-# Evaluate average model fit. 
-# PPs_save <- h.post.predict.dmc(samples, save.sim=T)
-# save(PPs_save, file ="E1.PMV.PPs.RData")
-# str(PPs_save)
-
-# getgglist
-load("E1.PMV.PPs.RData")
-
 #Generate PPs that respect the fact some RTs will be truncated by the trial
 #deadline. 
+
+### Do some stuff to index the non-responses and get the simulated data as if
+# the sim included trial deadlines
 
 load("data/exp_data/okdats.E1.NR.RData")
 names(okdats)[length(okdats)] <- "trial.pos"
@@ -72,36 +59,71 @@ for (i in 1:length(samples)) {
   attr(samples[[i]], "NRdata") <- data
 }
 
-testPP<-post.predict.dmc.MATCHORDER(samples, save.simulation=TRUE)
-require("data.table")
+h.matched.samples <- h.post.predict.dmc.MATCHORDER(samples)
 
-testPP[, Cum.Sum := cumsum(RT), by=list(trial.pos)]
+sim <- do.call(rbind, h.matched.samples)
+getdata <- lapply(h.matched.samples, function(x) attr(x, "data"))
+data <- do.call(rbind, getdata)
+data<-add.trial.cumsum.data(data)
+sim<-add.trial.cumsum.sim (sim, data)
 
-perfstack[, RowNum := cumsum(Count), by=list(identifier, Trial)]
+###
 
-hsamples<-samples
-samples <- samples[[1]];n.post=100;report=10
+#Plot non-resposes
 
-sim <- do.call(rbind, PPs_save)
-# Do the same for the data
-data <- lapply(PPs_save, function(x) attr(x, "data"))
-data <- do.call(rbind, data)
-# data
-ggplot.obj <- get.fitgglist.dmc(sim, data)
-# ggplot.obj[[1]]  # Response proportions
-# ggplot.obj[[2]]  # RTs
-# tsilggteg
-
-
-# Desired level names for graphs of factors
-# Rename appropriately
+#levels for graphing
 lev.S <- c("Conflict", "Nonconflict", "PM (Conflict)", "PM (Nonconflict)")
 lev.PM <- c("Control", "PM")
 lev.cond <- c("LL.LT", "LL.HT",
-                        "HL.LT", "HL.HT")
-# Conflict R, Nonconf R, PMR
+              "HL.LT", "HL.HT")
 lev.R <- c("CR", "NR", "PMR")
 
+NR.df <- get.NRs.ATCDMC(sim, data, miss_fun=get.trials.missed.E1_A4)
+
+levels(NR.df$cond)<- lev.cond
+
+plot <- ggplot(NR.df, aes(cond, mean)) 
+plot + geom_point(size=3) + geom_errorbar(aes(ymax = upper, ymin = lower), width= 0.2) +
+  geom_point(aes(cond, data), pch=21, size=4, 
+            colour="black")+geom_line(aes(group = 1, y=data), linetype=2)+
+  ylab("Probability of non-response") + xlab("Time Pressure/ Traffic Load")
+
+mark_sim_nrs <- sim$cond=="A" & sim$cumsum>12 |sim$cond=="B" & sim$cumsum>8 |  
+  sim$cond=="C" & sim$cumsum>20 |sim$cond=="D" & sim$cumsum>10
+
+
+#Take the non-responses out and take out the factors we needed only to calc them
+sim.noNRs <- sim[!mark_sim_nrs,]
+data.withs <- data
+data.withs$s <- okdats$s
+
+data<-data[!(data$block=="2" & data$R=="P"),]
+
+data.noNRs <- data.withs[data.withs$R!="M",]
+data.noNRs$R <- factor(as.character(data.noNRs$R ))
+
+sim.noNRs <-
+  sim.noNRs[,!(names(sim.noNRs) %in% c("trial", "trial.pos", "cumsum"))]
+data.noNRs <-
+  data.noNRs[,!(names(data.noNRs) %in% c("trial", "trial.pos", "cumsum"))]
+
+
+data.noNRs <- clean(okdats)
+
+#We removed <0.2s from the data and >3 IQR as we did for the data we estimated
+#from
+data.noNRs <- data.noNRs[,-length(data.noNRs)]
+
+# Desired level names for graphs of factors
+checkdata <- get.hdata.dmc(E1.block.B.V_cond.B.V.PMV.samples)
+
+# Conflict R, Nonconf R, PMR
+GGLIST <- get.fitgglist.dmc(sim.noNRs, data.noNRs)
+check<- h.post.predict.dmc(E1.block.B.V_cond.B.V.PMV.samples)
+
+ggplot.RT.dmc(check, xaxis="cond")
+ggplot.RP.dmc(GGLIST[[1]], xaxis="cond")
+ggplot.RT.dmc(GGLIST[[2]], xaxis="cond")
 
 
 ## Accuracy plots
