@@ -4,6 +4,7 @@ require("gridExtra")
 require("lme4")
 require("plyr")
 require("dplyr")
+require("data.table")
 theme_set(theme_simple())
 
 # 
@@ -159,34 +160,34 @@ get.trials.missed.E1_A4 <- function (sim) {
 }
 
 
-
-get.data.misses<- function(data) {
-  datatrialmiss <- ddply(data, .(cond, trial), summarize, M=any(R=="M"))
-  length(datatrialmiss$M[datatrialmiss$M]) / length(datatrialmiss$M)
-  tapply (datatrialmiss$M, list(datatrialmiss$cond), mean)
-}
-
-get.groupNRs.ATCDMC <- function(sim, data, fun=NA, lower=.025, upper=.975) {
-  
-  
-  df <- data.frame(t(apply(fun(sim), 2, FUN= function(x) c(mean(x), 
-                                                           quantile(x, probs= lower), 
-                                                           quantile(x, probs= upper)))))
-  data$trial <- NA
-  data$trial.pos <-as.numeric(data$trial.pos)
-  g=1
-  for (t in 1:length(data$RT))  {
-    if (t==1) data$trial[t] <- 1 else if (data$trial.pos[t] ==  data$trial.pos[t-1] +1) data$trial[t] <- g 
-    else {
-      g <- g+1 
-      data$trial[t] <- g} 
-  }
-  cbind(df,get.data.misses(data))
-  condition <- rownames(df)
-  df<-cbind(condition, cbind(df,get.data.misses(data)))
-  colnames(df)[1:5] <- c("cond", "mean", "lower", "upper", "data")
-  df
-}
+# 
+# get.data.misses<- function(data) {
+#   datatrialmiss <- ddply(data, .(cond, trial), summarize, M=any(R=="M"))
+#   length(datatrialmiss$M[datatrialmiss$M]) / length(datatrialmiss$M)
+#   tapply (datatrialmiss$M, list(datatrialmiss$cond), mean)
+# }
+# 
+# get.groupNRs.ATCDMC <- function(sim, data, fun=NA, lower=.025, upper=.975) {
+#   
+#   
+#   df <- data.frame(t(apply(fun(sim), 2, FUN= function(x) c(mean(x), 
+#                                                            quantile(x, probs= lower), 
+#                                                            quantile(x, probs= upper)))))
+#   data$trial <- NA
+#   data$trial.pos <-as.numeric(data$trial.pos)
+#   g=1
+#   for (t in 1:length(data$RT))  {
+#     if (t==1) data$trial[t] <- 1 else if (data$trial.pos[t] ==  data$trial.pos[t-1] +1) data$trial[t] <- g 
+#     else {
+#       g <- g+1 
+#       data$trial[t] <- g} 
+#   }
+#   cbind(df,get.data.misses(data))
+#   condition <- rownames(df)
+#   df<-cbind(condition, cbind(df,get.data.misses(data)))
+#   colnames(df)[1:5] <- c("cond", "mean", "lower", "upper", "data")
+#   df
+# }
 
 add.trial.cumsum.data <- function(df) {
   df$trial <- NA
@@ -228,40 +229,40 @@ add.trial.cumsum.sim <- function (sim, data) {
 }
 
 
-
-
-get.grouptrials.missed.E1_A4 <- function (sim) {
-  
-  Amissed <- c(); Bmissed <- c(); Cmissed <- c(); Dmissed <- c()
-  for (i in 1:length(unique(sim$reps))) {
-    sim1 <- sim[sim$reps==i,]
-    TrialRTsA <- sim1$RT[sim1$trial.pos==1 & sim1$cond=="A"] + 
-      sim1$RT[sim1$trial.pos==2 & sim1$cond=="A"]
-    TrialRTsB <- sim1$RT[sim1$trial.pos==1 & sim1$cond=="B"] +
-      sim1$RT[sim1$trial.pos==2 & sim1$cond=="B"]
-    TrialRTsC <- sim1$RT[sim1$trial.pos==1 & sim1$cond=="C"] + 
-      sim1$RT[sim1$trial.pos==2 & sim1$cond=="C"]+ 
-      sim1$RT[sim1$trial.pos==3 & sim1$cond=="C"]+ 
-      sim1$RT[sim1$trial.pos==4 & sim1$cond=="C"]+ 
-      sim1$RT[sim1$trial.pos==5 & sim1$cond=="C"]
-    TrialRTsD <- sim1$RT[sim1$trial.pos==1 & sim1$cond=="D"] + 
-      sim1$RT[sim1$trial.pos==2 & sim1$cond=="D"]+ 
-      sim1$RT[sim1$trial.pos==3 & sim1$cond=="D"]+ 
-      sim1$RT[sim1$trial.pos==4 & sim1$cond=="D"]+
-      sim1$RT[sim1$trial.pos==5 & sim1$cond=="D"]
-    Amissed[i] <- sum(TrialRTsA>12) / length(TrialRTsA)
-    Bmissed [i] <- sum(TrialRTsB>8)/ length(TrialRTsB)
-    Cmissed [i] <- sum(TrialRTsC>20)/ length(TrialRTsC)
-    Dmissed [i] <- sum(TrialRTsD>10) / length(TrialRTsD)
-    
-  }
-  
-  missed <- cbind(Amissed, Bmissed, Cmissed, Dmissed)
-  colnames (missed) <- c("A", "B", "C", "D")
-  missed
-}
-
-
+# 
+# 
+# get.grouptrials.missed.E1_A4 <- function (sim) {
+#   
+#   Amissed <- c(); Bmissed <- c(); Cmissed <- c(); Dmissed <- c()
+#   for (i in 1:length(unique(sim$reps))) {
+#     sim1 <- sim[sim$reps==i,]
+#     TrialRTsA <- sim1$RT[sim1$trial.pos==1 & sim1$cond=="A"] + 
+#       sim1$RT[sim1$trial.pos==2 & sim1$cond=="A"]
+#     TrialRTsB <- sim1$RT[sim1$trial.pos==1 & sim1$cond=="B"] +
+#       sim1$RT[sim1$trial.pos==2 & sim1$cond=="B"]
+#     TrialRTsC <- sim1$RT[sim1$trial.pos==1 & sim1$cond=="C"] + 
+#       sim1$RT[sim1$trial.pos==2 & sim1$cond=="C"]+ 
+#       sim1$RT[sim1$trial.pos==3 & sim1$cond=="C"]+ 
+#       sim1$RT[sim1$trial.pos==4 & sim1$cond=="C"]+ 
+#       sim1$RT[sim1$trial.pos==5 & sim1$cond=="C"]
+#     TrialRTsD <- sim1$RT[sim1$trial.pos==1 & sim1$cond=="D"] + 
+#       sim1$RT[sim1$trial.pos==2 & sim1$cond=="D"]+ 
+#       sim1$RT[sim1$trial.pos==3 & sim1$cond=="D"]+ 
+#       sim1$RT[sim1$trial.pos==4 & sim1$cond=="D"]+
+#       sim1$RT[sim1$trial.pos==5 & sim1$cond=="D"]
+#     Amissed[i] <- sum(TrialRTsA>12) / length(TrialRTsA)
+#     Bmissed [i] <- sum(TrialRTsB>8)/ length(TrialRTsB)
+#     Cmissed [i] <- sum(TrialRTsC>20)/ length(TrialRTsC)
+#     Dmissed [i] <- sum(TrialRTsD>10) / length(TrialRTsD)
+#     
+#   }
+#   
+#   missed <- cbind(Amissed, Bmissed, Cmissed, Dmissed)
+#   colnames (missed) <- c("A", "B", "C", "D")
+#   missed
+# }
+# 
+# 
 
 get.trials.missed.E1_A4 <- function(sim) {
   Amissed <- c(); Bmissed <- c(); Cmissed <- c(); Dmissed <- c()
@@ -293,36 +294,5 @@ get.NRs.ATCDMC <- function(sim, data, miss_fun=NA, lower=.025, upper=.975) {
 }
 
 
-clean <- function(df) {
-  dfc <- df
-  n=tapply(df$RT,list(df$s),length)
-  ns=tapply(df$RT,list(df$s),length)
-  mn=tapply(df$RT,list(df$s),mean)
-  sd=tapply(df$RT,list(df$s),IQR)
-  upper <- mn+3*(sd/1.349)
-  lower <- 0.2
-  bad <- logical(dim(df)[1])
-  levs <- paste(df$s,sep=".")
-  for (i in levels(df$s)){
-    lev <- i
-    bad[levs==lev] <- df[levs==lev,"RT"] > upper[i] | df[levs==lev,"RT"] < lower
-  }
-  df=df[!bad,]
-  nok=tapply(df$RT,list(df$s),length)
-  pbad=100-100*nok/n
-  nok=tapply(df$RT,list(df$s),length)
-  pbad=100-100*nok/ns
-  print(sort(round(pbad,5)))
-  print(mean(pbad,na.rm=T))
-  df
-}
-
-get.hdata.dmc <- function(hsamples){
-  list.wind<-lapply(seq_along(hsamples), function(samples, n, i) cbind(n[[i]], samples[[i]]$data), 
-                    samples= hsamples, n = names(hsamples))
-  out<-do.call(rbind, list.wind)
-  names(out)[1] <- "s"
-  out
-}
     
     
