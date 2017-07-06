@@ -974,3 +974,38 @@ pickps.h.post.predict.dmc<- function(samples,n.post=100,probs=c(1:99)/100,
   lapply(samples,pickps.post.predict.dmc,n.post=n.post,probs=probs,bw=bw,
          save.simulation=save.simulation, pickps_set=pickps_set, pickps_others=pickps_others)
 }
+
+
+finish.blockdf.E1_A4 <- function(effects) {
+  effects$S <- NA
+  effects$DV <- NA
+  effects$S[grep ("Conflict", rownames(effects))] <- "Conflict"
+  effects$S[grep ("Nonconflict", rownames(effects))] <- "Nonconflict"
+  effects$DV <- "Accuracy"
+  effects$DV[grep ("RT", rownames(effects))] <- "Correct RT"
+  effects$DV[grep ("(FA)", rownames(effects))] <- "Error RT"
+  effects$DV[rownames(effects)=="PM Accuracy"] <- "PM Accuracy"
+  effects$S[rownames(effects)=="PM Accuracy"] <- "PM"
+  effects$S[rownames(effects)=="PM RT"] <- "PM"
+  effects$DV[rownames(effects)=="PM RT"] <- "RT"
+  effects
+}
+
+finish.conddf.E1_A4 <- function(effects) {
+  effects$S <- NA
+  effects$DV <- NA
+  effects$contrast <- NA
+  effects$S[grep ("Conflict", rownames(effects))] <- "Conflict"
+  effects$S[grep ("Nonconflict", rownames(effects))] <- "Nonconflict"
+  effects$DV <- "Accuracy"
+  effects$DV[grep ("RT", rownames(effects))] <- "Correct RT"
+  effects$DV[grep ("(FA)", rownames(effects))] <- "Error RT"
+  # effects$DV[grep ("PM Acc", rownames(effects))] <- "PM Accuracy"
+  effects$S[grep ("PM", rownames(effects))] <- "PM"
+  # effects$S[rownames(effects)=="PM Accuracy"]
+  effects<- effects[grepl("Diff", rownames(effects)),]
+  effects$contrast[grep ("A-B", rownames(effects))] <- "A-B"
+  effects$contrast[grep ("B-C", rownames(effects))] <- "B-C"
+  effects$contrast[grep ("C-D", rownames(effects))] <- "C-D"
+  effects
+}
