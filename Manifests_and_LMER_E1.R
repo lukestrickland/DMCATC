@@ -13,7 +13,9 @@ setwd("C:/Users/Russell Boag/Documents/GitHub/DMCATC")
 source("dmc/dmc.R")
 load_model ("LBA","lbaN_B.R")
 source("LSAnova.R")
+require(gridExtra)
 require("lme4")
+require(car)
 require(plyr)
 require(dplyr)
 require("pander")
@@ -35,7 +37,8 @@ get.hdata.dmc <- function(hsamples){
 #
 
 data.E1 <- get.hdata.dmc(samples.E1)  # Get data from samples object
-save(data.E1, file="data.E1.RData")
+head(data.E1)
+# save(data.E1, file="data.E1.RData")
 
 # all.equal(datE1[order(datE1$s),], data2)  # Check recovered data matches original data
 
@@ -61,9 +64,12 @@ for(i in 1:length(data.E1$RT)){
 
 # # # Prep dataframes for analysis # # #
 #
+setwd("C:/Users/Russell Boag/Documents/GitHub/DMCATC/analysis")
+
 cdt <- data.E1[!(data.E1$S=="pc" | data.E1$S=="pn"),]  # Conflict detection task only (no PM)
 cdt$S <- factor(as.character(cdt$S)); cdt$R <- factor(as.character(cdt$R))
 str(cdt)
+cdt
 
 pm <- data.E1[(data.E1$S=="pc" | data.E1$S=="pn"),]  # PM trials only
 pm$S <- factor(as.character(pm$S)); pm$block <- factor(as.character(pm$block))
@@ -82,7 +88,7 @@ PM.TABLE.E1$pm.glm.E1.Pr <- gsub("0\\.", ".", PM.TABLE.E1$pm.glm.E1.Pr)
 rownames(PM.TABLE.E1) <- c("Stimulus","TP","Stimulus*TP")
 PM.TABLE.E1
 
-cdt.glmer.E1 <- glmer(C ~ block*cond+(1|s), data=cdt, family=binomial(link="probit"))
+cdt.glmer.E1 <- glmer(C ~ S*block*cond+(1|s), data=cdt, family=binomial(link="probit"))
 save(cdt.glmer.E1, file="cdt.glmer.E1.RData")
 load("cdt.glmer.E1.RData")
 cdt.glm.E1 <- Anova(cdt.glmer.E1,type="II")
@@ -91,7 +97,7 @@ CDT.TABLE.E1 <- data.frame(cdt.glm.E1$Chisq, cdt.glm.E1$Df, cdt.glm.E1$Pr)
 CDT.TABLE.E1$cdt.glm.E1.Chisq <- round(CDT.TABLE.E1$cdt.glm.E1.Chisq, 2)
 CDT.TABLE.E1$cdt.glm.E1.Pr <- format.pval(CDT.TABLE.E1$cdt.glm.E1.Pr, digits=2, eps= 0.001)
 CDT.TABLE.E1$cdt.glm.E1.Pr <- gsub("0\\.", ".", CDT.TABLE.E1$cdt.glm.E1.Pr)
-rownames(CDT.TABLE.E1) <- c("PM Block","TP","PM Block*TP")
+# rownames(CDT.TABLE.E1) <- c("PM Block","TP","PM Block*TP")
 CDT.TABLE.E1
 
 # # # Prep RT dataframes for analysis (keep correct RTs only) # # #
@@ -138,23 +144,68 @@ CDT.RT.TABLE.E1
 # # # Manifests - Mean Reponse Proportion # # #
 #
 
-RP.E1 <- ddply(data.E1, ~s*cond*block*S, summarise, RP=mean(C,na.rm=TRUE))  # Get Response Proportions
-head(RP.E1)
-str(RP.E1)
-save(RP.E1, file="RP.E1.RData")
+cdt <- data.E1[!(data.E1$S=="pc" | data.E1$S=="pn"),]  # Conflict detection task only (no PM)
+cdt$S <- factor(as.character(cdt$S)); cdt$R <- factor(as.character(cdt$R))
+str(cdt)
+head(cdt)
 
-mRP.E1 <- ddply(RP.E1, ~cond*block*S, summarise, M=mean(RP,na.rm=TRUE), SD=sd(RP,na.rm=TRUE))  # Means & SDs for Response Proportions
+pmt <- data.E1[(data.E1$S=="pc" | data.E1$S=="pn"),]  # PM trials only
+pmt$S <- factor(as.character(pmt$S)); pmt$block <- factor(as.character(pmt$block))
+str(pmt)
+head(pmt)
+
+RP.CDT <- ddply(cdt, ~s*cond*block*S, summarise, RP=mean(C,na.rm=TRUE))
+RP.CDT.S <- ddply(RP.CDT, ~S, summarise, M=mean(RP,na.rm=TRUE), SD=sd(RP,na.rm=TRUE))
+RP.CDT.Block <- ddply(RP.CDT, ~S*block, summarise, M=mean(RP,na.rm=TRUE), SD=sd(RP,na.rm=TRUE))
+RP.CDT.TP <- ddply(RP.CDT, ~S*cond, summarise, M=mean(RP,na.rm=TRUE), SD=sd(RP,na.rm=TRUE))
+
+RP.PMT <- ddply(pmt, ~s*cond*block*S, summarise, RP=mean(C,na.rm=TRUE))
+RP.PMT.S <- ddply(RP.PMT, ~S, summarise, M=mean(RP,na.rm=TRUE), SD=sd(RP,na.rm=TRUE))
+RP.PMT.TP <- ddply(RP.PMT, ~S*cond, summarise, M=mean(RP,na.rm=TRUE), SD=sd(RP,na.rm=TRUE))
+
+RP.CDT.S
+RP.CDT.Block
+RP.CDT.TP
+
+RP.PMT.S
+RP.PMT.TP
+ggplot(RP.CDT.Block, aes(block, M, shape=S)) +
+    geom_point(stat = "identity",size=3) +
+    ylim(0.5,1) + ylab("Accuracy") +
+    xlab("PM Block") +
+    ggtitle("Accuracy by PM Block")
+
+# Means & SDs for Response Proportions
+mRP.E1.Block <- ddply(RP.E1, ~block, summarise, M=mean(RP,na.rm=TRUE), SD=sd(RP,na.rm=TRUE))
+mRP.E1.Block
+mRP.E1.TP <- ddply(RP.E1, ~cond, summarise, M=mean(RP,na.rm=TRUE), SD=sd(RP,na.rm=TRUE))
+mRP.E1.TP
+
 head(mRP.E1)
 str(mRP.E1)
+
+
+
 save(mRP.E1, file="mRP.E1.RData")
 
 # # # Manifests - Mean RT # # #
 #
+# All responses
+mRT.E1 <- ddply(data.E1[ (data.E1$S=="cc" & data.E1$C=="1") | (data.E1$S=="nn" & data.E1$C=="1"), ], ~cond*S, summarise, M=mean(RT, na.rm = TRUE), SD=sd(RT, na.rm = TRUE))  # Mean RT
+mRT.E1
 
-mRT.E1 <- ddply(data.E1, ~s*cond*block*S, summarise, M=mean(RT, na.rm = TRUE), SD=sd(RT, na.rm = TRUE))  # Mean RT
-head(mRT.E1)
+
+mRT.E1 <- ddply(data.E1[data.E1$C=="1", ], ~S*cond, summarise, M=mean(RT, na.rm = TRUE), SD=sd(RT, na.rm = TRUE))  # Mean RT for Correct Responses
+mRT.E1
+mRT.E1 <- ddply(data.E1[data.E1$C=="1", ], ~S*block, summarise, M=mean(RT, na.rm = TRUE), SD=sd(RT, na.rm = TRUE))  # Mean RT for Correct Responses
+mRT.E1
+
 save(mRT.E1, file="mRT.E1.RData")
 
+# CDT Correct Responses Only
+ddply(dCDT.RT, ~cond, summarise, M=mean(y, na.rm=TRUE),SD=sd(y, na.rm = TRUE))
 
+# PM Task Correct Responses Only
+ddply(dPM.RT, ~cond, summarise, M=mean(y, na.rm=TRUE))
 
 
