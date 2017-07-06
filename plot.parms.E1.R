@@ -2,17 +2,12 @@
 # Running this top to bottom should correspond to my data analysis from the 
 # PMDC manuscript. 
 rm(list=ls())
-setwd("~/russ_model_analyses")
+# setwd("~/russ_model_analyses")
+setwd("D:/Software/DMC_ATCPMDC")
 source("dmc/dmc.R")
-load_model ("LBA","lbaN_B.R")
-# source("~/russ_model_analyses/dmc/dmc_sampling.R")
-# source("~/russ_model_analyses/dmc/dmc_plotting.R")
-# require("gridExtra")
-require("lme4")
-require("plyr")
-require("dplyr")
+source("dmc/dmc_ATC.R")
 
-load("~/E1.block.B.V_cond.B.V.PMV.samples.RData")
+load("data/samples/E1.block.B.V_cond.B.V.PMV.samples.RData")
 samples <- E1.block.B.V_cond.B.V.PMV.samples
 
 # Check how many runs it took to converge
@@ -49,52 +44,51 @@ load("gelman.diag.E1.RData")
 # plot.dmc(samples[[1]], p.prior= samples[[1]]$p.prior)
 
 
-# Evaluate average model fit. 
-# PPs_save <- h.post.predict.dmc(samples, save.sim=T)
-# save(PPs_save, file ="E1.PMV.PPs.RData")
-# str(PPs_save)
+# E1PP <- h.post.predict.dmc(E1.block.B.V_cond.B.V.PMV.samples)
+# save(E1PP, file="data/after_sampling/E1PP.RData")
 
-# getgglist
-load("E1.PMV.PPs.RData")
-sim <- do.call(rbind, PPs_save)
+E1PP <- h.post.predict.dmc(E1.block.B.V_cond.B.V.PMV.samples, save.simulation=
+                             TRUE)
+# save(E1PP, file="data/after_sampling/E1PP.RData")
+
+sim <- do.call(rbind, E1PP)
 # Do the same for the data
-data <- lapply(PPs_save, function(x) attr(x, "data"))
+data <- lapply(E1PP, function(x) attr(x, "data"))
 data <- do.call(rbind, data)
-# data
-ggplot.obj <- get.fitgglist.dmc(sim, data)
-# ggplot.obj[[1]]  # Response proportions
-# ggplot.obj[[2]]  # RTs
-# tsilggteg
 
 
-# Desired level names for graphs of factors
-# Rename appropriately
+#levels for graphing
 lev.S <- c("Conflict", "Nonconflict", "PM (Conflict)", "PM (Nonconflict)")
 lev.PM <- c("Control", "PM")
 lev.cond <- c("LL.LT", "LL.HT",
-                        "HL.LT", "HL.HT")
-# Conflict R, Nonconf R, PMR
+              "HL.LT", "HL.HT")
 lev.R <- c("CR", "NR", "PMR")
 
+#get a gglist as stored in the PP object.
+GGLIST <- get.fitgglist.dmc(sim,data)
 
+# clean out the nas
+GGLIST <- lapply(GGLIST, function(x)  x[is.finite(x$data),])
 
-## Accuracy plots
-acc.obj <- ggplot.obj[[1]]
-acc.obj
-str(acc.obj)
 # re-order to swap S and PM for desired panel order 
 # (side by side control vs PM, top and bottom for stim type
 # xaxis for cond)
-acc.obj <- acc.obj[,c(1,3,2,4,5,6,7,8)]
+pp.obj<- GGLIST[[1]]
+pp.obj <- pp.obj[,c(1,3,2,4,5,6,7,8)]
 
 # Better factor names
-levels(acc.obj$S) <- lev.S
-levels(acc.obj$block) <- lev.PM
-levels(acc.obj$cond) <- lev.cond
-levels(acc.obj$R) <- lev.R
+levels(pp.obj$S) <- lev.S
+levels(pp.obj$block) <- lev.PM
+levels(pp.obj$cond) <- lev.cond
+levels(pp.obj$R) <- lev.R
 
-ongoing.acc.plots <- ggplot.RA.dmc(acc.obj[acc.obj$S=="Nonconflict"|
-acc.obj$S=="Conflict",], ylim=c(0.5, 1)) + 
+##Take only the ONGOING accuracies and drop the R column.
+ongoing.acc.obj <- pp.obj[(pp.obj$S=="Conflict" & pp.obj$R=="CR")|
+                            (pp.obj$S=="Nonconflict" & pp.obj$R=="NR"),
+                           !(names(pp.obj) %in% "R")]
+
+
+ongoing.acc.plots <- ggplot.RP.dmc(ongoing.acc.obj, xaxis='cond')+
   ylab("Accuracy") + 
   xlab("Time Pressure/Traffic Load") + 
   ggtitle("Ongoing Task Accuracy by PM Block and Time Pressure") 
@@ -102,11 +96,13 @@ ongoing.acc.plots
 
 ggsave("E1.Fits.Acc.Ongoing.png", plot = last_plot())
 
+##Take only the PM accuracies and drop the R column.
+PM.acc.obj <- pp.obj[(pp.obj$S=="PM (Conflict)" & pp.obj$R=="PMR")|
+                            (pp.obj$S=="PM (Nonconflict)" & pp.obj$R=="PMR"),
+                          !(names(pp.obj) %in% "R")]
 
-PM.acc.plots <- ggplot.RA.dmc(acc.obj[acc.obj$S=="PM (Conflict)"|
-                                acc.obj$S=="PM (Nonconflict)",],
-              acc.fun=function(x){x$R=="PMR"},           
-              panels.ppage=4, ylim=c(0.5, 1)) + 
+PM.acc.plots <- ggplot.RP.dmc(PM.acc.obj,           
+              panels.ppage=4, xaxis='cond') + 
   ylab("Accuracy") + 
   xlab("Time Pressure/Traffic Load") + 
   ggtitle("PM Task Accuracy by Time Pressure") 
@@ -115,15 +111,15 @@ PM.acc.plots
 ggsave("E1.Fits.Acc.PM.png", plot = last_plot())
 
 # The grid arrange will depend on your design
-# grid.arrange(ongoing.acc.plots, PM.acc.plots,layout_matrix = cbind(
-#   c(1,1,2), c(1,1,2)))
+grid.arrange(ongoing.acc.plots, PM.acc.plots,layout_matrix = cbind(
+  c(1,1,2), c(1,1,2)))
 
 ## stolp ycaruccA
 
 # RT plots
 # Ongoing Task RT - dump PM, dump false alarms (so rare)
-oRT.obj <- ggplot.obj[[2]][(ggplot.obj[[2]]$S=="nn"|
-                            ggplot.obj[[2]]$S=="cc") & ggplot.obj[[2]]$R!="P",]
+oRT.obj <- GGLIST[[2]][(GGLIST[[2]]$S=="nn"|
+                            GGLIST[[2]]$S=="cc") & GGLIST[[2]]$R!="P",]
 
 oRT.obj <- oRT.obj[,c(1,3,2,4,5,6,7,8,9)]
 oRT.obj
@@ -167,7 +163,7 @@ ggsave("E1.Fits.RT.Error.png", plot = last_plot())
 # and show fit to TOTAL RT rather than separate correct/error.
 
 pRT.obj <-get.fitgglist.dmc(sim, data, noR=T)[[2]]
-pRT.obj <- pRT.obj[,c(1,3,4,5,6,7,8)]
+pRT.obj <- pRT.obj[is.finite(pRT.obj$data),c(1,3,4,5,6,7,8)]
 pRT.obj
 
 levels(pRT.obj$S) <- lev.S
@@ -191,9 +187,45 @@ ggsave("E1.Fits.RT.PM.png", plot = last_plot())
 # err.RTgraph <- err.RTgraph + xlab("")
 # PM.RTgraph <- PM.RTgraph + xlab("")
 
-# grid.arrange(corr.RTgraph, err.RTgraph, PM.RTgraph, layout_matrix = cbind(
-#   c(1,1,2,2,3), c(1,1,2,2,3)))
+grid.arrange(corr.RTgraph, err.RTgraph, PM.RTgraph, layout_matrix = cbind(
+  c(1,1,2,2,3), c(1,1,2,2,3)))
 # 
+
+
+#Do out of sample predictions of non-responses to see whether they are
+#consistent with the model. 
+load("data/exp_data/okdats.E1.NR.RData")
+names(okdats)[length(okdats)] <- "trial.pos"
+levels(okdats$block)<- c("2", "3")
+
+for (i in 1:length(samples)) {
+  data <- okdats[okdats$s==levels(okdats$s)[i],]
+  data <-data[,c(2,3,4,5,6,7)]
+  attr(samples[[i]], "NRdata") <- data
+}
+
+h.ordermatched.sims <- h.post.predict.dmc.MATCHORDER(samples) 
+save(h.ordermatched.sims, 
+     file="data/after_sampling/E1NRPP.RData")
+
+NRsim <- do.call(rbind, h.ordermatched.sims)
+getNRdata <- lapply(h.ordermatched.sims, function(x) attr(x, "data"))
+NRdata <- do.call(rbind, getNRdata)
+NRdata<-add.trial.cumsum.data(NRdata)
+NRsim<-add.trial.cumsum.sim (NRsim, NRdata)
+###
+
+NR.df <- get.NRs.ATCDMC(NRsim, NRdata, miss_fun=get.trials.missed.E1_A4)
+
+levels(NR.df$cond)<- lev.cond
+
+plot <- ggplot(NR.df, aes(cond, mean)) 
+plot + geom_point(size=3) + geom_errorbar(aes(ymax = upper, ymin = lower), 
+                                          width= 0.2) +
+  geom_point(aes(cond, data), pch=21, size=4, 
+             colour="black")+geom_line(aes(group = 1, y=data), linetype=2)+
+  ylab("Probability of non-response") + xlab("Time Pressure/ Traffic Load")
+
 
 
 # # # Parameter Plots # # #
@@ -207,7 +239,8 @@ fixedeffects.meanthetas <- function(samples){
   nmcs<- sapply(samples, function(x) x$nmc)
   nmc <- min(nmcs)
   
-  for (i in 1:length(samples)) if (nmcs[i] > nmc) samples[[i]]$theta <- samples[[i]]$theta[,,sample(1:dim(samples[[i]]$theta)[3], nmc)]
+  for (i in 1:length(samples)) if (nmcs[i] > nmc) samples[[i]]$theta <- 
+      samples[[i]]$theta[,,sample(1:dim(samples[[i]]$theta)[3], nmc)]
   samps <- lapply(samples, function(x) x["theta"])
   ##
   ## thetas into big array for apply
@@ -333,7 +366,7 @@ plot.ongoing
 ggplot(plot.corr, aes(factor(cond),M)) + 
   geom_point(stat = "identity", aes(shape=PM), size=3) +
   geom_errorbar(aes(ymax = M + SD, ymin = M - SD, width = 0.2)) + 
-  xlab("Time Pressue/Traffic Load") + ylab("V") + 
+  xlab("Time Pressure/Traffic Load") + ylab("V") + 
   scale_shape_discrete("PM Block:") + 
   ylim(0.9,2.7) +
   theme(text = element_text(size=20)) +
@@ -349,7 +382,7 @@ ggsave("E1.Rates.Correct.png", plot = last_plot())
 ggplot(plot.corr.noPM, aes(factor(cond),M)) + 
   geom_point(stat = "identity", aes(shape=PM), size=3) +
   geom_errorbar(aes(ymax = M + SD, ymin = M - SD, width = 0.2)) + 
-  xlab("Time Pressue/Traffic Load") + ylab("V") + 
+  xlab("Time Pressure/Traffic Load") + ylab("V") + 
   scale_shape_discrete("PM Block:") + 
   ylim(0.9,2.1) +
   theme(text = element_text(size=20)) +
@@ -365,7 +398,7 @@ ggsave("E1.Rates.Ongoing.Correct.png", plot = last_plot())
 ggplot(plot.FA, aes(factor(cond),M)) + 
   geom_point(stat = "identity", aes(shape=PM), size=3) +
   geom_errorbar(aes(ymax = M + SD, ymin = M - SD, width = 0.2)) + 
-  xlab("Time Pressue/Traffic Load") + ylab("V") + 
+  xlab("Time Pressure/Traffic Load") + ylab("V") + 
   scale_shape_discrete("PM Block:") + 
   ylim(-0.5,1.5) +
   theme(text = element_text(size=20)) +
@@ -381,7 +414,7 @@ ggsave("E1.Rates.Ongoing.FA.png", plot = last_plot())
 ggplot(plot.reactive, aes(factor(cond),M)) + 
   geom_point(stat = "identity", aes(shape=PM), size=3) +
   geom_errorbar(aes(ymax = M + SD, ymin = M - SD, width = 0.2)) +
-  xlab("Time Pressue/Traffic Load") + ylab("V") + 
+  xlab("Time Pressure/Traffic Load") + ylab("V") + 
   scale_shape_discrete("PM Block:") + 
   ylim(0.4,2.1) +
   theme(text = element_text(size=20)) +
@@ -397,7 +430,7 @@ ggsave("E1.Rates.Reactive.Inhibition.png", plot = last_plot())
 ggplot(plot.ongoing, aes(factor(cond),M)) + 
   geom_point(stat = "identity", aes(shape=PM), size=3) +
   geom_errorbar(aes(ymax = M + SD, ymin = M - SD, width = 0.2)) + 
-  xlab("Time Pressue Condition") + ylab("V") + 
+  xlab("Time Pressure Condition") + ylab("V") + 
   scale_shape_discrete("PM Block:") + 
   ylim(-0.5,2.2) +
   theme(text = element_text(size=20)) +
