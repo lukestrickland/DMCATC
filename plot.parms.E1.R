@@ -49,7 +49,7 @@ load("gelman.diag.E1.RData")
 
 E1PP <- h.post.predict.dmc(E1.block.B.V_cond.B.V.PMV.samples, save.simulation=
                              TRUE)
-# save(E1PP, file="data/after_sampling/E1PP.RData")
+save(E1PP, file="data/after_sampling/E1PP.RData")
 
 sim <- do.call(rbind, E1PP)
 # Do the same for the data
