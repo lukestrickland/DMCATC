@@ -519,6 +519,11 @@ block.effects.E1A4 <- function (currentsim) {
   accC = NA; accN = NA
   # nonaccC = NA; nonaccN = NA
   pmacc <- NA
+  pmcrt <- NA
+  pmert <- NA
+  
+  pmcrt <- mean(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & currentsim$R=="P"])
+  pmert <- mean(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & !currentsim$R=="P"])
   
   pmacc <- length(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & currentsim$R=="P"])/
     length(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn")])
@@ -547,7 +552,8 @@ block.effects.E1A4 <- function (currentsim) {
   
   
   out <- c(pmacc,
-           # pmrtdiff,
+           pmcrt,
+           pmert,
            costccC,costnnC,
            costnnN,costccN,
            # noncostccC,noncostccN,
@@ -559,7 +565,8 @@ block.effects.E1A4 <- function (currentsim) {
   )
   
   names(out) <- c("PM Accuracy",
-                  # "pmRTdiff",
+                  "PM cRT",
+                  "PM eRT",
                   "RT Cost Conflict","RT Cost Conflict (FA)",
                   "RT Cost Nonconflict","RT Cost Nonconflict (FA)",
                   # "noncostccC","noncostccN",
@@ -611,6 +618,24 @@ cond.effects <- function (currentsim) {
   pmaccdiffAB <- pmaccA - pmaccB
   pmaccdiffBC <- pmaccB - pmaccC
   pmaccdiffCD <- pmaccC - pmaccD
+  
+  #
+  pmcrtA <- mean(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & currentsim$R=="P"& currentsim$cond=="A"])
+  pmertA <- mean(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & !currentsim$R=="P"& currentsim$cond=="A"])
+  pmcrtB <- mean(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & currentsim$R=="P"& currentsim$cond=="B"])
+  pmertB <- mean(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & !currentsim$R=="P"& currentsim$cond=="B"])
+  pmcrtC <- mean(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & currentsim$R=="P"& currentsim$cond=="C"])
+  pmertC <- mean(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & !currentsim$R=="P"& currentsim$cond=="C"])
+  pmcrtD <- mean(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & currentsim$R=="P"& currentsim$cond=="D"])
+  pmertD <- mean(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & !currentsim$R=="P"& currentsim$cond=="D"])
+  
+  RTdiffPMcAB <- pmcrtA -  pmcrtB 
+  RTdiffPMcBC <- pmcrtB -  pmcrtC 
+  RTdiffPMcCD <- pmcrtC -  pmcrtD 
+  RTdiffPMeAB <- pmertA -  pmertB 
+  RTdiffPMeBC <- pmertB -  pmertC 
+  RTdiffPMeCD <- pmertC -  pmertD 
+  
   
   # RT for each stim by response by cond
   RTccCA <- mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="A"])
@@ -708,9 +733,25 @@ cond.effects <- function (currentsim) {
     length(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="D"])/
     length(currentsim$RT[currentsim$S=="nn" & currentsim$cond=="D"])
   
+  
+  RTdiffPMcAB <- pmcrtA -  pmcrtB 
+  RTdiffPMcBC <- pmcrtB -  pmcrtC 
+  RTdiffPMcCD <- pmcrtC -  pmcrtD 
+  RTdiffPMeAB <- pmertA -  pmertB 
+  RTdiffPMeBC <- pmertB -  pmertC 
+  RTdiffPMeCD <- pmertC -  pmertD  
+  
   out <- c(pmaccA,pmaccB,pmaccC,pmaccD,
            
            pmaccdiffAB,pmaccdiffBC,pmaccdiffCD,
+           
+           RTdiffPMcAB,
+           RTdiffPMcBC,
+           RTdiffPMcCD ,
+           RTdiffPMeAB ,
+           RTdiffPMeBC ,
+           RTdiffPMeCD , 
+           
            
            RTccCA,RTccCB,RTccCC,RTccCD,
            RTnnNA,RTnnNB,RTnnNC,RTnnND,
@@ -734,6 +775,12 @@ cond.effects <- function (currentsim) {
   
   names(out) <- c("PM Accuracy A","PM Accuracy B","PM Accuracy C","PM Accuracy D",
                   "PM Acc Diff A-B","PM Acc Diff B-C","PM Acc Diff C-D",
+                  "RT Diff PM A-B",
+                  "RT Diff PM B-C",
+                  "RT Diff PM C-D",
+                  "RT Diff PM (FA) A-B",
+                  "RT Diff PM (FA) B-C",
+                  "RT Diff PM (FA) C-D",
                   
                   "RT Conflict A","RT Conflict B","RT Conflict C","RT Conflict D",
                   "RT Nonconflict A","RT Nonconflict B","RT Nonconflict C","RT Nonconflict D",
@@ -759,8 +806,16 @@ cond.effects <- function (currentsim) {
     
 # samples=samples[[3]]
 # probs=c(1:99)/100;random=TRUE
-# bw="nrd0";report=10;save.simulation=TRUE;factors=NA
-
+# bw="nrd0";report=10;save.simulation=TRUE;factors=NA; n.post=100
+# pickps_set <- c("B.A2C",        "B.B2C",        "B.C2C" ,      
+#                 "B.D2C"  ,             "B.A2N"  ,      "B.B2N"  ,      "B.C2N"  ,     
+#                 "B.D2N")
+# 
+# pickps_others <- c("B.A3C"   ,     "B.B3C",        "B.C3C" ,      
+#                   "B.D3C",        "B.A3N"   ,     "B.B3N" ,       "B.C3N" ,      
+#                   "B.D3N" )
+# 
+# 
 
 
 pickps.post.predict.dmc = function(samples,n.post=100,probs=c(1:99)/100,random=TRUE,
@@ -918,4 +973,39 @@ pickps.h.post.predict.dmc<- function(samples,n.post=100,probs=c(1:99)/100,
 {
   lapply(samples,pickps.post.predict.dmc,n.post=n.post,probs=probs,bw=bw,
          save.simulation=save.simulation, pickps_set=pickps_set, pickps_others=pickps_others)
+}
+
+
+finish.blockdf.E1_A4 <- function(effects) {
+  effects$S <- NA
+  effects$DV <- NA
+  effects$S[grep ("Conflict", rownames(effects))] <- "Conflict"
+  effects$S[grep ("Nonconflict", rownames(effects))] <- "Nonconflict"
+  effects$DV <- "Accuracy"
+  effects$DV[grep ("RT", rownames(effects))] <- "Correct RT"
+  effects$DV[grep ("(FA)", rownames(effects))] <- "Error RT"
+  effects$DV[rownames(effects)=="PM Accuracy"] <- "PM Accuracy"
+  effects$S[rownames(effects)=="PM Accuracy"] <- "PM"
+  effects$S[rownames(effects)=="PM RT"] <- "PM"
+  effects$DV[rownames(effects)=="PM RT"] <- "RT"
+  effects
+}
+
+finish.conddf.E1_A4 <- function(effects) {
+  effects$S <- NA
+  effects$DV <- NA
+  effects$contrast <- NA
+  effects$S[grep ("Conflict", rownames(effects))] <- "Conflict"
+  effects$S[grep ("Nonconflict", rownames(effects))] <- "Nonconflict"
+  effects$DV <- "Accuracy"
+  effects$DV[grep ("RT", rownames(effects))] <- "Correct RT"
+  effects$DV[grep ("(FA)", rownames(effects))] <- "Error RT"
+  # effects$DV[grep ("PM Acc", rownames(effects))] <- "PM Accuracy"
+  effects$S[grep ("PM", rownames(effects))] <- "PM"
+  # effects$S[rownames(effects)=="PM Accuracy"]
+  effects<- effects[grepl("Diff", rownames(effects)),]
+  effects$contrast[grep ("A-B", rownames(effects))] <- "A-B"
+  effects$contrast[grep ("B-C", rownames(effects))] <- "B-C"
+  effects$contrast[grep ("C-D", rownames(effects))] <- "C-D"
+  effects
 }
