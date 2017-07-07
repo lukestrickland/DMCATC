@@ -3,8 +3,8 @@
 # PMDC manuscript.
 rm(list=ls())
 # setwd("~/russ_model_analyses")
-# setwd("D:/Software/DMC_ATCPMDC")
-setwd("C:/Users/Russell Boag/Documents/GitHub/DMCATC")
+setwd("D:/Software/DMC_ATCPMDC")
+# setwd("C:/Users/Russell Boag/Documents/GitHub/DMCATC")
 source("dmc/dmc.R")
 source("dmc/dmc_ATC.R")
 
@@ -48,10 +48,10 @@ load("gelman.diag.E1.RData")
 E1PP <- h.post.predict.dmc(samples, save.simulation=
                              TRUE)
 save(E1PP, file="data/after_sampling/E1PP.RData")
-<<<<<<< HEAD
+# <<<<<<< HEAD
 load("data/after_sampling/E1PP.RData")
 =======
->>>>>>> df826efb76acd8ad0e1cb10663f8f981493a9556
+# >>>>>>> df826efb76acd8ad0e1cb10663f8f981493a9556
 
 sim <- do.call(rbind, E1PP)
 # Do the same for the data
@@ -266,7 +266,7 @@ fixedeffects.meanthetas <- function(samples){
 }
 # # #
 
-setwd("data/after_sampling")
+# setwd("data/after_sampling")
 # av.thetas.E1 <- fixedeffects.meanthetas(samples)[[1]]
 # save(av.thetas.E1, file="av.thetas.E1.PMV.RData")
 load("av.thetas.E1.RData")
@@ -458,3 +458,101 @@ V.plots <- grid.arrange(V.corr.graph, V.ongoing.FA.graph,V.reactive.graph, layou
     c(1,1,1,1,2,2,2,3,3,3,3), c(1,1,1,1,2,2,2,3,3,3,3)))
 
 ggsave("E1.Rates.png", plot = V.plots, width = 9, height = 12)
+
+
+
+#### Posterior Exploration
+#Below script requires the main samples object called camples object and assumes
+#that there is a PP object named PP
+
+load("data/samples/E1.block.B.V_cond.B.V.PMV.samples.RData")
+samples <- E1.block.B.V_cond.B.V.PMV.samples
+PP <- E1PP
+load("data/after_sampling/E1PP.RData")
+
+
+#Set this to TRUE after running all the sims once
+#and then it will load them rather than re-run.
+run.before=F
+source("generate_postexploration_E1.R")
+##The above g
+
+###bLOCK EFFECTS with params averaged
+
+
+
+
+
+plot <- ggplot(all_effects_predictives.block, aes(S, mean)) 
+plot<- plot+ facet_grid(DV  ~  model, scales = "free", space = "fixed") + geom_point(size=3) + geom_errorbar(aes(ymax = upper, ymin = lower), width= 0.2) + 
+  geom_point(aes(S, data), pch=21, size=4, colour="black") +xlab("Stimulus Type")+
+  theme(text = element_text(size=18)) +ylab("Cost (PM - Control)")
+plot
+
+
+
+#cond effects with params averaged
+
+
+plotC <- ggplot(all_effects_predictives.cond[all_effects_predictives.cond$S=="Conflict",], aes(contrast, mean)) 
+plotC <- plotC+
+  facet_grid(DV  ~ model, scales = "free", space = "fixed") +
+  geom_point(size=3) + geom_errorbar(aes(ymax = upper, ymin = lower), width= 0.2) + 
+  geom_point(aes(contrast, data), pch=21, size=4, colour="black") +
+  theme(text = element_text(size=8)) +ylab("Difference")+xlab("")+ labs(title = "Conflict Trials")
+
+plotC
+
+plotN <- ggplot(all_effects_predictives.cond[all_effects_predictives.cond$S=="Nonconflict",], aes(contrast, mean)) 
+
+plotN <- plotN+
+  facet_grid(DV  ~ model, scales = "free", space = "fixed") +
+  geom_point(size=3) + geom_errorbar(aes(ymax = upper, ymin = lower), width= 0.2) + 
+  geom_point(aes(contrast, data), pch=21, size=4, colour="black") +xlab("Contrast")+
+  theme(text = element_text(size=8)) +ylab("")+ labs(title = "Nonconflict Trials")
+plotN
+
+plotP <- ggplot(all_effects_predictives.cond[all_effects_predictives.cond$S=="PM",], aes(contrast, mean)) 
+plotP <- plotP+
+  facet_grid(DV  ~ model, scales = "free", space = "fixed") +
+  geom_point(size=3) + geom_errorbar(aes(ymax = upper, ymin = lower), width= 0.2) + 
+  geom_point(aes(contrast, data), pch=21, size=4, colour="black") +
+  theme(text = element_text(size=8)) +ylab("")+xlab("")+ labs(title = "PM Trials")
+plotP
+
+#some possible grid arrangements
+
+grid.arrange(plotC, plotN, plotP, layout_matrix = cbind(c(1,1,1,2,2,2),
+                                                        c(1,1,1,2,2,2),
+                                                        c(1,1,1,2,2,2),
+                                                        c(NA,3,3,3,NA,NA),
+                                                        c(NA,3,3,3,NA,NA),
+                                                        c(NA,3,3,3,NA,NA)
+
+                                                        ))
+
+grid.arrange(plotC, plotN, plotP, layout_matrix = cbind(c(1,1,1,3,3,3),
+                                                        c(1,1,1,3,3,3),
+                                                        c(1,1,1,3,3,3),
+                                                        c(2,2,2,NA,NA,NA),
+                                                        c(2,2,2,NA,NA,NA),
+                                                        c(2,2,2,NA,NA,NA)
+                                                        
+))
+
+
+##Turning off PM control mechanisms systematically and examining PM accuracy/
+#PM RT
+
+
+plot <- ggplot(PM_control_mechanisms, aes(model, mean)) 
+plot<- plot+ facet_grid(DV  ~ ., scales = "free", space = "fixed") + 
+  geom_point(size=3) + geom_errorbar(aes(ymax = upper, ymin = lower), width= 0.2) + 
+  geom_line(aes(group=1, y=data), linetype=2) +xlab("Included Control Mechanisms")+
+  ylab("PM Trial Performance") +scale_x_discrete(labels=c("Proactive and Reactive", 
+                                                          "Only Reactive", "Only Proactive", "No Control")) + theme(text = element_text(size=18))
+plot
+
+
+
+

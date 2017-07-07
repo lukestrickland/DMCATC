@@ -473,9 +473,9 @@ avps.h.post.predict.dmc<- function(samples,n.post=100,probs=c(1:99)/100,
 
 # PPs = E1PP 
 # fun = block.effects.E1A4
-# lower=0.1
-# upper=0.9
-get.effects.dmc <- function (PPs, fun = function (x) {mean (x)}, lower=0.1, upper=0.9) {
+# lower=.025
+# upper=.975
+get.effects.dmc <- function (PPs, fun = function (x) {mean (x)}, lower=.025, upper=.975) {
   
   simdata<- do.call(rbind, PPs)
   data <- lapply(PPs, function(x) attr(x, "data"))
@@ -512,48 +512,114 @@ get.effects.dmc <- function (PPs, fun = function (x) {mean (x)}, lower=0.1, uppe
   effects.ggdf
 }
 
+# block.effects.E1A4 <- function (currentsim) {
+#   
+#   costccC = NA;costccN = NA
+#   costnnN = NA;costnnC = NA
+#   accC = NA; accN = NA
+#   # nonaccC = NA; nonaccN = NA
+#   pmacc <- NA
+#   pmcrt <- NA
+#   pmert <- NA
+#   
+#   pmcrt <- mean(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & currentsim$R=="P"])
+#   pmert <- mean(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & !currentsim$R=="P"])
+#   
+#   pmacc <- length(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & currentsim$R=="P"])/
+#     length(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn")])
+#   
+#   costccC <- mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$block=="3"]) -
+#     mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$block=="2"])
+#   
+#   costccN <- mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="N" & currentsim$block=="3"]) -
+#     mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="N" & currentsim$block=="2"])
+#   
+#   costnnN <- mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$block=="3"]) -
+#     mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$block=="2"])
+#   
+#   costnnC <- mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="C" & currentsim$block=="3"]) -
+#     mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="C" & currentsim$block=="2"])
+#   
+#   accC <- length(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$block=="3"])/
+#     length(currentsim$RT[currentsim$S=="cc" & currentsim$block=="3"]) -
+#     length(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$block=="2"])/
+#     length(currentsim$RT[currentsim$S=="cc" & currentsim$block=="2"])
+#   
+#   accN <- length(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$block=="3"])/
+#     length(currentsim$RT[currentsim$S=="nn" & currentsim$block=="3"]) -
+#     length(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$block=="2"])/
+#     length(currentsim$RT[currentsim$S=="nn" & currentsim$block=="2"])
+#   
+#   
+#   out <- c(pmacc,
+#            pmcrt,
+#            pmert,
+#            costccC,costnnC,
+#            costnnN,costccN,
+#            # noncostccC,noncostccN,
+#            # noncostnnN,noncostnnC,
+#            accC,
+#            # nonaccC,
+#            accN
+#            # nonaccN
+#   )
+#   
+#   names(out) <- c("PM Accuracy",
+#                   "PM cRT",
+#                   "PM eRT",
+#                   "RT Cost Conflict","RT Cost Conflict (FA)",
+#                   "RT Cost Nonconflict","RT Cost Nonconflict (FA)",
+#                   # "noncostccC","noncostccN",
+#                   # "noncostnnN","noncostnnC",
+#                   "Accuracy Cost Conflict",
+#                   # "nonaccC",
+#                   "Accuracy Cost Nonconflict"
+#                   # "nonaccN"
+#   )
+#   out
+#   
+# }
+
 block.effects.E1A4 <- function (currentsim) {
-  
+
   costccC = NA;costccN = NA
   costnnN = NA;costnnC = NA
   accC = NA; accN = NA
   # nonaccC = NA; nonaccN = NA
   pmacc <- NA
-  pmcrt <- NA
-  pmert <- NA
-  
-  pmcrt <- mean(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & currentsim$R=="P"])
-  pmert <- mean(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & !currentsim$R=="P"])
-  
+  pmrt <- NA
+
+  pmrt <- mean(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn")])
+
+
   pmacc <- length(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & currentsim$R=="P"])/
     length(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn")])
-  
+
   costccC <- mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$block=="3"]) -
     mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$block=="2"])
-  
+
   costccN <- mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="N" & currentsim$block=="3"]) -
     mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="N" & currentsim$block=="2"])
-  
+
   costnnN <- mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$block=="3"]) -
     mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$block=="2"])
-  
+
   costnnC <- mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="C" & currentsim$block=="3"]) -
     mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="C" & currentsim$block=="2"])
-  
+
   accC <- length(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$block=="3"])/
     length(currentsim$RT[currentsim$S=="cc" & currentsim$block=="3"]) -
     length(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$block=="2"])/
     length(currentsim$RT[currentsim$S=="cc" & currentsim$block=="2"])
-  
+
   accN <- length(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$block=="3"])/
     length(currentsim$RT[currentsim$S=="nn" & currentsim$block=="3"]) -
     length(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$block=="2"])/
     length(currentsim$RT[currentsim$S=="nn" & currentsim$block=="2"])
-  
-  
+
+
   out <- c(pmacc,
-           pmcrt,
-           pmert,
+           pmrt,
            costccC,costnnC,
            costnnN,costccN,
            # noncostccC,noncostccN,
@@ -563,10 +629,9 @@ block.effects.E1A4 <- function (currentsim) {
            accN
            # nonaccN
   )
-  
+
   names(out) <- c("PM Accuracy",
-                  "PM cRT",
-                  "PM eRT",
+                  "PM RT",
                   "RT Cost Conflict","RT Cost Conflict (FA)",
                   "RT Cost Nonconflict","RT Cost Nonconflict (FA)",
                   # "noncostccC","noncostccN",
@@ -577,9 +642,234 @@ block.effects.E1A4 <- function (currentsim) {
                   # "nonaccN"
   )
   out
-  
+
 }
 
+
+
+# # cond.effects <- function (currentsim) {
+#   
+#   RTccCA <- NA;RTccNA <- NA;RTnnNA <- NA;RTnnCA <- NA
+#   RTccCB <- NA;RTccNB <- NA;RTnnNB <- NA;RTnnCB <- NA
+#   RTccCC <- NA;RTccNC <- NA;RTnnNC <- NA;RTnnCC <- NA
+#   RTccCD <- NA;RTccND <- NA;RTnnND <- NA;RTnnCD <- NA
+#   
+#   RTdiffccCAB = NA;RTdiffccNAB = NA
+#   RTdiffnnNAB = NA;RTdiffnnCAB = NA
+#   
+#   RTdiffccCBC = NA;RTdiffccNBC = NA
+#   RTdiffnnNBC = NA;RTdiffnnCBC = NA
+#   
+#   RTdiffccCCD = NA;RTdiffccNCD = NA
+#   RTdiffnnNCD = NA;RTdiffnnCCD = NA
+#   
+#   accCA <- NA;accCB <- NA;accCC <- NA;accCD <- NA
+#   accNA <- NA;accNB <- NA;accNC <- NA;accND <- NA
+#   
+#   accdiffCAB = NA; accdiffNAB = NA
+#   accdiffCBC = NA; accdiffNBC = NA
+#   accdiffCCD = NA; accdiffNCD = NA
+#   
+#   pmaccA <- NA; pmaccB <- NA; pmaccC <- NA; pmaccD <- NA
+#   pmaccdiffAB <- NA; pmaccdiffBC <- NA; pmaccdiffCD <- NA
+#   
+#   pmaccA <- length(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & currentsim$R=="P" & currentsim$cond=="A"])/
+#     length(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & currentsim$cond=="A"])
+#   pmaccB <- length(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & currentsim$R=="P" & currentsim$cond=="B"])/
+#     length(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & currentsim$cond=="B"])
+#   pmaccC <- length(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & currentsim$R=="P" & currentsim$cond=="C"])/
+#     length(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & currentsim$cond=="C"])
+#   pmaccD <- length(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & currentsim$R=="P" & currentsim$cond=="D"])/
+#     length(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & currentsim$cond=="D"])
+#   
+#   pmaccdiffAB <- pmaccA - pmaccB
+#   pmaccdiffBC <- pmaccB - pmaccC
+#   pmaccdiffCD <- pmaccC - pmaccD
+#   
+#   #
+#   pmcrtA <- mean(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & currentsim$R=="P"& currentsim$cond=="A"])
+#   pmertA <- mean(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & !currentsim$R=="P"& currentsim$cond=="A"])
+#   pmcrtB <- mean(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & currentsim$R=="P"& currentsim$cond=="B"])
+#   pmertB <- mean(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & !currentsim$R=="P"& currentsim$cond=="B"])
+#   pmcrtC <- mean(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & currentsim$R=="P"& currentsim$cond=="C"])
+#   pmertC <- mean(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & !currentsim$R=="P"& currentsim$cond=="C"])
+#   pmcrtD <- mean(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & currentsim$R=="P"& currentsim$cond=="D"])
+#   pmertD <- mean(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & !currentsim$R=="P"& currentsim$cond=="D"])
+#   
+#   RTdiffPMcAB <- pmcrtA -  pmcrtB 
+#   RTdiffPMcBC <- pmcrtB -  pmcrtC 
+#   RTdiffPMcCD <- pmcrtC -  pmcrtD 
+#   RTdiffPMeAB <- pmertA -  pmertB 
+#   RTdiffPMeBC <- pmertB -  pmertC 
+#   RTdiffPMeCD <- pmertC -  pmertD 
+#   
+#   
+#   # RT for each stim by response by cond
+#   RTccCA <- mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="A"])
+#   RTccNA <- mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="N" & currentsim$cond=="A"])
+#   RTnnNA <- mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="A"])
+#   RTnnCA <- mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="C" & currentsim$cond=="A"])
+#   
+#   RTccCB <- mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="B"])
+#   RTccNB <- mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="N" & currentsim$cond=="B"])
+#   RTnnNB <- mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="B"])
+#   RTnnCB <- mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="C" & currentsim$cond=="B"])
+#   
+#   RTccCC <- mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="C"])
+#   RTccNC <- mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="N" & currentsim$cond=="C"])
+#   RTnnNC <- mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="C"])
+#   RTnnCC <- mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="C" & currentsim$cond=="C"])
+#   
+#   RTccCD <- mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="D"])
+#   RTccND <- mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="N" & currentsim$cond=="D"])
+#   RTnnND <- mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="D"])
+#   RTnnCD <- mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="C" & currentsim$cond=="D"])
+#   
+#   # RT differences between time pressure conditions for each stim by response
+#   RTdiffccCAB <- mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="A"]) -
+#     mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="B"])
+#   RTdiffccNAB <- mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="N" & currentsim$cond=="A"]) -
+#     mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="N" & currentsim$cond=="B"])
+#   RTdiffnnNAB <- mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="A"]) -
+#     mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="B"])
+#   RTdiffnnCAB <- mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="C" & currentsim$cond=="A"]) -
+#     mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="C" & currentsim$cond=="B"])
+#   
+#   RTdiffccCBC <- mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="B"]) -
+#     mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="C"])
+#   RTdiffccNBC <- mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="N" & currentsim$cond=="B"]) -
+#     mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="N" & currentsim$cond=="C"])
+#   RTdiffnnNBC <- mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="B"]) -
+#     mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="C"])
+#   RTdiffnnCBC <- mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="C" & currentsim$cond=="B"]) -
+#     mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="C" & currentsim$cond=="C"])
+#   
+#   RTdiffccCCD <- mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="C"]) -
+#     mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="D"])
+#   RTdiffccNCD <- mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="N" & currentsim$cond=="C"]) -
+#     mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="N" & currentsim$cond=="D"])
+#   RTdiffnnNCD <- mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="C"]) -
+#     mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="D"])
+#   RTdiffnnCCD <- mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="C" & currentsim$cond=="C"]) -
+#     mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="C" & currentsim$cond=="D"])
+#   
+#   # Accuracy by stimulus by condition
+#   accCA <- length(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="A"])/
+#     length(currentsim$RT[currentsim$S=="cc" & currentsim$cond=="A"])
+#   accCB <- length(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="B"])/
+#     length(currentsim$RT[currentsim$S=="cc" & currentsim$cond=="B"])
+#   accCC <- length(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="C"])/
+#     length(currentsim$RT[currentsim$S=="cc" & currentsim$cond=="C"])
+#   accCD <- length(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="D"])/
+#     length(currentsim$RT[currentsim$S=="cc" & currentsim$cond=="D"])
+#   
+#   accNA <- length(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="A"])/
+#     length(currentsim$RT[currentsim$S=="nn" & currentsim$cond=="A"])
+#   accNB <- length(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="B"])/
+#     length(currentsim$RT[currentsim$S=="nn" & currentsim$cond=="B"])
+#   accNC <- length(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="C"])/
+#     length(currentsim$RT[currentsim$S=="nn" & currentsim$cond=="C"])
+#   accND <- length(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="D"])/
+#     length(currentsim$RT[currentsim$S=="nn" & currentsim$cond=="D"])
+#   
+#   # Accuracy differences between time pressure conditions for each stimulus
+#   accdiffCAB <- length(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="A"])/
+#     length(currentsim$RT[currentsim$S=="cc" & currentsim$cond=="A"]) -
+#     length(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="B"])/
+#     length(currentsim$RT[currentsim$S=="cc" & currentsim$cond=="B"])
+#   accdiffNAB <- length(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="A"])/
+#     length(currentsim$RT[currentsim$S=="nn" & currentsim$cond=="A"]) -
+#     length(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="B"])/
+#     length(currentsim$RT[currentsim$S=="nn" & currentsim$cond=="B"])
+#   
+#   accdiffCBC <- length(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="B"])/
+#     length(currentsim$RT[currentsim$S=="cc" & currentsim$cond=="B"]) -
+#     length(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="C"])/
+#     length(currentsim$RT[currentsim$S=="cc" & currentsim$cond=="C"])
+#   accdiffNBC <- length(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="B"])/
+#     length(currentsim$RT[currentsim$S=="nn" & currentsim$cond=="B"]) -
+#     length(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="C"])/
+#     length(currentsim$RT[currentsim$S=="nn" & currentsim$cond=="C"])
+#   
+#   accdiffCCD <- length(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="C"])/
+#     length(currentsim$RT[currentsim$S=="cc" & currentsim$cond=="C"]) -
+#     length(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="D"])/
+#     length(currentsim$RT[currentsim$S=="cc" & currentsim$cond=="D"])
+#   accdiffNCD <- length(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="C"])/
+#     length(currentsim$RT[currentsim$S=="nn" & currentsim$cond=="C"]) -
+#     length(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="D"])/
+#     length(currentsim$RT[currentsim$S=="nn" & currentsim$cond=="D"])
+#   
+#   
+#   RTdiffPMcAB <- pmcrtA -  pmcrtB 
+#   RTdiffPMcBC <- pmcrtB -  pmcrtC 
+#   RTdiffPMcCD <- pmcrtC -  pmcrtD 
+#   RTdiffPMeAB <- pmertA -  pmertB 
+#   RTdiffPMeBC <- pmertB -  pmertC 
+#   RTdiffPMeCD <- pmertC -  pmertD  
+#   
+#   out <- c(pmaccA,pmaccB,pmaccC,pmaccD,
+#            
+#            pmaccdiffAB,pmaccdiffBC,pmaccdiffCD,
+#            
+#            RTdiffPMcAB,
+#            RTdiffPMcBC,
+#            RTdiffPMcCD ,
+#            RTdiffPMeAB ,
+#            RTdiffPMeBC ,
+#            RTdiffPMeCD , 
+#            
+#            
+#            RTccCA,RTccCB,RTccCC,RTccCD,
+#            RTnnNA,RTnnNB,RTnnNC,RTnnND,
+#            RTnnCA,RTnnCB,RTnnCC,RTnnCD,
+#            RTccNA,RTccNB,RTccNC,RTccND,
+#            
+#            RTdiffccCAB,RTdiffccCBC,RTdiffccCCD,
+#            RTdiffnnNAB,RTdiffnnNBC,RTdiffnnNCD,
+#            RTdiffnnCAB,RTdiffnnCBC,RTdiffnnCCD,
+#            RTdiffccNAB,RTdiffccNBC,RTdiffccNCD,
+#            
+#            accCA,accCB,accCC,accCD,
+#            accNA,accNB,accNC,accND,
+#            
+#            accdiffCAB,accdiffCBC,accdiffCCD,
+#            accdiffNAB,accdiffNBC,accdiffNCD
+#            
+#            # pmrtdiff,
+#            
+#   )
+#   
+#   names(out) <- c("PM Accuracy A","PM Accuracy B","PM Accuracy C","PM Accuracy D",
+#                   "PM Acc Diff A-B","PM Acc Diff B-C","PM Acc Diff C-D",
+#                   "RT Diff PM A-B",
+#                   "RT Diff PM B-C",
+#                   "RT Diff PM C-D",
+#                   "RT Diff PM (FA) A-B",
+#                   "RT Diff PM (FA) B-C",
+#                   "RT Diff PM (FA) C-D",
+#                   
+#                   "RT Conflict A","RT Conflict B","RT Conflict C","RT Conflict D",
+#                   "RT Nonconflict A","RT Nonconflict B","RT Nonconflict C","RT Nonconflict D",
+#                   "RT Conflict (FA) A","RT Conflict (FA) B","RT Conflict (FA) C","RT Conflict (FA) D",
+#                   "RT Nonconflict (FA) A","RT Nonconflict (FA) B","RT Nonconflict (FA) C","RT Nonconflict (FA) D",
+#                   
+#                   "RT Diff Conflict A-B","RT Diff Conflict B-C","RT Diff Conflict C-D",
+#                   "RT Diff Nonconflict A-B","RT Diff Nonconflict B-C","RT Diff Nonconflict C-D",
+#                   "RT Diff Conflict (FA) A-B","RT Diff Conflict (FA) B-C","RT Diff Conflict (FA) C-D",
+#                   "RT Diff Nonconflict (FA) A-B","RT Diff Nonconflict (FA) B-C","RT Diff Nonconflict (FA) C-D",
+#                   
+#                   "Accuracy Conflict A","Accuracy Conflict B","Accuracy Conflict C","Accuracy Conflict D",
+#                   "Accuracy Nonconflict A","Accuracy Nonconflict B","Accuracy Nonconflict C","Accuracy Nonconflict D",
+#                   
+#                   "Acc Diff Conflict A-B","Acc Diff Conflict B-C","Acc Diff Conflict C-D",
+#                   "Acc Diff Nonconflict A-B","Acc Diff Nonconflict B-C","Acc Diff Nonconflict C-D"
+#                   
+#   )
+#   out
+#   
+# }
+    
 cond.effects <- function (currentsim) {
   
   RTccCA <- NA;RTccNA <- NA;RTnnNA <- NA;RTnnCA <- NA
@@ -602,6 +892,8 @@ cond.effects <- function (currentsim) {
   accdiffCAB = NA; accdiffNAB = NA
   accdiffCBC = NA; accdiffNBC = NA
   accdiffCCD = NA; accdiffNCD = NA
+  pmcrtA=NA;pmcrtB=NA;pmcrtC=NA;pmcrtD=NA
+  
   
   pmaccA <- NA; pmaccB <- NA; pmaccC <- NA; pmaccD <- NA
   pmaccdiffAB <- NA; pmaccdiffBC <- NA; pmaccdiffCD <- NA
@@ -620,21 +912,15 @@ cond.effects <- function (currentsim) {
   pmaccdiffCD <- pmaccC - pmaccD
   
   #
-  pmcrtA <- mean(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & currentsim$R=="P"& currentsim$cond=="A"])
-  pmertA <- mean(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & !currentsim$R=="P"& currentsim$cond=="A"])
-  pmcrtB <- mean(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & currentsim$R=="P"& currentsim$cond=="B"])
-  pmertB <- mean(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & !currentsim$R=="P"& currentsim$cond=="B"])
-  pmcrtC <- mean(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & currentsim$R=="P"& currentsim$cond=="C"])
-  pmertC <- mean(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & !currentsim$R=="P"& currentsim$cond=="C"])
-  pmcrtD <- mean(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & currentsim$R=="P"& currentsim$cond=="D"])
-  pmertD <- mean(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & !currentsim$R=="P"& currentsim$cond=="D"])
-  
+  pmcrtA <- mean(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") &  currentsim$cond=="A"])
+  pmcrtB <- mean(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") &  currentsim$cond=="B"])
+  pmcrtC <- mean(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") &  currentsim$cond=="C"])
+  pmcrtD <- mean(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") &  currentsim$cond=="D"])
+
   RTdiffPMcAB <- pmcrtA -  pmcrtB 
   RTdiffPMcBC <- pmcrtB -  pmcrtC 
   RTdiffPMcCD <- pmcrtC -  pmcrtD 
-  RTdiffPMeAB <- pmertA -  pmertB 
-  RTdiffPMeBC <- pmertB -  pmertC 
-  RTdiffPMeCD <- pmertC -  pmertD 
+
   
   
   # RT for each stim by response by cond
@@ -737,9 +1023,7 @@ cond.effects <- function (currentsim) {
   RTdiffPMcAB <- pmcrtA -  pmcrtB 
   RTdiffPMcBC <- pmcrtB -  pmcrtC 
   RTdiffPMcCD <- pmcrtC -  pmcrtD 
-  RTdiffPMeAB <- pmertA -  pmertB 
-  RTdiffPMeBC <- pmertB -  pmertC 
-  RTdiffPMeCD <- pmertC -  pmertD  
+
   
   out <- c(pmaccA,pmaccB,pmaccC,pmaccD,
            
@@ -748,9 +1032,6 @@ cond.effects <- function (currentsim) {
            RTdiffPMcAB,
            RTdiffPMcBC,
            RTdiffPMcCD ,
-           RTdiffPMeAB ,
-           RTdiffPMeBC ,
-           RTdiffPMeCD , 
            
            
            RTccCA,RTccCB,RTccCC,RTccCD,
@@ -778,10 +1059,7 @@ cond.effects <- function (currentsim) {
                   "RT Diff PM A-B",
                   "RT Diff PM B-C",
                   "RT Diff PM C-D",
-                  "RT Diff PM (FA) A-B",
-                  "RT Diff PM (FA) B-C",
-                  "RT Diff PM (FA) C-D",
-                  
+
                   "RT Conflict A","RT Conflict B","RT Conflict C","RT Conflict D",
                   "RT Nonconflict A","RT Nonconflict B","RT Nonconflict C","RT Nonconflict D",
                   "RT Conflict (FA) A","RT Conflict (FA) B","RT Conflict (FA) C","RT Conflict (FA) D",
@@ -801,9 +1079,7 @@ cond.effects <- function (currentsim) {
   )
   out
   
-}
-    
-    
+}    
 # samples=samples[[3]]
 # probs=c(1:99)/100;random=TRUE
 # bw="nrd0";report=10;save.simulation=TRUE;factors=NA; n.post=100
@@ -976,6 +1252,19 @@ pickps.h.post.predict.dmc<- function(samples,n.post=100,probs=c(1:99)/100,
 }
 
 
+# finish.blockdf.E1_A4 <- function(effects) {
+#   effects$S <- NA
+#   effects$DV <- NA
+#   effects$S[grep ("Conflict", rownames(effects))] <- "Conflict"
+#   effects$S[grep ("Nonconflict", rownames(effects))] <- "Nonconflict"
+#   effects$DV <- "Accuracy"
+#   effects$DV[grep ("RT", rownames(effects))] <- "Correct RT"
+#   effects$DV[grep ("eRT", rownames(effects))] <- "Error RT"
+#   effects$DV[grep ("(FA)", rownames(effects))] <- "Error RT"
+#   effects$S[grep ("PM", rownames(effects))] <- "PM"
+#   effects
+# }
+
 finish.blockdf.E1_A4 <- function(effects) {
   effects$S <- NA
   effects$DV <- NA
@@ -983,13 +1272,12 @@ finish.blockdf.E1_A4 <- function(effects) {
   effects$S[grep ("Nonconflict", rownames(effects))] <- "Nonconflict"
   effects$DV <- "Accuracy"
   effects$DV[grep ("RT", rownames(effects))] <- "Correct RT"
+  effects$DV[grep ("PM RT", rownames(effects))] <- "RT"
   effects$DV[grep ("(FA)", rownames(effects))] <- "Error RT"
-  effects$DV[rownames(effects)=="PM Accuracy"] <- "PM Accuracy"
-  effects$S[rownames(effects)=="PM Accuracy"] <- "PM"
-  effects$S[rownames(effects)=="PM RT"] <- "PM"
-  effects$DV[rownames(effects)=="PM RT"] <- "RT"
+  effects$S[grep ("PM", rownames(effects))] <- "PM"
   effects
 }
+
 
 finish.conddf.E1_A4 <- function(effects) {
   effects$S <- NA
@@ -1003,9 +1291,10 @@ finish.conddf.E1_A4 <- function(effects) {
   # effects$DV[grep ("PM Acc", rownames(effects))] <- "PM Accuracy"
   effects$S[grep ("PM", rownames(effects))] <- "PM"
   # effects$S[rownames(effects)=="PM Accuracy"]
+  effects$DV[grep ("RT Diff PM", rownames(effects))] <- "RT"
   effects<- effects[grepl("Diff", rownames(effects)),]
   effects$contrast[grep ("A-B", rownames(effects))] <- "A-B"
   effects$contrast[grep ("B-C", rownames(effects))] <- "B-C"
-  effects$contrast[grep ("C-D", rownames(effects))] <- "C-D"
+  
   effects
 }

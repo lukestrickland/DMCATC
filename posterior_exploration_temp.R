@@ -183,7 +183,7 @@ full_noPM_PMacc <- finish.blockdf.E1_A4(full_effects)[1:3,]; full_noPM_PMacc$mod
 no_proactive_PMacc <- finish.blockdf.E1_A4(control_thres_effects_all)[1:3,]; no_proactive_PMacc$model <- "proactive"
 
 full_noPM_PMacc <- finish.blockdf.E1_A4(full_effects)[1:3,]; full_noPM_PMacc$model <- "Full"
-no_reactive_PMacc <- finish.blockdf.E1_A4(no_reactive_effects)[1:3,]; no_reactive_PMacc$model <- "reactive"
+no_reactive_PMacc <- finish.blockdf.E1_A4(no_reactive_effects)[1:2,]; no_reactive_PMacc$model <- "reactive"
 rbind(full_noPM_PMacc, no_proactive_PMacc, no_reactive_PMacc)
 
 
