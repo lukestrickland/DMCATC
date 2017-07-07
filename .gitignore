@@ -3,4 +3,9 @@
 .*RDataTmp
 .Rproj.user
 .Rproj
+<<<<<<< HEAD
 .png
+=======
+.png
+.Rhistory
+>>>>>>> df826efb76acd8ad0e1cb10663f8f981493a9556

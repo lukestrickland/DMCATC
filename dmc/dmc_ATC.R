@@ -292,7 +292,630 @@ get.NRs.ATCDMC <- function(sim, data, miss_fun=NA, lower=.025, upper=.975) {
   colnames(df)[1:5] <- c("cond", "mean", "lower", "upper", "data")
   df
 }
+# 
+# samples=samples[[3]]
+# probs=c(1:99)/100;random=TRUE
+# bw="nrd0";report=10;save.simulation=TRUE;factors=NA
+# av.posts<-av.posts.threscond
+avps.post.predict.dmc = function(samples,n.post=100,probs=c(1:99)/100,random=TRUE,
+                                    bw="nrd0",report=10,save.simulation=TRUE,factors=NA, av.posts=c())
+  # make list of posterior preditive density, quantiles and response p(robability)
+{
+  
+  
+  get.dqp <- function(sim,facs,probs,n.post=NA) {
+    
+    quantile.names <- function(x,probs=seq(0, 1, 0.25),na.rm=FALSE,type=7, ...) {
+      out <- quantile(x,probs=probs,na.rm=na.rm,type=type,names=FALSE,...)
+      names(out) <- probs*100
+      if (all(is.na(out))) NULL else out
+    }
+    
+    qs <- tapply(sim$RT,sim[,c(facs,"R")],quantile.names,probs=probs,na.rm=TRUE)
+    #     qs <- apply(qs,1:length(dim(qs)),function(x){
+    #       if ( is.null(x[[1]]) || all(is.na(x[[1]]))) NULL else x[[1]]})
+    
+    # get probabilities given not na
+    simOK <- sim[!is.na(sim$RT),]
+    p <- tapply(simOK$RT,simOK[,c(facs,"R")],length)
+    p[is.na(p)] <- 0 # In case some cells are empty
+    np <- rep(apply(p,1:length(facs),sum),times=length(levels(simOK$R)))
+    p <- p/np
+    # get p NA
+    pNA <- tapply(sim$RT,sim[,c(facs,"R")],length)
+    pNA[is.na(pNA)] <- 0 # In case some cells are empty
+    npNA <- rep(apply(pNA,1:length(facs),sum),times=length(levels(sim$R)))
+    pNA <- tapply(is.na(sim$RT),sim[,c(facs,"R")],sum)
+    pNA[is.na(pNA)] <- 0 # In case some cells are empty
+    pNA <- pNA/npNA
+    
+    # For a simulation get proability replicates
+    if (!is.na(n.post)) { 
+      repfac <- rep(1:n.post,each=sum(ns))
+      repfac <- repfac[!is.na(sim$RT)]
+      ps <- tapply(simOK$RT,cbind(simOK[,c(facs,"R")],rep=repfac),length)
+      ps[is.na(ps)] <- 0 # In case some cells are empty
+      ps <- n.post*ps/np  
+      # and NA replicates
+      pNAs <- tapply(is.na(sim$RT),cbind(sim[,c(facs,"R")],rep=rep(1:n.post,each=sum(ns))),sum)
+      pNAs[is.na(pNAs)] <- 0 # In case some cells are empty
+      pNAs <- n.post*pNAs/npNA
+    } else {
+      ps=NULL
+      pNAs=NULL
+    }
+    
+    # cell names
+    cell.names <- dimnames(qs)[[1]]
+    n.cell <- length(facs)+1
+    for ( i in 2:n.cell )
+      cell.names <- outer(cell.names,dimnames(qs)[[i]],"paste",sep=".")
+    cell.names <- as.vector(cell.names)
+    # Get density and make defective
+    dens <- tapply(sim$RT,sim[,c(facs,"R")],function(x){
+      if (all(is.na(x))) NULL else {
+        x <- x[x>=quantile(x,.01,na.rm=TRUE) & x<=quantile(x,.99,na.rm=TRUE)]
+        if (length(x[!is.na(x)])<2) NULL else density(x[!is.na(x)],bw=bw)
+      }
+    })
+    for (i in 1:length(p)) if ( is.finite(p[i]) && !(p[i]==0) ) 
+    {
+      if (!is.null(qs[i][[1]])) {
+        names(qs[i][[1]]) <- as.numeric(names(qs[i][[1]]))*p[i]/100
+        attr(qs[i][[1]],"cell.name") <- cell.names[i]
+      }
+      if (!is.null(dens[i][[1]]) ) {
+        dens[i][[1]]$y <- dens[i][[1]]$y*p[i]
+        attr(dens[i][[1]],"cell.name") <- cell.names[i]
+      }
+    }
+    dnd <- dimnames(dens)
+    dnq <- dimnames(qs)
+    dens <- apply(dens,1:length(facs),function(x){x})
+    qs <- apply(qs,1:length(facs),function(x){x})
+    if ( is.null(dim(dens)) ) {
+      dens <- array(dens,dim=c(length(dens)))
+      dimnames(dens) <- dnd[-length(dnd)] 
+      qs <- array(qs,dim=c(length(qs)))
+      dimnames(qs) <- dnq[-length(dnq)] 
+    }
+    list(pdf=dens,cdf=qs,p=p,ps=ps,pNA=pNA,pNAs=pNAs)
+  }
+  
+  model <- attributes(samples$data)$model
+  facs <- names(attr(model,"factors"))
+  if (any(is.na(factors))) factors <- facs
+  if (!all(factors %in% facs)) 
+    stop(paste("Factors argument must contain one or more of:",paste(facs,collapse=",")))
+  resp <- names(attr(model,"responses"))
+  ns <- table(samples$data[,facs],dnn=facs)
+  n.par <- dim(samples$theta)[2]
+  thetas <- matrix(aperm(samples$theta,c(3,1,2)),ncol=n.par)
+  colnames(thetas) <- dimnames(samples$theta)[[2]]
+  if (is.na(n.post)) use <- c(1:dim(thetas)[1]) else {
+    if (random) use <- sample(c(1:dim(thetas)[1]),n.post,replace=F) else
+      use <- round(seq(1,dim(thetas)[1],length.out=n.post))
+  }
+  n.post <- length(use)
+  posts <- thetas[use,]
+  
+  
+  cat("Below is how I'm averaging (each row is averaged). If this is wrong, adjust your 
+      av.posts to grep correctly.")
+  for (q in 1:length(av.posts)) print(colnames(posts[, grep(av.posts[q], colnames(posts))]))
+  ###tweak to average av.posts  
+  q=1
+  
+  if(length(av.posts)!= 0) {
+    ### loop through all the averaged posts
+    for (q in 1:length(av.posts)) {
+      
+      num.params <- dim(posts[, grep(av.posts[q], colnames(posts))])[2]  
+      average.params <- rowMeans(posts[, grep(av.posts[q], colnames(posts))])
+      posts[, grep(av.posts[q], colnames(posts))] <- matrix(average.params,nrow=length(average.params),ncol=num.params,byrow=F)  
+      
+    }
+  }
+  
+  ########  
+  n.rep <- sum(ns)
+  sim <- data.frame(matrix(nrow=n.post*n.rep,ncol=dim(samples$data)[2]))
+  names(sim) <- names(samples$data)
+  # Tweaks for Stop Signal
+  if ( !any(names(samples$data)=="SSD") ) {
+    SSD <- rep(Inf,sum(ns)) 
+    leave.out <- -c(1:dim(samples$data)[2])[names(samples$data)=="RT"]
+  } else {
+    # Assumes last two are SSD and RT! FIX ME.
+    if (is.null(facs)) SSD <- samples$data$SSD else
+      SSD <- unlist(tapply(samples$data$SSD,samples$data[,facs],identity)) 
+    leave.out <- -c((dim(samples$data)[2]-1):dim(samples$data)[2])
+  }
+  cat("\n")
+  cat(paste("Simulating (\'.\'=",report,"): ",sep=""))
+  for (i in names(samples$data)[leave.out])
+    sim[[i]] <- factor(rep(NA,n.post*n.rep),levels=levels(samples$data[[i]]))
+  for (i in 1:n.post) {
+    tmp <- simulate.dmc(posts[i,],model,ns,SSD=SSD)
+    sim[(1+(i-1)*n.rep):(i*n.rep),names(tmp)] <- tmp
+    if ( (i %% report) == 0) cat(".")
+  }
+  if ( any(names(sim)=="R2") ) { # MTR model
+    sim$R <- paste(as.character(sim$R),as.character(sim$R2),sep="") 
+    sim$R[sim$R2=="DK"] <- "DK"
+    sim$R <- factor(sim$R)
+    samples$data$R <- paste(as.character(samples$data$R),as.character(samples$data$R2),sep="") 
+    samples$data$R[samples$data$R2=="DK"] <- "DK"
+    samples$data$R <- factor(samples$data$R)
+  }
+  if (save.simulation) {
+    sim <- cbind(reps=rep(1:n.post,each=dim(samples$data)[1]),sim)
+    attr(sim,"data") <- samples$data
+    sim
+  } else {
+    sim.dqp <- get.dqp(sim,factors,probs,n.post)
+    dat.dqp <- get.dqp(sim=samples$data,factors,probs)
+    names(dat.dqp) <- paste("data",names(dat.dqp),sep=".")
+    c(sim.dqp,dat.dqp)
+  }
+}
 
 
+
+avps.h.post.predict.dmc<- function(samples,n.post=100,probs=c(1:99)/100,
+                                          bw="nrd0",
+                                     save.simulation=FALSE, av.posts=c())
+  # apply lost.predict to each subject
+{
+  lapply(samples,avps.post.predict.dmc,n.post=n.post,probs=probs,bw=bw,
+         save.simulation=save.simulation, av.posts=av.posts)
+}
+
+# PPs = E1PP 
+# fun = block.effects.E1A4
+# lower=0.1
+# upper=0.9
+get.effects.dmc <- function (PPs, fun = function (x) {mean (x)}, lower=0.1, upper=0.9) {
+  
+  simdata<- do.call(rbind, PPs)
+  data <- lapply(PPs, function(x) attr(x, "data"))
+  data <- do.call(rbind, data)
+  nreps=max(PPs[[1]]$reps)
+  
+  
+  data.effects<- fun(data)
+  noutput <- length(data.effects)
+  
+  sim.effects <- matrix(NA, nrow= nreps, ncol=noutput+1)
+  sim.effects[,noutput+1] <- 1:nreps
+  
+  colnames(sim.effects) <- c(names(data.effects), "n.rep")
+  ######
+  
+  ##calculate effects separately for each rep
+  for (j in 1:nreps) { 
+    
+    currentsim.effects <- simdata[simdata$reps==j,]
+    sim.effects[j,1:noutput] <- fun(currentsim.effects)
+    
+  }
+  
+  ##Get a ggplot df with posterior mean, lower, and upper. 
+  effects.ggdf <-  t(apply(sim.effects, c(2), function(x) c(mean(x), 
+                                                quantile(x, probs=c(lower,upper)))))
+  effects.ggdf <- data.frame(effects.ggdf)
+  effects.ggdf <- effects.ggdf[(!rownames(effects.ggdf) %in% "n.rep"),]
+  colnames(effects.ggdf) <- c("mean", "lower", "upper")
+  contrast <- rownames(effects.ggdf)
+  effects.ggdf$data<-as.vector(data.effects)
+  attr(effects.ggdf, "post.effects.samples") <- sim.effects
+  effects.ggdf
+}
+
+block.effects.E1A4 <- function (currentsim) {
+  
+  costccC = NA;costccN = NA
+  costnnN = NA;costnnC = NA
+  accC = NA; accN = NA
+  # nonaccC = NA; nonaccN = NA
+  pmacc <- NA
+  
+  pmacc <- length(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & currentsim$R=="P"])/
+    length(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn")])
+  
+  costccC <- mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$block=="3"]) -
+    mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$block=="2"])
+  
+  costccN <- mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="N" & currentsim$block=="3"]) -
+    mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="N" & currentsim$block=="2"])
+  
+  costnnN <- mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$block=="3"]) -
+    mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$block=="2"])
+  
+  costnnC <- mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="C" & currentsim$block=="3"]) -
+    mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="C" & currentsim$block=="2"])
+  
+  accC <- length(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$block=="3"])/
+    length(currentsim$RT[currentsim$S=="cc" & currentsim$block=="3"]) -
+    length(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$block=="2"])/
+    length(currentsim$RT[currentsim$S=="cc" & currentsim$block=="2"])
+  
+  accN <- length(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$block=="3"])/
+    length(currentsim$RT[currentsim$S=="nn" & currentsim$block=="3"]) -
+    length(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$block=="2"])/
+    length(currentsim$RT[currentsim$S=="nn" & currentsim$block=="2"])
+  
+  
+  out <- c(pmacc,
+           # pmrtdiff,
+           costccC,costnnC,
+           costnnN,costccN,
+           # noncostccC,noncostccN,
+           # noncostnnN,noncostnnC,
+           accC,
+           # nonaccC,
+           accN
+           # nonaccN
+  )
+  
+  names(out) <- c("PM Accuracy",
+                  # "pmRTdiff",
+                  "RT Cost Conflict","RT Cost Conflict (FA)",
+                  "RT Cost Nonconflict","RT Cost Nonconflict (FA)",
+                  # "noncostccC","noncostccN",
+                  # "noncostnnN","noncostnnC",
+                  "Accuracy Cost Conflict",
+                  # "nonaccC",
+                  "Accuracy Cost Nonconflict"
+                  # "nonaccN"
+  )
+  out
+  
+}
+
+cond.effects <- function (currentsim) {
+  
+  RTccCA <- NA;RTccNA <- NA;RTnnNA <- NA;RTnnCA <- NA
+  RTccCB <- NA;RTccNB <- NA;RTnnNB <- NA;RTnnCB <- NA
+  RTccCC <- NA;RTccNC <- NA;RTnnNC <- NA;RTnnCC <- NA
+  RTccCD <- NA;RTccND <- NA;RTnnND <- NA;RTnnCD <- NA
+  
+  RTdiffccCAB = NA;RTdiffccNAB = NA
+  RTdiffnnNAB = NA;RTdiffnnCAB = NA
+  
+  RTdiffccCBC = NA;RTdiffccNBC = NA
+  RTdiffnnNBC = NA;RTdiffnnCBC = NA
+  
+  RTdiffccCCD = NA;RTdiffccNCD = NA
+  RTdiffnnNCD = NA;RTdiffnnCCD = NA
+  
+  accCA <- NA;accCB <- NA;accCC <- NA;accCD <- NA
+  accNA <- NA;accNB <- NA;accNC <- NA;accND <- NA
+  
+  accdiffCAB = NA; accdiffNAB = NA
+  accdiffCBC = NA; accdiffNBC = NA
+  accdiffCCD = NA; accdiffNCD = NA
+  
+  pmaccA <- NA; pmaccB <- NA; pmaccC <- NA; pmaccD <- NA
+  pmaccdiffAB <- NA; pmaccdiffBC <- NA; pmaccdiffCD <- NA
+  
+  pmaccA <- length(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & currentsim$R=="P" & currentsim$cond=="A"])/
+    length(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & currentsim$cond=="A"])
+  pmaccB <- length(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & currentsim$R=="P" & currentsim$cond=="B"])/
+    length(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & currentsim$cond=="B"])
+  pmaccC <- length(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & currentsim$R=="P" & currentsim$cond=="C"])/
+    length(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & currentsim$cond=="C"])
+  pmaccD <- length(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & currentsim$R=="P" & currentsim$cond=="D"])/
+    length(currentsim$RT[(currentsim$S=="pc"|currentsim$S=="pn") & currentsim$cond=="D"])
+  
+  pmaccdiffAB <- pmaccA - pmaccB
+  pmaccdiffBC <- pmaccB - pmaccC
+  pmaccdiffCD <- pmaccC - pmaccD
+  
+  # RT for each stim by response by cond
+  RTccCA <- mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="A"])
+  RTccNA <- mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="N" & currentsim$cond=="A"])
+  RTnnNA <- mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="A"])
+  RTnnCA <- mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="C" & currentsim$cond=="A"])
+  
+  RTccCB <- mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="B"])
+  RTccNB <- mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="N" & currentsim$cond=="B"])
+  RTnnNB <- mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="B"])
+  RTnnCB <- mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="C" & currentsim$cond=="B"])
+  
+  RTccCC <- mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="C"])
+  RTccNC <- mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="N" & currentsim$cond=="C"])
+  RTnnNC <- mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="C"])
+  RTnnCC <- mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="C" & currentsim$cond=="C"])
+  
+  RTccCD <- mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="D"])
+  RTccND <- mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="N" & currentsim$cond=="D"])
+  RTnnND <- mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="D"])
+  RTnnCD <- mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="C" & currentsim$cond=="D"])
+  
+  # RT differences between time pressure conditions for each stim by response
+  RTdiffccCAB <- mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="A"]) -
+    mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="B"])
+  RTdiffccNAB <- mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="N" & currentsim$cond=="A"]) -
+    mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="N" & currentsim$cond=="B"])
+  RTdiffnnNAB <- mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="A"]) -
+    mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="B"])
+  RTdiffnnCAB <- mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="C" & currentsim$cond=="A"]) -
+    mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="C" & currentsim$cond=="B"])
+  
+  RTdiffccCBC <- mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="B"]) -
+    mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="C"])
+  RTdiffccNBC <- mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="N" & currentsim$cond=="B"]) -
+    mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="N" & currentsim$cond=="C"])
+  RTdiffnnNBC <- mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="B"]) -
+    mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="C"])
+  RTdiffnnCBC <- mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="C" & currentsim$cond=="B"]) -
+    mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="C" & currentsim$cond=="C"])
+  
+  RTdiffccCCD <- mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="C"]) -
+    mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="D"])
+  RTdiffccNCD <- mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="N" & currentsim$cond=="C"]) -
+    mean(currentsim$RT[currentsim$S=="cc" & currentsim$R=="N" & currentsim$cond=="D"])
+  RTdiffnnNCD <- mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="C"]) -
+    mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="D"])
+  RTdiffnnCCD <- mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="C" & currentsim$cond=="C"]) -
+    mean(currentsim$RT[currentsim$S=="nn" & currentsim$R=="C" & currentsim$cond=="D"])
+  
+  # Accuracy by stimulus by condition
+  accCA <- length(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="A"])/
+    length(currentsim$RT[currentsim$S=="cc" & currentsim$cond=="A"])
+  accCB <- length(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="B"])/
+    length(currentsim$RT[currentsim$S=="cc" & currentsim$cond=="B"])
+  accCC <- length(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="C"])/
+    length(currentsim$RT[currentsim$S=="cc" & currentsim$cond=="C"])
+  accCD <- length(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="D"])/
+    length(currentsim$RT[currentsim$S=="cc" & currentsim$cond=="D"])
+  
+  accNA <- length(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="A"])/
+    length(currentsim$RT[currentsim$S=="nn" & currentsim$cond=="A"])
+  accNB <- length(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="B"])/
+    length(currentsim$RT[currentsim$S=="nn" & currentsim$cond=="B"])
+  accNC <- length(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="C"])/
+    length(currentsim$RT[currentsim$S=="nn" & currentsim$cond=="C"])
+  accND <- length(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="D"])/
+    length(currentsim$RT[currentsim$S=="nn" & currentsim$cond=="D"])
+  
+  # Accuracy differences between time pressure conditions for each stimulus
+  accdiffCAB <- length(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="A"])/
+    length(currentsim$RT[currentsim$S=="cc" & currentsim$cond=="A"]) -
+    length(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="B"])/
+    length(currentsim$RT[currentsim$S=="cc" & currentsim$cond=="B"])
+  accdiffNAB <- length(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="A"])/
+    length(currentsim$RT[currentsim$S=="nn" & currentsim$cond=="A"]) -
+    length(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="B"])/
+    length(currentsim$RT[currentsim$S=="nn" & currentsim$cond=="B"])
+  
+  accdiffCBC <- length(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="B"])/
+    length(currentsim$RT[currentsim$S=="cc" & currentsim$cond=="B"]) -
+    length(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="C"])/
+    length(currentsim$RT[currentsim$S=="cc" & currentsim$cond=="C"])
+  accdiffNBC <- length(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="B"])/
+    length(currentsim$RT[currentsim$S=="nn" & currentsim$cond=="B"]) -
+    length(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="C"])/
+    length(currentsim$RT[currentsim$S=="nn" & currentsim$cond=="C"])
+  
+  accdiffCCD <- length(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="C"])/
+    length(currentsim$RT[currentsim$S=="cc" & currentsim$cond=="C"]) -
+    length(currentsim$RT[currentsim$S=="cc" & currentsim$R=="C" & currentsim$cond=="D"])/
+    length(currentsim$RT[currentsim$S=="cc" & currentsim$cond=="D"])
+  accdiffNCD <- length(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="C"])/
+    length(currentsim$RT[currentsim$S=="nn" & currentsim$cond=="C"]) -
+    length(currentsim$RT[currentsim$S=="nn" & currentsim$R=="N" & currentsim$cond=="D"])/
+    length(currentsim$RT[currentsim$S=="nn" & currentsim$cond=="D"])
+  
+  out <- c(pmaccA,pmaccB,pmaccC,pmaccD,
+           
+           pmaccdiffAB,pmaccdiffBC,pmaccdiffCD,
+           
+           RTccCA,RTccCB,RTccCC,RTccCD,
+           RTnnNA,RTnnNB,RTnnNC,RTnnND,
+           RTnnCA,RTnnCB,RTnnCC,RTnnCD,
+           RTccNA,RTccNB,RTccNC,RTccND,
+           
+           RTdiffccCAB,RTdiffccCBC,RTdiffccCCD,
+           RTdiffnnNAB,RTdiffnnNBC,RTdiffnnNCD,
+           RTdiffnnCAB,RTdiffnnCBC,RTdiffnnCCD,
+           RTdiffccNAB,RTdiffccNBC,RTdiffccNCD,
+           
+           accCA,accCB,accCC,accCD,
+           accNA,accNB,accNC,accND,
+           
+           accdiffCAB,accdiffCBC,accdiffCCD,
+           accdiffNAB,accdiffNBC,accdiffNCD
+           
+           # pmrtdiff,
+           
+  )
+  
+  names(out) <- c("PM Accuracy A","PM Accuracy B","PM Accuracy C","PM Accuracy D",
+                  "PM Acc Diff A-B","PM Acc Diff B-C","PM Acc Diff C-D",
+                  
+                  "RT Conflict A","RT Conflict B","RT Conflict C","RT Conflict D",
+                  "RT Nonconflict A","RT Nonconflict B","RT Nonconflict C","RT Nonconflict D",
+                  "RT Conflict (FA) A","RT Conflict (FA) B","RT Conflict (FA) C","RT Conflict (FA) D",
+                  "RT Nonconflict (FA) A","RT Nonconflict (FA) B","RT Nonconflict (FA) C","RT Nonconflict (FA) D",
+                  
+                  "RT Diff Conflict A-B","RT Diff Conflict B-C","RT Diff Conflict C-D",
+                  "RT Diff Nonconflict A-B","RT Diff Nonconflict B-C","RT Diff Nonconflict C-D",
+                  "RT Diff Conflict (FA) A-B","RT Diff Conflict (FA) B-C","RT Diff Conflict (FA) C-D",
+                  "RT Diff Nonconflict (FA) A-B","RT Diff Nonconflict (FA) B-C","RT Diff Nonconflict (FA) C-D",
+                  
+                  "Accuracy Conflict A","Accuracy Conflict B","Accuracy Conflict C","Accuracy Conflict D",
+                  "Accuracy Nonconflict A","Accuracy Nonconflict B","Accuracy Nonconflict C","Accuracy Nonconflict D",
+                  
+                  "Acc Diff Conflict A-B","Acc Diff Conflict B-C","Acc Diff Conflict C-D",
+                  "Acc Diff Nonconflict A-B","Acc Diff Nonconflict B-C","Acc Diff Nonconflict C-D"
+                  
+  )
+  out
+  
+}
     
     
+# samples=samples[[3]]
+# probs=c(1:99)/100;random=TRUE
+# bw="nrd0";report=10;save.simulation=TRUE;factors=NA
+
+
+
+pickps.post.predict.dmc = function(samples,n.post=100,probs=c(1:99)/100,random=TRUE,
+                                 bw="nrd0",report=10,save.simulation=TRUE,factors=NA, pickps_others, pickps_set)
+  # make list of posterior preditive density, quantiles and response p(robability)
+{
+  
+  
+  get.dqp <- function(sim,facs,probs,n.post=NA) {
+    
+    quantile.names <- function(x,probs=seq(0, 1, 0.25),na.rm=FALSE,type=7, ...) {
+      out <- quantile(x,probs=probs,na.rm=na.rm,type=type,names=FALSE,...)
+      names(out) <- probs*100
+      if (all(is.na(out))) NULL else out
+    }
+    
+    qs <- tapply(sim$RT,sim[,c(facs,"R")],quantile.names,probs=probs,na.rm=TRUE)
+    #     qs <- apply(qs,1:length(dim(qs)),function(x){
+    #       if ( is.null(x[[1]]) || all(is.na(x[[1]]))) NULL else x[[1]]})
+    
+    # get probabilities given not na
+    simOK <- sim[!is.na(sim$RT),]
+    p <- tapply(simOK$RT,simOK[,c(facs,"R")],length)
+    p[is.na(p)] <- 0 # In case some cells are empty
+    np <- rep(apply(p,1:length(facs),sum),times=length(levels(simOK$R)))
+    p <- p/np
+    # get p NA
+    pNA <- tapply(sim$RT,sim[,c(facs,"R")],length)
+    pNA[is.na(pNA)] <- 0 # In case some cells are empty
+    npNA <- rep(apply(pNA,1:length(facs),sum),times=length(levels(sim$R)))
+    pNA <- tapply(is.na(sim$RT),sim[,c(facs,"R")],sum)
+    pNA[is.na(pNA)] <- 0 # In case some cells are empty
+    pNA <- pNA/npNA
+    
+    # For a simulation get proability replicates
+    if (!is.na(n.post)) { 
+      repfac <- rep(1:n.post,each=sum(ns))
+      repfac <- repfac[!is.na(sim$RT)]
+      ps <- tapply(simOK$RT,cbind(simOK[,c(facs,"R")],rep=repfac),length)
+      ps[is.na(ps)] <- 0 # In case some cells are empty
+      ps <- n.post*ps/np  
+      # and NA replicates
+      pNAs <- tapply(is.na(sim$RT),cbind(sim[,c(facs,"R")],rep=rep(1:n.post,each=sum(ns))),sum)
+      pNAs[is.na(pNAs)] <- 0 # In case some cells are empty
+      pNAs <- n.post*pNAs/npNA
+    } else {
+      ps=NULL
+      pNAs=NULL
+    }
+    
+    # cell names
+    cell.names <- dimnames(qs)[[1]]
+    n.cell <- length(facs)+1
+    for ( i in 2:n.cell )
+      cell.names <- outer(cell.names,dimnames(qs)[[i]],"paste",sep=".")
+    cell.names <- as.vector(cell.names)
+    # Get density and make defective
+    dens <- tapply(sim$RT,sim[,c(facs,"R")],function(x){
+      if (all(is.na(x))) NULL else {
+        x <- x[x>=quantile(x,.01,na.rm=TRUE) & x<=quantile(x,.99,na.rm=TRUE)]
+        if (length(x[!is.na(x)])<2) NULL else density(x[!is.na(x)],bw=bw)
+      }
+    })
+    for (i in 1:length(p)) if ( is.finite(p[i]) && !(p[i]==0) ) 
+    {
+      if (!is.null(qs[i][[1]])) {
+        names(qs[i][[1]]) <- as.numeric(names(qs[i][[1]]))*p[i]/100
+        attr(qs[i][[1]],"cell.name") <- cell.names[i]
+      }
+      if (!is.null(dens[i][[1]]) ) {
+        dens[i][[1]]$y <- dens[i][[1]]$y*p[i]
+        attr(dens[i][[1]],"cell.name") <- cell.names[i]
+      }
+    }
+    dnd <- dimnames(dens)
+    dnq <- dimnames(qs)
+    dens <- apply(dens,1:length(facs),function(x){x})
+    qs <- apply(qs,1:length(facs),function(x){x})
+    if ( is.null(dim(dens)) ) {
+      dens <- array(dens,dim=c(length(dens)))
+      dimnames(dens) <- dnd[-length(dnd)] 
+      qs <- array(qs,dim=c(length(qs)))
+      dimnames(qs) <- dnq[-length(dnq)] 
+    }
+    list(pdf=dens,cdf=qs,p=p,ps=ps,pNA=pNA,pNAs=pNAs)
+  }
+  
+  model <- attributes(samples$data)$model
+  facs <- names(attr(model,"factors"))
+  if (any(is.na(factors))) factors <- facs
+  if (!all(factors %in% facs)) 
+    stop(paste("Factors argument must contain one or more of:",paste(facs,collapse=",")))
+  resp <- names(attr(model,"responses"))
+  ns <- table(samples$data[,facs],dnn=facs)
+  n.par <- dim(samples$theta)[2]
+  thetas <- matrix(aperm(samples$theta,c(3,1,2)),ncol=n.par)
+  colnames(thetas) <- dimnames(samples$theta)[[2]]
+  if (is.na(n.post)) use <- c(1:dim(thetas)[1]) else {
+    if (random) use <- sample(c(1:dim(thetas)[1]),n.post,replace=F) else
+      use <- round(seq(1,dim(thetas)[1],length.out=n.post))
+  }
+  n.post <- length(use)
+  posts <- thetas[use,]
+  
+  ###Replace some parameter vlaues with others. 
+  posts[,colnames(posts) %in% pickps_others] <- posts[,colnames(posts) %in% pickps_set]
+  
+  ########  
+  n.rep <- sum(ns)
+  sim <- data.frame(matrix(nrow=n.post*n.rep,ncol=dim(samples$data)[2]))
+  names(sim) <- names(samples$data)
+  # Tweaks for Stop Signal
+  if ( !any(names(samples$data)=="SSD") ) {
+    SSD <- rep(Inf,sum(ns)) 
+    leave.out <- -c(1:dim(samples$data)[2])[names(samples$data)=="RT"]
+  } else {
+    # Assumes last two are SSD and RT! FIX ME.
+    if (is.null(facs)) SSD <- samples$data$SSD else
+      SSD <- unlist(tapply(samples$data$SSD,samples$data[,facs],identity)) 
+    leave.out <- -c((dim(samples$data)[2]-1):dim(samples$data)[2])
+  }
+  cat("\n")
+  cat(paste("Simulating (\'.\'=",report,"): ",sep=""))
+  for (i in names(samples$data)[leave.out])
+    sim[[i]] <- factor(rep(NA,n.post*n.rep),levels=levels(samples$data[[i]]))
+  for (i in 1:n.post) {
+    tmp <- simulate.dmc(posts[i,],model,ns,SSD=SSD)
+    sim[(1+(i-1)*n.rep):(i*n.rep),names(tmp)] <- tmp
+    if ( (i %% report) == 0) cat(".")
+  }
+  if ( any(names(sim)=="R2") ) { # MTR model
+    sim$R <- paste(as.character(sim$R),as.character(sim$R2),sep="") 
+    sim$R[sim$R2=="DK"] <- "DK"
+    sim$R <- factor(sim$R)
+    samples$data$R <- paste(as.character(samples$data$R),as.character(samples$data$R2),sep="") 
+    samples$data$R[samples$data$R2=="DK"] <- "DK"
+    samples$data$R <- factor(samples$data$R)
+  }
+  if (save.simulation) {
+    sim <- cbind(reps=rep(1:n.post,each=dim(samples$data)[1]),sim)
+    attr(sim,"data") <- samples$data
+    sim
+  } else {
+    sim.dqp <- get.dqp(sim,factors,probs,n.post)
+    dat.dqp <- get.dqp(sim=samples$data,factors,probs)
+    names(dat.dqp) <- paste("data",names(dat.dqp),sep=".")
+    c(sim.dqp,dat.dqp)
+  }
+}
+
+pickps.h.post.predict.dmc<- function(samples,n.post=100,probs=c(1:99)/100,
+                                   bw="nrd0",
+                                   save.simulation=FALSE, pickps_set, pickps_others)
+  # apply lost.predict to each subject
+{
+  lapply(samples,pickps.post.predict.dmc,n.post=n.post,probs=probs,bw=bw,
+         save.simulation=save.simulation, pickps_set=pickps_set, pickps_others=pickps_others)
+}

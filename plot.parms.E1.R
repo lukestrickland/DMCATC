@@ -48,7 +48,10 @@ load("gelman.diag.E1.RData")
 E1PP <- h.post.predict.dmc(samples, save.simulation=
                              TRUE)
 save(E1PP, file="data/after_sampling/E1PP.RData")
+<<<<<<< HEAD
 load("data/after_sampling/E1PP.RData")
+=======
+>>>>>>> df826efb76acd8ad0e1cb10663f8f981493a9556
 
 sim <- do.call(rbind, E1PP)
 # Do the same for the data

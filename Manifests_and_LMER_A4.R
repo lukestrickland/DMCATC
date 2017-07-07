@@ -16,10 +16,10 @@ source("LSAnova.R")
 pkgs <- c("plyr", "dplyr", "tidyr", "broom", "pander", "car", "lme4", "xtable")
 # install.packages(pkgs) #install
 sapply(pkgs, require, character.only = T) #load
-# load("~/Modelling/x1/samples/okdats.E1.RData")  # Original data
-load("C:/Users/Russell Boag/Documents/GitHub/DMCATC/data/samples/E1.block.B.V_cond.B.V.PMV.samples.RData")  # Samples object
-samples.E1 <- E1.block.B.V_cond.B.V.PMV.samples
-rm(E1.block.B.V_cond.B.V.PMV.samples)
+# load("~/Modelling/x1/samples/okdats.A4.RData")  # Original data
+load("C:/Users/Russell Boag/Documents/GitHub/DMCATC/data/samples/A4.block.B.V_cond.B.V.PMV.samples.RData")  # Samples object
+samples.A4 <- A4.block.B.V_cond.B.V.PMV.samples
+rm(A4.block.B.V_cond.B.V.PMV.samples)
 
 
 # # # Get data from samples object # # #
@@ -33,25 +33,25 @@ get.hdata.dmc <- function(hsamples){
 }
 #
 
-data.E1 <- get.hdata.dmc(samples.E1)  # Get data from samples object
-head(data.E1)
-# save(data.E1, file="data.E1.RData")
+data.A4 <- get.hdata.dmc(samples.A4)  # Get data from samples object
+head(data.A4)
+# save(data.A4, file="data.A4.RData")
 
-# all.equal(datE1[order(datE1$s),], data2)  # Check recovered data matches original data
+# all.equal(datA4[order(datA4$s),], data2)  # Check recovered data matches original data
 
 
 # # # Add logical S-R match factor 'C' # # #
 #
-data.E1$C <- rep(0,length(data.E1$RT))
-for(i in 1:length(data.E1$RT)){
-  if(data.E1$S[i]=="cc" & data.E1$R[i]=="C"){
-    data.E1$C[i] <- 1
-  } else if(data.E1$S[i]=="nn" & data.E1$R[i]=="N"){
-    data.E1$C[i] <- 1
-  } else if(data.E1$S[i]=="pc" & data.E1$R[i]=="P"){
-    data.E1$C[i] <- 1
-  } else if(data.E1$S[i]=="pn" & data.E1$R[i]=="P"){
-    data.E1$C[i] <- 1
+data.A4$C <- rep(0,length(data.A4$RT))
+for(i in 1:length(data.A4$RT)){
+  if(data.A4$S[i]=="cc" & data.A4$R[i]=="C"){
+    data.A4$C[i] <- 1
+  } else if(data.A4$S[i]=="nn" & data.A4$R[i]=="N"){
+    data.A4$C[i] <- 1
+  } else if(data.A4$S[i]=="pc" & data.A4$R[i]=="P"){
+    data.A4$C[i] <- 1
+  } else if(data.A4$S[i]=="pn" & data.A4$R[i]=="P"){
+    data.A4$C[i] <- 1
   }
 }
 #
@@ -62,41 +62,41 @@ for(i in 1:length(data.E1$RT)){
 setwd("C:/Users/Russell Boag/Documents/GitHub/DMCATC/analysis")
 
 # Conflict Detection Task trials only (no PM)
-CDT <- data.E1[!(data.E1$S=="pc" | data.E1$S=="pn"),]
+CDT <- data.A4[!(data.A4$S=="pc" | data.A4$S=="pn"),]
 CDT$S <- factor(as.character(CDT$S)); CDT$R <- factor(as.character(CDT$R))
 str(CDT)
 head(CDT)
 
 # PM Task trials only
-PMT <- data.E1[(data.E1$S=="pc" | data.E1$S=="pn"),]
+PMT <- data.A4[(data.A4$S=="pc" | data.A4$S=="pn"),]
 PMT$S <- factor(as.character(PMT$S)); PMT$block <- factor(as.character(PMT$block))
 str(PMT)
 head(PMT)
 #
 
-CDT.Acc.glmer.E1 <- glmer(C ~ S*block*cond+(1|s), data=CDT, family=binomial(link="probit"))
-save(CDT.Acc.glmer.E1, file="CDT.Acc.glmer.E1.RData")
-load("CDT.Acc.glmer.E1.RData")
-CDT.Acc.glm.E1 <- Anova(CDT.Acc.glmer.E1,type="II")
-CDT.Acc.glm.E1
-# CDT.TABLE.E1 <- data.frame(cdt.glm.E1$Chisq, cdt.glm.E1$Df, cdt.glm.E1$Pr)
-# CDT.TABLE.E1$cdt.glm.E1.Chisq <- round(CDT.TABLE.E1$cdt.glm.E1.Chisq, 2)
-# CDT.TABLE.E1$cdt.glm.E1.Pr <- format.pval(CDT.TABLE.E1$cdt.glm.E1.Pr, digits=2, eps= 0.001)
-# CDT.TABLE.E1$cdt.glm.E1.Pr <- gsub("0\\.", ".", CDT.TABLE.E1$cdt.glm.E1.Pr)
-# # rownames(CDT.TABLE.E1) <- c("PM Block","TP","PM Block*TP")
-# CDT.TABLE.E1
+CDT.Acc.glmer.A4 <- glmer(C ~ S*block*cond+(1|s), data=CDT, family=binomial(link="probit"))
+save(CDT.Acc.glmer.A4, file="CDT.Acc.glmer.A4.RData")
+load("CDT.Acc.glmer.A4.RData")
+CDT.Acc.glm.A4 <- Anova(CDT.Acc.glmer.A4,type="II")
+CDT.Acc.glm.A4
+# CDT.TABLE.A4 <- data.frame(cdt.glm.A4$Chisq, cdt.glm.A4$Df, cdt.glm.A4$Pr)
+# CDT.TABLE.A4$cdt.glm.A4.Chisq <- round(CDT.TABLE.A4$cdt.glm.A4.Chisq, 2)
+# CDT.TABLE.A4$cdt.glm.A4.Pr <- format.pval(CDT.TABLE.A4$cdt.glm.A4.Pr, digits=2, eps= 0.001)
+# CDT.TABLE.A4$cdt.glm.A4.Pr <- gsub("0\\.", ".", CDT.TABLE.A4$cdt.glm.A4.Pr)
+# # rownames(CDT.TABLE.A4) <- c("PM Block","TP","PM Block*TP")
+# CDT.TABLE.A4
 
-PMT.Acc.glmer.E1 <- glmer(C ~ S*cond+(1|s), data=PMT, family=binomial(link="probit"))
-save(PMT.Acc.glmer.E1, file="PMT.Acc.glmer.E1.RData")
-load("PMT.Acc.glmer.E1.RData")
-PMT.Acc.glm.E1 <- Anova(PMT.Acc.glmer.E1,type="II")
-PMT.Acc.glm.E1
-# PM.TABLE.E1 <- data.frame(pm.glm.E1$Chisq, pm.glm.E1$Df, pm.glm.E1$Pr)
-# PM.TABLE.E1$pm.glm.E1.Chisq <- round(PM.TABLE.E1$pm.glm.E1.Chisq, 2)
-# PM.TABLE.E1$pm.glm.E1.Pr <- format.pval(PM.TABLE.E1$pm.glm.E1.Pr, digits=2, eps= 0.001)
-# PM.TABLE.E1$pm.glm.E1.Pr <- gsub("0\\.", ".", PM.TABLE.E1$pm.glm.E1.Pr)
-# rownames(PM.TABLE.E1) <- c("Stimulus","TP","Stimulus*TP")
-# PM.TABLE.E1
+PMT.Acc.glmer.A4 <- glmer(C ~ S*cond+(1|s), data=PMT, family=binomial(link="probit"))
+save(PMT.Acc.glmer.A4, file="PMT.Acc.glmer.A4.RData")
+load("PMT.Acc.glmer.A4.RData")
+PMT.Acc.glm.A4 <- Anova(PMT.Acc.glmer.A4,type="II")
+PMT.Acc.glm.A4
+# PM.TABLE.A4 <- data.frame(pm.glm.A4$Chisq, pm.glm.A4$Df, pm.glm.A4$Pr)
+# PM.TABLE.A4$pm.glm.A4.Chisq <- round(PM.TABLE.A4$pm.glm.A4.Chisq, 2)
+# PM.TABLE.A4$pm.glm.A4.Pr <- format.pval(PM.TABLE.A4$pm.glm.A4.Pr, digits=2, eps= 0.001)
+# PM.TABLE.A4$pm.glm.A4.Pr <- gsub("0\\.", ".", PM.TABLE.A4$pm.glm.A4.Pr)
+# rownames(PM.TABLE.A4) <- c("Stimulus","TP","Stimulus*TP")
+# PM.TABLE.A4
 
 
 # # # Prep RT dataframes for analysis (keep correct RTs only) # # #
@@ -118,30 +118,30 @@ head(dPMT.RT)
 str(dPMT.RT)
 
 #
-CDTC.RT.lmer.E1 <- lmer(y ~ S*block*cond+(1|s), data=dCDT.RT)
-save(CDTC.RT.lmer.E1, file="CDTC.RT.lmer.E1.RData")
-load("CDTC.RT.lmer.E1.RData")
-CDT.RT.glm.E1 <- Anova(CDTC.RT.lmer.E1,type="II")
-CDT.RT.glm.E1
-# CDT.RT.TABLE.E1 <- data.frame(CDT.RT.glm.E1$Chisq, CDT.RT.glm.E1$Df, CDT.RT.glm.E1$Pr)
-# CDT.RT.TABLE.E1$CDT.RT.glm.E1.Chisq <- round(CDT.RT.TABLE.E1$CDT.RT.glm.E1.Chisq, 2)
-# CDT.RT.TABLE.E1$CDT.RT.glm.E1.Pr <- format.pval(CDT.RT.TABLE.E1$CDT.RT.glm.E1.Pr, digits=2, eps= 0.001)
-# CDT.RT.TABLE.E1$CDT.RT.glm.E1.Pr <- gsub("0\\.", ".", CDT.RT.TABLE.E1$CDT.RT.glm.E1.Pr)
-# rownames(CDT.RT.TABLE.E1) <- c("Stimulus","PM Block","TP","Stimulus*Block","Stimulus*TP","Block*TP","Stimulus*Block*TP")
-# CDT.RT.TABLE.E1
+CDTC.RT.lmer.A4 <- lmer(y ~ S*block*cond+(1|s), data=dCDT.RT)
+save(CDTC.RT.lmer.A4, file="CDTC.RT.lmer.A4.RData")
+load("CDTC.RT.lmer.A4.RData")
+CDT.RT.glm.A4 <- Anova(CDTC.RT.lmer.A4,type="II")
+CDT.RT.glm.A4
+# CDT.RT.TABLE.A4 <- data.frame(CDT.RT.glm.A4$Chisq, CDT.RT.glm.A4$Df, CDT.RT.glm.A4$Pr)
+# CDT.RT.TABLE.A4$CDT.RT.glm.A4.Chisq <- round(CDT.RT.TABLE.A4$CDT.RT.glm.A4.Chisq, 2)
+# CDT.RT.TABLE.A4$CDT.RT.glm.A4.Pr <- format.pval(CDT.RT.TABLE.A4$CDT.RT.glm.A4.Pr, digits=2, eps= 0.001)
+# CDT.RT.TABLE.A4$CDT.RT.glm.A4.Pr <- gsub("0\\.", ".", CDT.RT.TABLE.A4$CDT.RT.glm.A4.Pr)
+# rownames(CDT.RT.TABLE.A4) <- c("Stimulus","PM Block","TP","Stimulus*Block","Stimulus*TP","Block*TP","Stimulus*Block*TP")
+# CDT.RT.TABLE.A4
 
 #
-PMC.RT.lmer.E1 <- lmer(y ~ S*cond+(1|s), data=dPMT.RT)
-save(PMC.RT.lmer.E1, file="PMC.RT.lmer.E1.RData")
-load("PMC.RT.lmer.E1.RData")
-PM.RT.glm.E1 <- Anova(PMC.RT.lmer.E1,type="II")
-PM.RT.glm.E1
-# PM.RT.TABLE.E1 <- data.frame(PM.RT.glm.E1$Chisq, PM.RT.glm.E1$Df, PM.RT.glm.E1$Pr)
-# PM.RT.TABLE.E1$PM.RT.glm.E1.Chisq <- round(PM.RT.TABLE.E1$PM.RT.glm.E1.Chisq, 2)
-# PM.RT.TABLE.E1$PM.RT.glm.E1.Pr <- format.pval(PM.RT.TABLE.E1$PM.RT.glm.E1.Pr, digits=2, eps= 0.001)
-# PM.RT.TABLE.E1$PM.RT.glm.E1.Pr <- gsub("0\\.", ".", PM.RT.TABLE.E1$PM.RT.glm.E1.Pr)
-# rownames(PM.RT.TABLE.E1) <- c("Stimulus","TP","Stimulus*TP")
-# PM.RT.TABLE.E1
+PMC.RT.lmer.A4 <- lmer(y ~ S*cond+(1|s), data=dPMT.RT)
+save(PMC.RT.lmer.A4, file="PMC.RT.lmer.A4.RData")
+load("PMC.RT.lmer.A4.RData")
+PM.RT.glm.A4 <- Anova(PMC.RT.lmer.A4,type="II")
+PM.RT.glm.A4
+# PM.RT.TABLE.A4 <- data.frame(PM.RT.glm.A4$Chisq, PM.RT.glm.A4$Df, PM.RT.glm.A4$Pr)
+# PM.RT.TABLE.A4$PM.RT.glm.A4.Chisq <- round(PM.RT.TABLE.A4$PM.RT.glm.A4.Chisq, 2)
+# PM.RT.TABLE.A4$PM.RT.glm.A4.Pr <- format.pval(PM.RT.TABLE.A4$PM.RT.glm.A4.Pr, digits=2, eps= 0.001)
+# PM.RT.TABLE.A4$PM.RT.glm.A4.Pr <- gsub("0\\.", ".", PM.RT.TABLE.A4$PM.RT.glm.A4.Pr)
+# rownames(PM.RT.TABLE.A4) <- c("Stimulus","TP","Stimulus*TP")
+# PM.RT.TABLE.A4
 
 
 # # # Manifests - Mean Reponse Proportion # # #
@@ -191,21 +191,21 @@ PMT.Acc.COND
 #
 
 # Ongoing Task Correct RTs by Block
-CDT.RT.corr.BLOCK <- ddply(data.E1[ (data.E1$S=="cc" & data.E1$C=="1") |
-                                        (data.E1$S=="nn" & data.E1$C=="1"), ],
+CDT.RT.corr.BLOCK <- ddply(data.A4[ (data.A4$S=="cc" & data.A4$C=="1") |
+                                        (data.A4$S=="nn" & data.A4$C=="1"), ],
                            ~S*block, summarise, M=mean(RT, na.rm = TRUE), SD=sd(RT, na.rm = TRUE))
 
 # PM Task Correct RTs by Block
-PMT.RT.corr.BLOCK <- ddply(data.E1[ (data.E1$S=="pc" & data.E1$C==1) |
-                                        (data.E1$S=="pn" & data.E1$C==1), ],
+PMT.RT.corr.BLOCK <- ddply(data.A4[ (data.A4$S=="pc" & data.A4$C==1) |
+                                        (data.A4$S=="pn" & data.A4$C==1), ],
                            ~block, summarise, M=mean(RT, na.rm = TRUE), SD=sd(RT, na.rm = TRUE))
 
 # Ongoing Task Correct RTs by Condition
-CDT.RT.corr.COND <- ddply(data.E1[ (data.E1$S=="cc" & data.E1$C==1) | (data.E1$S=="nn" & data.E1$C==1), ], ~S*cond, summarise,
+CDT.RT.corr.COND <- ddply(data.A4[ (data.A4$S=="cc" & data.A4$C==1) | (data.A4$S=="nn" & data.A4$C==1), ], ~S*cond, summarise,
       M=mean(RT, na.rm = TRUE), SD=sd(RT, na.rm = TRUE))
 
 # PM Task Correct RTs by Condition
-PMT.RT.corr.COND <- ddply(data.E1[ (data.E1$S=="pc" & data.E1$C==1) | (data.E1$S=="pn" & data.E1$C==1), ], ~cond, summarise,
+PMT.RT.corr.COND <- ddply(data.A4[ (data.A4$S=="pc" & data.A4$C==1) | (data.A4$S=="pn" & data.A4$C==1), ], ~cond, summarise,
                      M=mean(RT, na.rm = TRUE), SD=sd(RT, na.rm = TRUE))
 
 levels(CDT.RT.corr.BLOCK$S) <- c("Conflict","Nonconflict","PM (Conflict)","PM (Nonconflict)")
