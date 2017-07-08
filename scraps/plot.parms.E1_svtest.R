@@ -9,7 +9,9 @@ source("dmc/dmc.R")
 source("dmc/dmc_ATC.R")
 
 load("data/samples/E1.block.B.V_cond.B.V.PMV.samples.RData")
+load("data/samples/E1.sdv.samples.RData")
 samples <- E1.block.B.V_cond.B.V.PMV.samples
+samples <- E1.1sdv.samples
 
 # Check how many runs it took to converge
 # If any say "FAIL" then it didn't converge
@@ -48,6 +50,12 @@ for(i in 1:length(samples)) {
 E1PP <- h.post.predict.dmc(samples, save.simulation=
                              TRUE)
 save(E1PP, file="data/after_sampling/E1PP.RData")
+
+E1PP <- h.post.predict.dmc(samples, save.simulation=
+                             TRUE)
+save(E1PP, file="data/after_sampling/E1PPsv1.RData")
+
+
 # # <<<<<<< HEAD
 load("data/after_sampling/E1PP.RData")
 # =======
@@ -96,7 +104,7 @@ ongoing.acc.plots <- ggplot.RP.dmc(ongoing.acc.obj, xaxis='cond') +
     ggtitle("Ongoing Task Accuracy by PM Block and Time Pressure")
 ongoing.acc.plots
 
-# ggsave("E1.Fits.Acc.Ongoing.png", plot = last_plot())
+ggsave("E1.Fits.Acc.Ongoingsv1.png", plot = last_plot())
 
 ## Take only the PM accuracies and drop the R column.
 PM.acc.obj <- pp.obj[(pp.obj$S=="PM (Conflict)" & pp.obj$R=="PMR")|
@@ -110,7 +118,7 @@ PM.acc.plots <- ggplot.RP.dmc(PM.acc.obj,panels.ppage=4, xaxis='cond') +
     ggtitle("PM Task Accuracy by Time Pressure")
 PM.acc.plots
 
-# ggsave("E1.Fits.Acc.PM.png", plot = last_plot())
+ggsave("E1.Fits.Acc.PMsv1.png", plot = last_plot())
 
 # The grid arrange will depend on your design
 E1.acc.plots <- grid.arrange(ongoing.acc.plots, PM.acc.plots,layout_matrix = cbind(
@@ -146,7 +154,7 @@ corr.RTgraph <- ggplot.RT.dmc(corr.RTs, panels.ppage=4, xaxis="cond") +
   ggtitle("Ongoing Task Correct RTs by PM Block and Time Pressure")
 corr.RTgraph
 
-# ggsave("E1.Fits.RT.Correct.png", plot = last_plot())
+ggsave("E1.Fits.RT.Correctsv1.png", plot = last_plot())
 
 
 err.RTs <- oRT.obj[(oRT.obj$S=="Conflict" & oRT.obj$R=="NR")|
@@ -160,7 +168,7 @@ err.RTgraph <- ggplot.RT.dmc(err.RTs, panels.ppage=4, xaxis="cond") +
   ggtitle("Ongoing Task Error RTs by PM Block and Time Pressure")
 err.RTgraph
 
-# ggsave("E1.Fits.RT.Error.png", plot = last_plot())
+ggsave("E1.Fits.RT.Errorsv1.png", plot = last_plot())
 
 # There is not that much RT data for PM trials.
 # so aggregate differently
@@ -182,7 +190,7 @@ PM.RTgraph <- ggplot.RT.dmc(pRT.obj, xaxis="cond") +
   ggtitle("PM RT by Time Pressure")
 PM.RTgraph
 
-# ggsave("E1.Fits.RT.PM.png", plot = last_plot())
+ggsave("E1.Fits.RT.PMsv1.png", plot = last_plot())
 
 
 
