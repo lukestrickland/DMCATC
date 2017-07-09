@@ -8,6 +8,7 @@ setwd("D:/Software/DMC_ATCPMDC")
 source("dmc/dmc.R")
 source("dmc/dmc_ATC.R")
 
+
 load("data/samples/E1.block.B.V_cond.B.V.PMV.samples.RData")
 samples <- E1.block.B.V_cond.B.V.PMV.samples
 
@@ -472,8 +473,8 @@ load("data/after_sampling/E1PP.RData")
 
 
 #Set this to TRUE after running all the sims once
-#and then it will load them rather than re-run.
-run.before=F
+#and then it will6 load them rather than re-run.
+run.before=T
 source("generate_postexploration_E1.R")
 ##The above g
 
