@@ -487,7 +487,7 @@ source("generate_postexploration_E1.R")
 plot <- ggplot(all_effects_predictives.block, aes(S, mean))
 plot<- plot+ facet_grid(DV  ~  model, scales = "free", space = "fixed") + geom_point(size=3) + geom_errorbar(aes(ymax = upper, ymin = lower), width= 0.2) +
   geom_point(aes(S, data), pch=21, size=4, colour="black") +xlab("Stimulus Type")+
-  theme(text = element_text(size=18)) +ylab("Cost (PM - Control)")
+  theme(text = element_text(size=16)) +ylab("Cost (PM - Control)")
 plot
 
 
