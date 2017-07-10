@@ -15,109 +15,109 @@ cat("Running a lot of sims, go do something else for a while
     
     ")
 
-  
-  ### First generate posterior predictives
-  #with certain parameters averaged across conditions.
-  #avps.post.predict.dmc & avps.h.post.predict.dmc
-  # grep match all parameters to the av.posts vector,
-  #and ones that match each other are averaged.
-  
-  
-#Aggregate over BLOCK
-av.posts.thresblock <- c(
-  "^B.A*C", "^B.B*C", "^B.C*C", "^B.D*C", "^B.A*N" ,"^B.B*N",
-  "^B.C*N" ,"^B.D*N"
-)
-
-av.posts.thresblock <- glob2rx(av.posts.thresblock)
-
-#note this function converts your av.posts to regex using glob2rx
-fixed.thresholds.block <-
-  avps.h.post.predict.dmc(samples, save.simulation=T, av.posts=
-                            av.posts.thresblock)
-
-av.posts.ratesblock<- c(
-  "mean_v.ccA*C", "mean_v.nnA*C", "mean_v.ccB*C",
-  "mean_v.nnB*C", "mean_v.ccC*C", "mean_v.nnC*C",
-  "mean_v.ccD*C", "mean_v.nnD*C", "mean_v.ccA*N",
-  "mean_v.nnA*N", "mean_v.ccB*N", "mean_v.nnB*N",
-  "mean_v.ccC*N" ,"mean_v.nnC*N", "mean_v.ccD*N",
-  "mean_v.nnD*N"
-  
-)
-
-av.posts.ratesblock <- glob2rx(av.posts.ratesblock)
-fixed.rates.block <-
-  avps.h.post.predict.dmc(samples, save.simulation=T, av.posts=
-                            av.posts.ratesblock)
-
-save(fixed.thresholds.block, fixed.rates.block, file="data/after_sampling/av.posts.block.PPs.RData")
-
-full_effects.block <- get.effects.dmc(PP, fun=block.effects.E1A4)
-thresholdfix_effects.block <- get.effects.dmc(fixed.thresholds.block, fun=block.effects.E1A4)
-ratesfix_effects.block <- get.effects.dmc(fixed.rates.block, fun=block.effects.E1A4)
-
-save(full_effects.block, thresholdfix_effects.block,ratesfix_effects.block,
-     file="data/after_sampling/av.posts.block.effects.RData")
-
-rm(fixed.thresholds.block, fixed.rates.block)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#Aggregate over COND
-av.posts.thresholdscond  <- c(
-  "B.*2C", "B.*3C", "B.*2N" ,"B.*3N", "B.*3P"
-) 
-
-av.posts.thresholdscond <- unique(av.posts.thresholdscond)
-av.posts.thresholdscond <- glob2rx(av.posts.thresholdscond)
-
-fixed.thresholds.cond <-
-  avps.h.post.predict.dmc(samples, save.simulation=T, av.posts=
-                            av.posts.thresholdscond )
-
-
-av.posts.ratescond<- c("mean_v.cc*2C", "mean_v.nn*2C", "mean_v.cc*3C", "mean_v.nn*3C",
-                       "mean_v.pc*3C", "mean_v.pn*3C", "mean_v.cc*2N", "mean_v.nn*2N",
-                       "mean_v.cc*3N", "mean_v.nn*3N", "mean_v.pc*3N", "mean_v.pn*3N",
-                       "mean_v.pp*3P" )
-
-av.posts.ratescond <- glob2rx(av.posts.ratescond)
-
-fixed.rates.cond <-
-  avps.h.post.predict.dmc(samples, save.simulation=T, av.posts=
-                            av.posts.ratescond)
-save(fixed.thresholds.cond, fixed.rates.cond, file="data/after_sampling/av.posts.cond.PPs.RData")
-
-
-full_effects.cond <- get.effects.dmc(PP, fun=cond.effects)
-thresholdfix_effects.cond <- get.effects.dmc(fixed.thresholds.cond, fun=cond.effects)
-ratesfix_effects.cond <- get.effects.dmc(fixed.rates.cond, fun=cond.effects)
-save(full_effects.cond, thresholdfix_effects.cond,ratesfix_effects.cond, file="data/after_sampling/av.posts.cond.effects.RData")
-
-rm(fixed.thresholds.cond, fixed.rates.cond)
-
-
-
-
-
-
-
-
-
-
-
+#   
+#   ### First generate posterior predictives
+#   #with certain parameters averaged across conditions.
+#   #avps.post.predict.dmc & avps.h.post.predict.dmc
+#   # grep match all parameters to the av.posts vector,
+#   #and ones that match each other are averaged.
+#   
+#   
+# #Aggregate over BLOCK
+# av.posts.thresblock <- c(
+#   "^B.A*C", "^B.B*C", "^B.C*C", "^B.D*C", "^B.A*N" ,"^B.B*N",
+#   "^B.C*N" ,"^B.D*N"
+# )
+# 
+# av.posts.thresblock <- glob2rx(av.posts.thresblock)
+# 
+# #note this function converts your av.posts to regex using glob2rx
+# fixed.thresholds.block <-
+#   avps.h.post.predict.dmc(samples, save.simulation=T, av.posts=
+#                             av.posts.thresblock)
+# 
+# av.posts.ratesblock<- c(
+#   "mean_v.ccA*C", "mean_v.nnA*C", "mean_v.ccB*C",
+#   "mean_v.nnB*C", "mean_v.ccC*C", "mean_v.nnC*C",
+#   "mean_v.ccD*C", "mean_v.nnD*C", "mean_v.ccA*N",
+#   "mean_v.nnA*N", "mean_v.ccB*N", "mean_v.nnB*N",
+#   "mean_v.ccC*N" ,"mean_v.nnC*N", "mean_v.ccD*N",
+#   "mean_v.nnD*N"
+#   
+# )
+# 
+# av.posts.ratesblock <- glob2rx(av.posts.ratesblock)
+# fixed.rates.block <-
+#   avps.h.post.predict.dmc(samples, save.simulation=T, av.posts=
+#                             av.posts.ratesblock)
+# 
+# save(fixed.thresholds.block, fixed.rates.block, file="data/after_sampling/av.posts.block.PPs.RData")
+# 
+# full_effects.block <- get.effects.dmc(PP, fun=block.effects.E1A4)
+# thresholdfix_effects.block <- get.effects.dmc(fixed.thresholds.block, fun=block.effects.E1A4)
+# ratesfix_effects.block <- get.effects.dmc(fixed.rates.block, fun=block.effects.E1A4)
+# 
+# save(full_effects.block, thresholdfix_effects.block,ratesfix_effects.block,
+#      file="data/after_sampling/av.posts.block.effects.RData")
+# 
+# rm(fixed.thresholds.block, fixed.rates.block)
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# #Aggregate over COND
+# av.posts.thresholdscond  <- c(
+#   "B.*2C", "B.*3C", "B.*2N" ,"B.*3N", "B.*3P"
+# ) 
+# 
+# av.posts.thresholdscond <- unique(av.posts.thresholdscond)
+# av.posts.thresholdscond <- glob2rx(av.posts.thresholdscond)
+# 
+# fixed.thresholds.cond <-
+#   avps.h.post.predict.dmc(samples, save.simulation=T, av.posts=
+#                             av.posts.thresholdscond )
+# 
+# 
+# av.posts.ratescond<- c("mean_v.cc*2C", "mean_v.nn*2C", "mean_v.cc*3C", "mean_v.nn*3C",
+#                        "mean_v.pc*3C", "mean_v.pn*3C", "mean_v.cc*2N", "mean_v.nn*2N",
+#                        "mean_v.cc*3N", "mean_v.nn*3N", "mean_v.pc*3N", "mean_v.pn*3N",
+#                        "mean_v.pp*3P" )
+# 
+# av.posts.ratescond <- glob2rx(av.posts.ratescond)
+# 
+# fixed.rates.cond <-
+#   avps.h.post.predict.dmc(samples, save.simulation=T, av.posts=
+#                             av.posts.ratescond)
+# save(fixed.thresholds.cond, fixed.rates.cond, file="data/after_sampling/av.posts.cond.PPs.RData")
+# 
+# 
+# full_effects.cond <- get.effects.dmc(PP, fun=cond.effects)
+# thresholdfix_effects.cond <- get.effects.dmc(fixed.thresholds.cond, fun=cond.effects)
+# ratesfix_effects.cond <- get.effects.dmc(fixed.rates.cond, fun=cond.effects)
+# save(full_effects.cond, thresholdfix_effects.cond,ratesfix_effects.cond, file="data/after_sampling/av.posts.cond.effects.RData")
+# 
+# rm(fixed.thresholds.cond, fixed.rates.cond)
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
 
 
 ### Slightly different thing- don't average but remove PM related mechanisms.
@@ -134,7 +134,7 @@ thres3  <- c("B.A3C"   ,     "B.B3C",        "B.C3C" ,
              "B.D3C",        "B.A3N"   ,     "B.B3N" ,       "B.C3N" ,      
              "B.D3N" )
 
-no_proactive <- pickps.h.post.predict.dmc(E1.block.B.V_cond.B.V.PMV.samples, 
+no_proactive <- pickps.h.post.predict.dmc(samples, 
                                           pickps_others=thres3,
                                           pickps_set=thres2, save.simulation=T)
 
@@ -150,14 +150,14 @@ PM_ongoingrates <-c(rates[grep("pn", rates)], rates[grep("pc", rates)])
 #No reactive:
 ## Pick out the ongoing task accumulatoin rates on PM trials 
 #and replace with ongoing task accumulation rates from non-PM trials (in PM blokcs)
-no_reactive <- pickps.h.post.predict.dmc(E1.block.B.V_cond.B.V.PMV.samples, 
+no_reactive <- pickps.h.post.predict.dmc(samples, 
                                          pickps_others=PM_ongoingrates,
                                          pickps_set=nonPM_ongoingrates, save.simulation=T)
 
 defaultparams <- c(nonPM_ongoingrates, thres2)
 controlparams <- c(PM_ongoingrates, thres3)
 
-no_control <- pickps.h.post.predict.dmc(E1.block.B.V_cond.B.V.PMV.samples, 
+no_control <- pickps.h.post.predict.dmc(samples, 
                                         pickps_others=controlparams,
                                         pickps_set=defaultparams, save.simulation=T)
 
