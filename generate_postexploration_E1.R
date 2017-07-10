@@ -53,6 +53,26 @@ fixed.rates.block <-
 
 save(fixed.thresholds.block, fixed.rates.block, file="data/after_sampling/av.posts.block.PPs.RData")
 
+full_effects.block <- get.effects.dmc(PP, fun=block.effects.E1A4)
+thresholdfix_effects.block <- get.effects.dmc(fixed.thresholds.block, fun=block.effects.E1A4)
+ratesfix_effects.block <- get.effects.dmc(fixed.rates.block, fun=block.effects.E1A4)
+
+save(full_effects.block, thresholdfix_effects.block,ratesfix_effects.block,
+     file="data/after_sampling/av.posts.block.effects.RData")
+
+rm(fixed.thresholds.block, fixed.rates.block)
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #Aggregate over COND
@@ -79,6 +99,25 @@ fixed.rates.cond <-
   avps.h.post.predict.dmc(samples, save.simulation=T, av.posts=
                             av.posts.ratescond)
 save(fixed.thresholds.cond, fixed.rates.cond, file="data/after_sampling/av.posts.cond.PPs.RData")
+
+
+full_effects.cond <- get.effects.dmc(PP, fun=cond.effects)
+thresholdfix_effects.cond <- get.effects.dmc(fixed.thresholds.cond, fun=cond.effects)
+ratesfix_effects.cond <- get.effects.dmc(fixed.rates.cond, fun=cond.effects)
+save(full_effects.cond, thresholdfix_effects.cond,ratesfix_effects.cond, file="data/after_sampling/av.posts.cond.effects.RData")
+
+rm(fixed.thresholds.cond, fixed.rates.cond)
+
+
+
+
+
+
+
+
+
+
+
 
 
 ### Slightly different thing- don't average but remove PM related mechanisms.
@@ -130,11 +169,6 @@ file="data/after_sampling/PM_mechanism_piecetest_PPs.RData")
 
 cat("Your sims are done, now calculating effects for each. Still a while to go.")
 
-full_effects.cond <- get.effects.dmc(PP, fun=cond.effects)
-thresholdfix_effects.cond <- get.effects.dmc(fixed.thresholds.cond, fun=cond.effects)
-ratesfix_effects.cond <- get.effects.dmc(fixed.rates.cond, fun=cond.effects)
-save(full_effects.cond, thresholdfix_effects.cond,ratesfix_effects.cond, file="data/after_sampling/av.posts.cond.effects.RData")
-
 
 full_effects.block <-get.effects.dmc(PP, fun=block.effects.E1A4)
 control_thres_effects_all <-get.effects.dmc(no_proactive, fun=block.effects.E1A4)
@@ -146,12 +180,9 @@ save(full_effects.block ,
      no_reactive_effects,
      no_control_effects, file="data/after_sampling/PM_mechanism_piecetest_effects.RData")
 
-full_effects.block <- get.effects.dmc(PP, fun=block.effects.E1A4)
-thresholdfix_effects.block <- get.effects.dmc(fixed.thresholds.block, fun=block.effects.E1A4)
-ratesfix_effects.block <- get.effects.dmc(fixed.rates.block, fun=block.effects.E1A4)
-
-save(full_effects.block, thresholdfix_effects.block,ratesfix_effects.block,
-     file="data/after_sampling/av.posts.block.effects.RData")
+rm(no_proactive , 
+   no_reactive,
+   no_control)
 
 
 #Final data processing
