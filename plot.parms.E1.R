@@ -468,13 +468,14 @@ ggsave("E1.Rates.png", plot = V.plots, width = 9, height = 12)
 
 load("data/samples/E1.block.B.V_cond.B.V.PMV.samples.RData")
 samples <- E1.block.B.V_cond.B.V.PMV.samples
-PP <- E1PP
-load("data/after_sampling/E1PP.RData")
 
+load("data/after_sampling/E1PP.RData")
+PP <- E1PP
 
 #Set this to TRUE after running all the sims once
 #and then it will6 load them rather than re-run.
-run.before=T
+run.before=F
+Enam="E1"
 source("generate_postexploration_E1.R")
 ##The above g
 
