@@ -7,7 +7,7 @@ require("dplyr")
 require("data.table")
 theme_set(theme_simple())
 
-# 
+# A few functions for posterior predicctive p values and z scores. 
 minp <- function (effect) min(ecdf(effect)(0), 1-ecdf(effect)(0))
 
 zandp <- function(samples, fun){

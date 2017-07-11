@@ -40,6 +40,9 @@ paste("data/after_sampling/av.posts.block.", Enam, ".PPs.RData", sep="")
       
 save(fixed.thresholds.block, fixed.rates.block, file=
        paste("data/after_sampling/av.posts.block.", Enam, ".PPs.RData", sep=""))
+	   
+	   #get.effects.dmc gets whatever effects are specified by fun for the data, and for each rep of the sim. then it calculates posterior mean and quantiles
+	   #the output is a data frame with post.mean, credible intervals of the effects plus data effect. 
 
 full_effects.block <- get.effects.dmc(PP, fun=block.effects.E1A4)
 thresholdfix_effects.block <- get.effects.dmc(fixed.thresholds.block, fun=block.effects.E1A4)
@@ -178,7 +181,7 @@ rm(no_proactive ,
    no_control)
 
 
-#Final data processing
+#Final data processing. These functions just clean up the output of get.effects.dmc a little bit.
 
 full_noPM.block <- finish.blockdf.E1_A4(full_effects.block)[-(1:2),]; full_noPM.block$model <- "Full"
 threshold_noPM.block <- finish.blockdf.E1_A4(thresholdfix_effects.block)[-(1:2),]; threshold_noPM.block$model <- 
