@@ -1,3 +1,17 @@
+---
+title: "Parameter Plots and Tables for ATC Experiment E1"
+author: "Russell Boag"
+date: "12 July 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r load and prep data, echo=FALSE, include=FALSE}
+
 ###################### Russ data analysis template ###############################
 # Running this top to bottom should correspond to my data analysis from the
 # PMDC manuscript.
@@ -7,7 +21,8 @@ rm(list=ls())
 setwd("C:/Users/Russell Boag/Documents/GitHub/DMCATC")
 source("dmc/dmc.R")
 source("dmc/dmc_ATC.R")
-
+pkgs <- c("plyr", "dplyr", "tidyr", "broom", "pander", "xtable")
+sapply(pkgs, require, character.only = T) #load
 
 load("data/samples/E1.block.B.V_cond.B.V.PMV.samples.RData")
 samples <- E1.block.B.V_cond.B.V.PMV.samples
@@ -79,7 +94,7 @@ GGLIST <- lapply(GGLIST, function(x)  x[is.finite(x$data),])
 # Re-order to swap S and PM for desired panel order
 # (side by side control vs PM, top and bottom for stim type
 # xaxis for cond)
-pp.obj<- GGLIST[[1]]
+pp.obj <- GGLIST[[1]]
 pp.obj <- pp.obj[,c(1,3,2,4,5,6,7,8)]
 
 # Better factor names
@@ -98,7 +113,7 @@ ongoing.acc.plots <- ggplot.RP.dmc(ongoing.acc.obj, xaxis='cond') +
     ylab("Accuracy") +
     xlab("Time Pressure/Traffic Load") +
     ggtitle("Ongoing Task Accuracy by PM Block and Time Pressure")
-ongoing.acc.plots
+# ongoing.acc.plots
 
 # ggsave("E1.Fits.Acc.Ongoing.png", plot = last_plot())
 
@@ -112,7 +127,7 @@ PM.acc.plots <- ggplot.RP.dmc(PM.acc.obj,panels.ppage=4, xaxis='cond') +
     ylab("Accuracy") +
     xlab("Time Pressure/Traffic Load") +
     ggtitle("PM Task Accuracy by Time Pressure")
-PM.acc.plots
+# PM.acc.plots
 
 # ggsave("E1.Fits.Acc.PM.png", plot = last_plot())
 
@@ -148,7 +163,7 @@ corr.RTgraph <- ggplot.RT.dmc(corr.RTs, panels.ppage=4, xaxis="cond") +
   xlab("Time Pressure/Traffic Load") +
   ylab("RT (s)") +
   ggtitle("Ongoing Task Correct RTs by PM Block and Time Pressure")
-corr.RTgraph
+# corr.RTgraph
 
 # ggsave("E1.Fits.RT.Correct.png", plot = last_plot())
 
@@ -162,7 +177,7 @@ err.RTgraph <- ggplot.RT.dmc(err.RTs, panels.ppage=4, xaxis="cond") +
   xlab("Time Pressure/Traffic Load") +
   ylab ("RT (s)") +
   ggtitle("Ongoing Task Error RTs by PM Block and Time Pressure")
-err.RTgraph
+# err.RTgraph
 
 # ggsave("E1.Fits.RT.Error.png", plot = last_plot())
 
@@ -184,24 +199,21 @@ PM.RTgraph <- ggplot.RT.dmc(pRT.obj, xaxis="cond") +
   xlab("Time Pressure/Traffic Load") +
   ylab("RT (s)") +
   ggtitle("PM RT by Time Pressure")
-PM.RTgraph
+# PM.RTgraph
 
 # ggsave("E1.Fits.RT.PM.png", plot = last_plot())
 
 
-
-# fix xaxis names
-# corr.RTgraph <- corr.RTgraph + xlab("")
-# err.RTgraph <- err.RTgraph + xlab("")
-# PM.RTgraph <- PM.RTgraph + xlab("")
-
 E1.RT.plots.ongoing <- grid.arrange(corr.RTgraph, err.RTgraph, layout_matrix = cbind(
   c(1,1,2,2), c(1,1,2,2)))
-
+E1.RT.plots.PM <- PM.RTgraph
 # ggsave("E1.Fits.RT.Ongoing.png", plot = E1.RT.plots.ongoing, width = 9, height = 12)
 # ggsave("E1.Fits.RT.PM.png", plot = PM.RTgraph, width = 9, height = 6)
 #
 
+```
+
+```{r compute nonresponse predictions, echo=FALSE, include=FALSE, eval=FALSE}
 
 # Do out of sample predictions of non-responses to see whether they are
 # consistent with the model.
@@ -238,10 +250,13 @@ NR.plot <- NR.plot + geom_point(size=3) + geom_errorbar(aes(ymax = upper, ymin =
     ylab("Probability of non-response") +
     xlab("Time Pressure/ Traffic Load") +
     ggtitle("Predicted Probability of Nonresponse by Time Pressure")
-NR.plot
+# NR.plot
 # ggsave(NR.plot, file="E1.NR.Prob.png", width = 9, height = 4.5)
 
 
+```
+
+```{r generate parameter plots, echo=FALSE, include=FALSE}
 # # # Parameter Plots # # #
 #
 #
@@ -282,11 +297,11 @@ msds <- data.frame(msds)
 
 # # # Nondecision Time # # #
 t0 <- msds[grep("t0", rownames(msds)),]
-t0
+# t0
 
 # # # Plot Thresholds # # #
 Bs <- msds[grep("B\\.", rownames(msds)),]
-Bs
+# Bs
 
 # Data frame for ggplot
 Bs$PM <- NA; Bs$R <- NA; Bs$cond <- NA
@@ -302,21 +317,21 @@ Bs$cond[grep ("\\.D", rownames(Bs))] <- "HL.HT"
 plot.df <- Bs
 plot.df$cond <- factor(plot.df$cond)
 plot.df$cond <- factor(plot.df$cond, levels=c("LL.LT","LL.HT","HL.LT","HL.HT"))
-levels(plot.df$cond)
+# levels(plot.df$cond)
 
-ggplot(plot.df, aes(factor(cond),M)) +
-  geom_point(stat = "identity",aes(shape=PM), size=3) +
-  geom_errorbar(aes(ymax = M + SD, ymin = M - SD, width = 0.2)) +
-  xlab("Time Pressure/Traffic Load") + ylab("B") +
-  scale_shape_discrete("PM Block:") +
-  ylim(0.8,3.5) +
-  theme(text = element_text()) +
-  theme(
-    axis.line.x = element_line(),
-    axis.line.y = element_line()
-  ) + geom_line(aes(group=PM, y=M), linetype=2) +
-  ggtitle("Response Threshold by Time Pressure") +
-  facet_grid(. ~ R)
+B.plot <- ggplot(plot.df, aes(factor(cond),M)) +
+    geom_point(stat = "identity",aes(shape=PM), size=3) +
+    geom_errorbar(aes(ymax = M + SD, ymin = M - SD, width = 0.2)) +
+    xlab("Time Pressure/Traffic Load") + ylab("B") +
+    scale_shape_discrete("PM Block:") +
+    ylim(0.8,3.5) +
+    theme(text = element_text()) +
+    theme(
+        axis.line.x = element_line(),
+        axis.line.y = element_line()
+    ) + geom_line(aes(group=PM, y=M), linetype=2) +
+    ggtitle("Response Threshold by Time Pressure") +
+    facet_grid(. ~ R)
 
 # setwd("C:/Users/Russell Boag/Documents/GitHub/DMCATC")
 # ggsave("E1.Thresholds.png", plot = last_plot(), width = 9, height = 6)
@@ -334,11 +349,11 @@ mvs$S[grep ("cc", rownames(mvs))] <- "Conflict"
 mvs$S[grep ("pc", rownames(mvs))] <- "PM (Conflict)"
 mvs$S[grep ("pn", rownames(mvs))] <- "PM (Nonconflict)"
 mvs$S[grep ("pp", rownames(mvs))] <- "PM"
-mvs
+# mvs
 
 mvs$PM[grep ("2", rownames(mvs))] <- "Control"
 mvs$PM[grep ("3", rownames(mvs))] <- "PM"
-mvs
+# mvs
 
 mvs$cond[grep ("A2", rownames(mvs))] <- "LL.LT"
 mvs$cond[grep ("A3", rownames(mvs))] <- "LL.LT"
@@ -348,14 +363,14 @@ mvs$cond[grep ("C2", rownames(mvs))] <- "HL.LT"
 mvs$cond[grep ("C3", rownames(mvs))] <- "HL.LT"
 mvs$cond[grep ("D2", rownames(mvs))] <- "HL.HT"
 mvs$cond[grep ("D3", rownames(mvs))] <- "HL.HT"
-mvs
+# mvs
 
 mvs$R[grep ("2N", rownames(mvs))] <- "NR"
 mvs$R[grep ("3N", rownames(mvs))] <- "NR"
 mvs$R[grep ("2C", rownames(mvs))] <- "CR"
 mvs$R[grep ("3C", rownames(mvs))] <- "CR"
 mvs$R[grep ("P", rownames(mvs))] <- "PMR"
-mvs
+# mvs
 
 #
 plot.df <- mvs
@@ -364,26 +379,26 @@ plot.df$PM <- factor(plot.df$PM)
 plot.df$cond <- factor(plot.df$cond)
 plot.df$R <- factor(plot.df$R)
 
-dim(plot.df)
+# dim(plot.df)
 plot.df <- plot.df[-53,]
-str(plot.df)
-plot.df
-levels(plot.df$cond)
+# str(plot.df)
+# plot.df
+# levels(plot.df$cond)
 plot.df$cond <- factor(plot.df$cond, levels=c("LL.LT","LL.HT","HL.LT","HL.HT"))
 
 
 plot.corr <- plot.df[((plot.df$S=="Conflict" & plot.df$R=="CR")|(plot.df$S=="Nonconflict" & plot.df$R=="NR")|(plot.df$S=="PM" & plot.df$R=="PMR")),]
-plot.corr
+# plot.corr
 plot.corr.noPM <- plot.df[((plot.df$S=="Conflict" & plot.df$R=="CR")|(plot.df$S=="Nonconflict" & plot.df$R=="NR")),]
-plot.corr.noPM
+# plot.corr.noPM
 plot.FA <- plot.df[((plot.df$S=="Conflict" & plot.df$R=="NR")|(plot.df$S=="Nonconflict" & plot.df$R=="CR")),]
-plot.FA
+# plot.FA
 plot.reactive <- plot.df[((plot.df$S=="Conflict" & plot.df$R=="CR")|(plot.df$S=="Nonconflict" & plot.df$R=="NR")|
                               (plot.df$S=="PM (Conflict)" & plot.df$R=="CR")|(plot.df$S=="PM (Nonconflict)" & plot.df$R=="NR")),]
-plot.reactive
+# plot.reactive
 plot.ongoing <- plot.df[((plot.df$S=="Conflict" & plot.df$R=="CR")|(plot.df$S=="Nonconflict" & plot.df$R=="NR")|
                              (plot.df$S=="Conflict" & plot.df$R=="NR")|(plot.df$S=="Nonconflict" & plot.df$R=="CR")),]
-plot.ongoing
+# plot.ongoing
 
 V.corr.graph <- ggplot(plot.corr, aes(factor(cond),M)) +
   geom_point(stat = "identity", aes(shape=PM), size=3) +
@@ -399,7 +414,7 @@ V.corr.graph <- ggplot(plot.corr, aes(factor(cond),M)) +
   ggtitle("Drift Rates for Ongoing Task and PM Correct Responses by Time Pressure") +
   facet_grid(. ~ S + R)
 
-V.corr.graph
+# V.corr.graph
 
 # ggsave("E1.Rates.Correct.png", plot = last_plot())
 
@@ -435,7 +450,7 @@ V.ongoing.FA.graph <- ggplot(plot.FA, aes(factor(cond),M)) +
   ggtitle("Drift Rates for Ongoing Task False Alarms by Time Pressure") +
   facet_grid(. ~ S + R)
 
-V.ongoing.FA.graph
+# V.ongoing.FA.graph
 
 # ggsave("E1.Rates.Ongoing.FA.png", plot = last_plot())
 
@@ -453,114 +468,81 @@ V.reactive.graph <- ggplot(plot.reactive, aes(factor(cond),M)) +
   ggtitle("Reactive Inhibition of Ongoing Task Drift Rates by Time Pressure") +
   facet_grid(. ~ S + R)
 
-V.reactive.graph
+# V.reactive.graph
 
 # ggsave("E1.Rates.Reactive.Inhibition.png", plot = last_plot())
 
+V.plots <- grid.arrange(V.corr.graph, V.ongoing.FA.graph, V.reactive.graph, layout_matrix = cbind(
+    c(1,1,1,2,2,2,3,3,3), c(1,1,1,2,2,2,3,3,3), c(1,1,1,2,2,2,3,3,3), c(1,1,1,NA,NA,NA,3,3,3)))
 
-V.plots <- grid.arrange(V.corr.graph, V.ongoing.FA.graph,V.reactive.graph, layout_matrix = cbind(
-    c(1,1,1,1,2,2,2,3,3,3,3), c(1,1,1,1,2,2,2,3,3,3,3)))
+# ggsave("E1.Rates.png", plot = V.plots, width = 9, height = 12)
 
-ggsave("E1.Rates.png", plot = V.plots, width = 9, height = 12)
+```
 
+## Model Fits to Response Accuracy
 
-#
-# #### Posterior Exploration
-# #Below script requires the main samples object called camples object and assumes
-#that there is a PP object named PP
+```{r plot accuracy fits, echo=FALSE, fig.height=9, fig.width=7}
 
-load("data/samples/E1.block.B.V_cond.B.V.PMV.samples.RData")
-samples <- E1.block.B.V_cond.B.V.PMV.samples
+plot <- E1.acc.plots
 
-load("data/after_sampling/E1PP.RData")
-PP <- E1PP
+plot(plot)
 
-#Set this to TRUE after running all the sims once
-#and then it will6 load them rather than re-run.
-run.before=F
-# <<<<<<< HEAD
-# =======
-# Enam="E1"
-# >>>>>>> a23a0198bd3449e18d4d112a6de53a3f6a23b83a
-source("generate_postexploration_E1.R")
-##The above g
+```
 
-###bLOCK EFFECTS with params averaged
+## Model Fits to RT (Ongoing)
 
+```{r plot RT fits ongoing, echo=FALSE, fig.height=12, fig.width=7}
 
+plot <- E1.RT.plots.ongoing 
 
+plot(plot)
 
+```
 
-plot <- ggplot(all_effects_predictives.block, aes(S, mean))
-plot<- plot+ facet_grid(DV  ~  model, scales = "free", space = "fixed") + geom_point(size=3) + geom_errorbar(aes(ymax = upper, ymin = lower), width= 0.2) +
-  geom_point(aes(S, data), pch=21, size=4, colour="black") +xlab("Stimulus Type")+
-  theme(text = element_text(size=16)) +ylab("Cost (PM - Control)")
-plot
+## Model Fits to RT (PM)
 
+```{r plot RT fits PM, echo=FALSE, fig.height=3, fig.width=7}
 
+plot <- E1.RT.plots.PM
 
-#cond effects with params averaged
+plot(plot)
 
+```
 
-plotC <- ggplot(all_effects_predictives.cond[all_effects_predictives.cond$S=="Conflict",], aes(contrast, mean))
-plotC <- plotC+
-  facet_grid(DV  ~ model, scales = "free", space = "fixed") +
-  geom_point(size=3) + geom_errorbar(aes(ymax = upper, ymin = lower), width= 0.2) +
-  geom_point(aes(contrast, data), pch=21, size=4, colour="black") +
-  theme(text = element_text(size=8)) +ylab("Difference")+xlab("")+ labs(title = "Conflict Trials")
+## Out of Sample Predicted Nonresponse Proportions
 
-plotC
+```{r plot nonresponse proportions, echo=FALSE, eval=FALSE, fig.height=3, fig.width=7}
 
-plotN <- ggplot(all_effects_predictives.cond[all_effects_predictives.cond$S=="Nonconflict",], aes(contrast, mean))
+plot <- NR.plot
 
-plotN <- plotN+
-  facet_grid(DV  ~ model, scales = "free", space = "fixed") +
-  geom_point(size=3) + geom_errorbar(aes(ymax = upper, ymin = lower), width= 0.2) +
-  geom_point(aes(contrast, data), pch=21, size=4, colour="black") +xlab("Contrast")+
-  theme(text = element_text(size=8)) +ylab("")+ labs(title = "Nonconflict Trials")
-plotN
+plot(plot)
 
-plotP <- ggplot(all_effects_predictives.cond[all_effects_predictives.cond$S=="PM",], aes(contrast, mean))
-plotP <- plotP+
-  facet_grid(DV  ~ model, scales = "free", space = "fixed") +
-  geom_point(size=3) + geom_errorbar(aes(ymax = upper, ymin = lower), width= 0.2) +
-  geom_point(aes(contrast, data), pch=21, size=4, colour="black") +
-  theme(text = element_text(size=8)) +ylab("")+xlab("")+ labs(title = "PM Trials")
-plotP
+```
 
-#some possible grid arrangements
+## Parameter Plots: Thresholds
 
-grid.arrange(plotC, plotN, plotP, layout_matrix = cbind(c(1,1,1,2,2,2),
-                                                        c(1,1,1,2,2,2),
-                                                        c(1,1,1,2,2,2),
-                                                        c(NA,3,3,3,NA,NA),
-                                                        c(NA,3,3,3,NA,NA),
-                                                        c(NA,3,3,3,NA,NA)
+```{r plot thresholds, echo=FALSE, fig.height=4.5, fig.width=7}
 
-                                                        ))
+plot <- B.plot
 
-grid.arrange(plotC, plotN, plotP, layout_matrix = cbind(c(1,1,1,3,3,3),
-                                                        c(1,1,1,3,3,3),
-                                                        c(1,1,1,3,3,3),
-                                                        c(2,2,2,NA,NA,NA),
-                                                        c(2,2,2,NA,NA,NA),
-                                                        c(2,2,2,NA,NA,NA)
+plot(plot)
 
-))
+```
 
+## Parameter Plots: Rates
 
-##Turning off PM control mechanisms systematically and examining PM accuracy/
-#PM RT
+```{r plot rates, echo=FALSE, fig.height=12, fig.width=7}
 
+plot <- V.plots
 
-plot <- ggplot(PM_control_mechanisms, aes(model, mean))
-plot<- plot+ facet_grid(DV  ~ ., scales = "free", space = "fixed") +
-  geom_point(size=3) + geom_errorbar(aes(ymax = upper, ymin = lower), width= 0.2) +
-  geom_line(aes(group=1, y=data), linetype=2) +xlab("Included Control Mechanisms")+
-  ylab("PM Trial Performance") +scale_x_discrete(labels=c("Proactive and Reactive",
-                                                          "Only Reactive", "Only Proactive", "No Control")) + theme(text = element_text(size=18))
-plot
+plot(plot)
+
+```
+
+## Parameter Tables
+
+```{r parameter tables, echo=FALSE}
 
 
 
-
+```

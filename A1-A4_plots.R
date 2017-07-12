@@ -48,6 +48,13 @@ zandp <- function(samples, fun){
     paste(round(Z,2), "(", round(p,3), ")", sep="")
 }
 
+mean.sd <- function(samples, fun){
+    effect<- group.inference.dist(samples, fun)
+    M <- mean(effect)
+    SD <- sd(effect)
+    data.frame(M, SD)
+}
+
 # # # Functions to get thresholds averaged over condition # # #
 #
 
@@ -65,20 +72,6 @@ av.B.diff.C <- function (thetas) ((thetas[,"B.A3C",, drop=F] + thetas[,"B.B3C",,
 
 av.B.diff.N <- function (thetas) ((thetas[,"B.A3N",, drop=F] + thetas[,"B.B3N",, drop=F] + thetas[,"B.C3N",, drop=F] + thetas[,"B.D3N",, drop=F])/4 - (thetas[,"B.A2N",, drop=F] + thetas[,"B.B2N",, drop=F] + thetas[,"B.C2N",, drop=F] + thetas[,"B.D2N",, drop=F])/4)
 #
-# av.B.2C.dist <- group.inference.dist(samples.A1,av.B.2C)
-# av.B.2N.dist <- group.inference.dist(samples.A1,av.B.2N)
-# av.B.3C.dist <- group.inference.dist(samples.A1,av.B.3C)
-# av.B.3N.dist <- group.inference.dist(samples.A1,av.B.3N)
-# av.B.3P.dist <- group.inference.dist(samples.A1,av.B.3P)
-
-
-mean.sd <- function(samples, fun){
-    effect<- group.inference.dist(samples, fun)
-    M <- mean(effect)
-    SD <- sd(effect)
-    data.frame(M, SD)
-}
-
 
 B.diff.C.A1 <- mean.sd(samples.A1,av.B.diff.C)
 B.diff.N.A1 <- mean.sd(samples.A1,av.B.diff.N)

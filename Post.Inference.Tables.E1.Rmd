@@ -1,3 +1,16 @@
+---
+title: "Parameter and Posterior Inference Tables for ATC Experiment E1"
+author: "Russell Boag"
+date: "12 July 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load and prep data, echo=FALSE, include=FALSE}
+
 
 rm(list=ls())
 setwd("C:/Users/Russell Boag/Documents/GitHub/DMCATC")
@@ -438,7 +451,7 @@ Reactive.Table <- data.frame(rbind(
         zandp(samples.E1, Reactive.ccDN)
         )
 ))
-colnames(Reactive.Table) <- c("Conflict","Nonconflict","Conflict (FA)","Nonconflict (FA)")
+colnames(Reactive.Table) <- c("Conflict","Nonconflict","Conflict (Error)","Nonconflict (Error)")
 # Reactive.Table
 
 #
@@ -488,7 +501,7 @@ Capacity.Table <- data.frame(rbind(
                          zandp(samples.E1, Capacity.ccDN)
     )
 ))
-colnames(Capacity.Table) <- c("Conflict","Nonconflict","Conflict (FA)","Nonconflict (FA)")
+colnames(Capacity.Table) <- c("Conflict","Nonconflict","Conflict (Error)","Nonconflict (Error)")
 # Capacity.Table
 
 #
@@ -584,3 +597,125 @@ Capacity.Table
 ProactiveTP.Table
 Effort.by.TP.Table.Wide
 
+```
+
+## Parameter Table: Nondecision Time
+
+```{r t0, echo=FALSE}
+
+panderOptions("digits", 3)
+
+table <- t0.Table
+
+pander(table)
+
+```
+
+## Parameter Table: sdv
+
+```{r sdv, echo=FALSE}
+
+panderOptions("digits", 3)
+
+table <- sdv.Table
+
+pander(table)
+
+```
+
+
+## Parameter Table: Thresholds by PM Block
+
+```{r thresholds by pm block, echo=FALSE}
+
+panderOptions("digits", 3)
+
+table <- av.Bs.PM.Table
+
+pander(table)
+
+```
+
+## Parameter Table: Thresholds by Time Pressure
+
+```{r thresholds by time pressure, echo=FALSE}
+
+panderOptions("digits", 3)
+
+table <- av.Bs.TP.Table
+
+pander(table)
+
+```
+
+## Parameter Table: Drift Rates by PM Block
+
+```{r rates by pm block, echo=FALSE}
+
+panderOptions("digits", 3)
+
+table <- av.vs.PM.Table
+
+pander(table)
+
+```
+
+## Posterior Inference Table: Reactive Inhibition
+
+```{r post inf reactive inhibition, echo=FALSE}
+
+panderOptions("digits", 3)
+
+table <- Reactive.Table
+
+pander(table)
+
+```
+
+## Posterior Inference Table: Proactive Control
+
+```{r post inf proactive control pm, echo=FALSE}
+
+panderOptions("digits", 3)
+
+table <- Proactive.Table
+
+pander(table)
+
+```
+
+## Posterior Inference Table: Capacity Sharing
+
+```{r post inf capacity sharing, echo=FALSE}
+
+panderOptions("digits", 3)
+
+table <- Capacity.Table
+
+pander(table)
+
+```
+
+## Posterior Inference Table: Proactive Control by Time Pressure
+
+```{r post inf proactive control time pressure, echo=FALSE}
+
+panderOptions("digits", 3)
+
+table <- ProactiveTP.Table
+
+pander(table)
+
+```
+
+## Posterior Inference Table: Effort/Arousal by Time Pressure
+
+```{r post inf effort arousal time pressure, echo=FALSE}
+
+panderOptions("digits", 3)
+
+table <- Effort.by.TP.Table.Wide
+
+pander(table)
+
+```

@@ -1,0 +1,245 @@
+---
+title: "Results Importance"
+output: word_document
+---
+```{r length, echo=FALSE, results='hide'}
+
+getdat <- function(dirstr="data",codename="codes",slow=3000,fast=200) {
+  codes <- read.delim(paste(dirstr,codename,sep="/"))
+  fns <- dir(dirstr)[grep(".txt",dir(dirstr))]
+  sns <- unlist(lapply(strsplit(fns,".",fixed=TRUE),function(x){x[1]}))
+  for (i in 1:length(fns)) {
+    #     print(sns[i])    
+    dat <- read.delim(paste(dirstr,fns[i],sep="/"))
+    dat<- dat[,1:9]
+    
+    dat$Condition <- factor(as.character(dat$Condition),
+                            labels=c("C","I","UI"))     
+    ##### chuck key presses other than LD/PM in data frame datswrongkey   
+    if ((codes[codes[,1]==as.numeric(sns[i]),2]==1)|(codes[codes[,1]==as.numeric(sns[i]),2]==2)){
+      datwrongkey <- dat[!(dat$Actresponse=="s"|dat$Actresponse=="d"|dat$Actresponse=="j"),]
+      if (length(datwrongkey)>0) datwrongkey <- cbind(s=rep(sns[i],dim(datwrongkey)[1]),datwrongkey)    
+    } else { datwrongkey <- dat[!(dat$Actresponse=="d"|dat$Actresponse=="j"|dat$Actresponse=="k"),]
+             if (length(datwrongkey)>0) datwrongkey <- cbind(s=rep(sns[i],dim(datwrongkey)[1]),datwrongkey)
+    }
+    
+    
+    if (i==1) datswrongkey <<- as.data.frame(datwrongkey)  else datswrongkey <<- rbind(datswrongkey,datwrongkey)
+    
+    
+    
+    if (codes[codes[,1]==as.numeric(sns[i]),2]==1) {    
+      dat$Reqresponse <- factor(as.character(dat$Reqresponse),
+                                labels=c("Nonword","Word")) 
+      dat$Actresponse <- factor(as.character(dat$Actresponse),
+                                levels=c("d","j","s"))   
+      dat$Actresponse <- factor(as.character(dat$Actresponse),
+                                labels=c("Nonword","PM","Word"))
+    } else if (codes[codes[,1]==as.numeric(sns[i]),2]==2) {
+      dat$Reqresponse <- factor(as.character(dat$Reqresponse),
+                                labels=c("Word","Nonword")) 
+      dat$Actresponse <- factor(as.character(dat$Actresponse),
+                                levels=c("d","j","s"))   
+      dat$Actresponse <- factor(as.character(dat$Actresponse),
+                                labels=c("Word","PM","Nonword"))         
+    } else if (codes[codes[,1]==as.numeric(sns[i]),2]==4) {
+      dat$Reqresponse <- factor(as.character(dat$Reqresponse),
+                                labels=c("Word","Nonword")) 
+      dat$Actresponse <- factor(as.character(dat$Actresponse),
+                                levels=c("d","j","k"))   
+      dat$Actresponse <- factor(as.character(dat$Actresponse),
+                                labels=c("PM","Word","Nonword"))     
+    } else if (codes[codes[,1]==as.numeric(sns[i]),2]==3) {
+      dat$Reqresponse <- factor(as.character(dat$Reqresponse),
+                                labels=c("Nonword","Word")) 
+      dat$Actresponse <- factor(as.character(dat$Actresponse),
+                                levels=c("d","j","k"))   
+      dat$Actresponse <- factor(as.character(dat$Actresponse),
+                                labels=c("PM","Nonword","Word"))  
+    }     
+    dat$trials <- rep(1:440,times=9)
+    dat$quarters <- rep(c(rep(1, times = 110), rep(2, times = 110), rep(3, times = 110), rep(4, times = 110)), times=9)
+    dat <- dat[!is.na(dat$Actresponse),]
+    tmp=table(dat$Stimuli[dat$Reqresponse!="PM"])
+    dat$Score <- as.logical(dat$Score)
+    dat <- cbind(s=rep(sns[i],dim(dat)[1]),dat)
+    dat$s <- as.character(dat$s)
+    if (i==1)  dats <- dat  else dats <- rbind(dats,dat)
+    ##badR uniques out
+    datdupe <- dat[duplicated(dat$Stimulus),]
+    if (i==1) datdupes <<- datdupe else datdupes <<- rbind(datdupes,datdupe)
+  }
+  dats$s <- factor(dats$s)  
+  names(dats) <- c("s","condition","day", "block", "item",
+                   "C","S","R","RT", "ispmcue", "trial", "quarter")
+  cat("% Fast Responses\n")
+  print(round(100*tapply(dats$RT<fast,dats$s,mean)))
+  cat("% Slow Responses\n")
+  print(round(100*tapply(dats$RT>slow,dats$s,mean)))
+  dats
+}
+
+
+
+dats <- getdat()
+wrongkey <- length(datswrongkey$RT) / (length(dats$RT) + length(datswrongkey$RT)) 
+dats$RT <- dats$RT/1000
+dats$item<- as.character(dats$item)
+dats$ispmcue<- as.character(dats$ispmcue)
+dats$ispmcue[dats$ispmcue=="j"|dats$ispmcue=="d"] <- "PM"
+dats$C[dats$ispmcue=="PM" & dats$R!="PM"]<- F
+dats$day<-as.factor(dats$day)
+dats$block<-as.factor(dats$block)
+dats$quarter<-as.factor(dats$quarter)
+names(dats)[2] <- "PM"
+dats$S <- as.character(dats$S)
+dats$S[dats$ispmcue=="PM"&dats$S=="Word"]<- "PMW"
+dats$S[dats$ispmcue=="PM"&dats$S=="Nonword"]<- "PMN"
+dats$S<- factor(dats$S)
+
+# check for bad subjects
+fast <- tapply(dats$RT<0.200,list(Day=dats$day,PM = dats$PM, s=dats$s),mean)
+slow <- tapply(dats$RT>5,list(Day=dats$da,PM = dats$PM,s=dats$s),mean)
+
+
+# cut first two trials of each quarter
+dats <- dats[!(dats$trial %in% c(1,2,111,112,221,222,331,332)),] 
+
+# PM trials and 2 after 
+
+badS <- dats$S=="PMW"|dats$S=="PMN"
+missingtrials <- abs(dats$trial-1-c(F,dats$trial[-length(dats$trial)]))
+cutS = ifelse( c(FALSE,head(badS,-1)) & missingtrials<2 |
+                 c(FALSE,FALSE,head(badS,-2)) & (missingtrials+c(0,head(missingtrials,-1)) < 1),
+               TRUE,
+               FALSE
+)
+
+badR <- dats$R=="PM"; nbadr=length(badR) 
+cutR = ifelse( c(FALSE,head(badR,-1)) & missingtrials<2 |
+                 c(FALSE,FALSE,head(badR,-2)) & (missingtrials+c(0,head(missingtrials,-1)) < 1),
+               TRUE,
+               FALSE
+)
+
+dats <- dats[!cutS &!cutR,]
+
+##SAME AS OLD PARSE UP TO HERE 18/04
+## NOW DO ANALYSES CONSISTENT WITH THE METHODOLOGY FROM EX5 FOR THE COMBINED PAPER
+
+# IQR 3SD clean
+clean <- function(df) {
+  dfc <- df
+  n=tapply(df$RT,list(df$s),length)
+  ns=tapply(df$RT,list(df$s),length)
+  mn=tapply(df$RT,list(df$s),mean)
+  sd=tapply(df$RT,list(df$s),IQR)
+  upper <- mn+3*(sd/1.349)
+  lower <- 0.2
+  bad <- logical(dim(df)[1])
+  levs <- paste(df$s,sep=".")
+  for (i in levels(df$s)){
+    lev <- i
+    bad[levs==lev] <- df[levs==lev,"RT"] > upper[i] | df[levs==lev,"RT"] < lower
+  }
+  df=df[!bad,]
+  nok=tapply(df$RT,list(df$s),length)
+  pbad=100-100*nok/n
+  nok=tapply(df$RT,list(df$s),length)
+  pbad=100-100*nok/ns
+  print(sort(round(pbad,5)))
+  print(mean(pbad,na.rm=T))
+  df
+}
+
+dats<- dats[!(dats$PM=="C" & dats$R== "PM"),]
+okdats <- clean(dats)
+
+## Traditional anova analyses
+#Cut PMs, FAs and 2 after for the LDT frame
+ldt.old.length <- length(dats$RT[!(dats$R=="PM"|dats$ispmcue=="PM")])
+PM.old.length <- length(dats$RT[dats$ispmcue=="PM"])
+ldt <- okdats[!(okdats$R=="PM"|okdats$ispmcue=="PM"),]
+ldt$S <- factor(as.character(ldt$S))
+ldt$PM <- factor(as.character(ldt$PM))
+
+PM <- okdats[okdats$ispmcue=="PM",]
+PM$S <- factor(as.character(PM$S)); PM$PM <- factor(as.character(PM$PM))
+
+
+```
+
+#Results
+An alpha level of 0.05 was used in all analyses. The first two trials of each quarter were excluded from the analyses, as were trials where participants responded with a key which was not designated to indicate their PM or LD responses (`r options(digits = 2); wrongkey*100`% of trials) and trials with outlying RTs (<0.2s or >mean RT plus 3 times the interquartile range / 1.349, which is a robust equivalent to the mean +3 SD cutoff; `r (ldt.old.length- length(ldt$RT))/ldt.old.length`% of non-target trials and `r (PM.old.length- length(PM$RT))/PM.old.length`% of PM trials were excluded). Two participants responded once each with the PM response key in the control condition, these trials and 2 trials after were excluded from the analyses. In addition to stimulus type (word, non-word) and condition, the subsequent analyses included a day order factor (day 1, day 2, day 3) to capture any effects of task repetition. We used generalized linear mixed models with a probit link function to analyze accuracies, and general linear mixed models to analyze RTs. All analyses were carried again using lme4 and the car package for Wald's chi-square tests. The models run for the current analysis (ongoing acc/RT, PM acc/RT) are tabulated in the supplementary materials, report the direction of significant effects in the body of the paper. All standard errors reported in the paper were calculated using the Morey (2008) bias corrected method.
+
+#Prospective Memory
+
+```{r PM, echo=FALSE, results='hide'}
+source("LSAnova.R")
+dPMacc <- arr2df(tapply(PM$C,list(s=PM$s,PM=PM$PM, day = PM$day, S= PM$S), mean))
+meanPMacc <- mneffects(dPMacc,list("day","S", "PM", digits=2))
+sePMP <-se(dPMacc, facs= c("PM"))
+seSP <- se(dPMacc, facs= c("S"))
+seDP <- se(dPMacc, facs= c("day"))
+
+```
+
+PM responses were scored as correct if the participant pressed the PM response key instead of a lexical decision response key on the target trial. PM accuracy decreased over days (day 1 M = `r meanPMacc$day[["1"]]`%; SE = `r seDP[[1]]`%; day 2 M = `r meanPMacc$day[["2"]]`%; SE = `r seDP[[2]]`%; day 3 M = `r meanPMacc$day[["3"]]`%; SE = `r seDP[[3]]`%), and was higher for non-word PM targets (M = `r meanPMacc$S[["PMN"]]`%, SE = `r seSP[["PMN"]]`%) than for word PM targets (M = `r meanPMacc$S[["PMW"]]`%, SE = `r seSP[["PMW"]]`%). We found the typical effect of importance emphasis, PM accuracy was higher in the PM-important condition (M = `r meanPMacc$PM[["I"]]`%, SE = `r sePMP[["I"]]`%) than in the PM-unimportant condition (M = `r meanPMacc$PM[["UI"]]`%, SE = `r sePMP[["UI"]]`%).
+
+
+```{r PMRT, echo=FALSE, results='hide'}
+source("LSAnova.R")
+dPMrt <-arr2df(tapply(PM$RT[PM$C],list(s=PM$s[PM$C],PM=PM$PM[PM$C],day = PM$day[PM$C], S= PM$S[PM$C]),mean))
+meanPMrt<- mneffects(dPMrt,list("PM", "S", "day"),digits=3)
+sePMPrt <-se2(dPMrt, facs="PM")
+seSPrt <- se2(dPMrt, facs="S")
+seDPrt <- se2(dPMrt, facs="day")
+
+#False Alarms
+FA <- okdats[!okdats$S =="PMW" & !okdats$S =="PMN",]
+FA$S <- factor(as.character(FA$S))
+FA$fa <- FA$R=="PM"
+FAs <- arr2df(tapply(FA$fa,list(s=FA$s,PM=FA$PM, S=FA$S, day = FA$day), mean))
+FAs <- FAs [!FAs$PM=="C",]; FAs$PM <- factor (as.character(FAs$PM))
+
+
+#wont run stick with anova
+# fa.glmer <- glmer(fa ~ PM*day*S+(1|s), data=FA,family=binomial(link = "probit"))
+# Anova(fa.glmer,type="II")
+
+
+FAanova <- wsAnova(FAs)
+FAs$y <- FAs$y*100
+FAmns <- mneffects(FAs,list("PM","S", "day", c("S", "day")),digits=4)
+FAlist <-sort(tapply (FAs$y,list(s=FAs$s), mean))
+
+
+```
+
+
+Correct PM responses were faster in the PM-important condition (M = `r meanPMrt$PM[["I"]]`s, SE = `r sePMPrt[["I"]]`s) than in the PM-unimportant condition (M = `r meanPMrt$PM[["UI"]]`s, SE = `r sePMPrt[["UI"]]`s), and there was an effect of day order (day 1 M = `r meanPMrt$day[["1"]]`s, SE = `r seDPrt[["1"]]`s; day 2 M = `r meanPMrt$day[["2"]]`, SE = `r seDPrt[["2"]]`s; day 3 M = `r meanPMrt$day[["3"]]`s, SE = `r seDPrt[["3"]]`s). PM responses took longer for non-word PM targets (M = `r meanPMrt$S[["PMN"]]`s, SE = `r seSPrt[["PMN"]]`s) than for word targets (M = `r meanPMrt$S[["PMW"]]`s, SE = `r seSPrt[["PMW"]]`s). PM response false alarms were rare, ranging from `r FAlist[1]` to `r FAlist[length(FAlist)]`% of trials. This low rate of false alarms caused problems estimated our mixed-effects model, and so we used a standard ANOVA. A stimulus type by condition by day repeated measures ANOVA was conducted on mean false alarm rates. There was an effect of condition; false alarms were more common in the PM-important condition (`r FAmns$PM[["I"]]`%) than in the PM-unimportant condition (`r FAmns$PM[["UI"]]`%), F (`r FAanova$univariate.tests["PM","num Df"]`, `r FAanova$univariate.tests["PM","den Df"]`) = `r FAanova$univariate.tests["PM","F"]`, p < `r FAanova$univariate.tests["PM","Pr(>F)"]`, ??p2 = `r FAanova$PartialEtaSq["PM"]`. False alarms were less common on non-word trials (`r FAmns$S[["Nonword"]]`%) than on word trials (`r FAmns$S[["Word"]]`%), F (1, 35) = `r FAanova$univariate.tests["S","F"]`, p < `r FAanova$univariate.tests["S","Pr(>F)"]`, ??p2 = `r FAanova$PartialEtaSq["S"]`. No other effects of interactions were significant (smallest p = `r FAanova$pval.adjustments["PM:day","Pr(>F[GG])"]`, ??p2??? =`r FAanova$pval.adjustments["PM:day","GG eps"]`).  
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

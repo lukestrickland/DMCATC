@@ -11,7 +11,7 @@ output:
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-```{r load data, echo=FALSE}
+```{r load data, echo=FALSE, include=FALSE}
 rm(list=ls())
 # setwd("~/russ_model_analyses")
 setwd("C:/Users/Russell Boag/Documents/GitHub/DMCATC")
@@ -30,7 +30,7 @@ samples.E1 <- E1.block.B.V_cond.B.V.PMV.samples
 rm(E1.block.B.V_cond.B.V.PMV.samples)
 ```
 
-```{r prep data, echo=FALSE}
+```{r prep data, echo=FALSE, include=FALSE}
 # samples.E1[["p17"]]$data[ (samples.E1[["p17"]]$data$S=="pc" | samples.E1[["p17"]]$data$S=="pn"  ) & samples.E1[["p17"]]$data$S=="P" ]
 
 # names(samples.E1) != "p17"
@@ -72,7 +72,7 @@ for(i in 1:length(data.E1$RT)){
 #
 ```
 
-```{r run GLMER accuracy analyses, echo=FALSE}
+```{r run GLMER accuracy analyses, echo=FALSE, include=FALSE}
 
 # # # Prep dataframes for analysis # # #
 #
@@ -126,7 +126,7 @@ colnames(PMT.Acc.TABLE.E1) <- c("Chi-square","df","p")
 setwd("C:/Users/Russell Boag/Documents/GitHub/DMCATC")
 ```
 
-```{r run LMER RT analyses, echo=FALSE}
+```{r run LMER RT analyses, echo=FALSE, include=FALSE}
 # # # Prep RT dataframes for analysis (keep correct RTs only) # # #
 #
 setwd("C:/Users/Russell Boag/Documents/GitHub/DMCATC/analysis")
@@ -179,7 +179,7 @@ setwd("C:/Users/Russell Boag/Documents/GitHub/DMCATC")
 
 ```
 
-```{r calculate manifests and planned contrasts, echo=FALSE}
+```{r calculate manifests and planned contrasts, echo=FALSE, include=FALSE}
 
 setwd("C:/Users/Russell Boag/Documents/GitHub/DMCATC/analysis")
 # # # ANOVA analysis: Ongoing Task Accuracy # # #
