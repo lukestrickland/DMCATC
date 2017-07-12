@@ -12,6 +12,9 @@ source("dmc/dmc_ATC.R")
 load("data/samples/E1.block.B.V_cond.B.V.PMV.samples.RData")
 samples <- E1.block.B.V_cond.B.V.PMV.samples
 rm(E1.block.B.V_cond.B.V.PMV.samples)
+
+samples <- samples[names(samples) != "p17"]  # Exclude p17 E1 due to no PM responses
+
 # Check how many runs it took to converge
 # If any say "FAIL" then it didn't converge
 
@@ -468,13 +471,17 @@ ggsave("E1.Rates.png", plot = V.plots, width = 9, height = 12)
 
 load("data/samples/E1.block.B.V_cond.B.V.PMV.samples.RData")
 samples <- E1.block.B.V_cond.B.V.PMV.samples
-PP <- E1PP
-load("data/after_sampling/E1PP.RData")
 
+load("data/after_sampling/E1PP.RData")
+PP <- E1PP
 
 #Set this to TRUE after running all the sims once
 #and then it will6 load them rather than re-run.
 run.before=F
+<<<<<<< HEAD
+=======
+Enam="E1"
+>>>>>>> a23a0198bd3449e18d4d112a6de53a3f6a23b83a
 source("generate_postexploration_E1.R")
 ##The above g
 

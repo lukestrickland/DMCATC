@@ -13,11 +13,13 @@ require("pander")
 
 # # # Load samples object # # #
 #
-load("C:/Users/Russell Boag/Documents/GitHub/DMCATC/samples/E1.block.B.V_cond.B.V.PMV.samples.RData")  # Samples object
+load("data/samples/E1.block.B.V_cond.B.V.PMV.samples.RData")  # Samples object
 samples.E1 <- E1.block.B.V_cond.B.V.PMV.samples
 rm(E1.block.B.V_cond.B.V.PMV.samples)
 
-# samples.E1[[1]]$theta
+samples.E1 <- samples.E1[names(samples.E1) != "p17"]  # Exclude p17 E1 due to no PM responses
+
+
 
 # # # Load functions # # #
 #
@@ -66,14 +68,6 @@ Reactive.nnCC <- function (thetas) thetas[,"mean_v.nnC3C",, drop=F] - thetas[,"m
 Reactive.nnDC <- function (thetas) thetas[,"mean_v.nnD3C",, drop=F] - thetas[,"mean_v.pnD3C",, drop=F]
 
 
-
-# HFreacpN <- function (thetas) (thetas[,"mean_v.FwN",, drop=F] - thetas[,"mean_v.FpN",, drop=F]) - (thetas[,"mean_v.HwN",, drop=F] - thetas[,"mean_v.HpN",, drop=F])
-
-
-# HFreacpW <- function (thetas) (thetas[,"mean_v.FwW",, drop=F] - thetas[,"mean_v.FpW",, drop=F]) - (thetas[,"mean_v.HwW",, drop=F] - thetas[,"mean_v.HpW",, drop=F])
-#
-# HFreacpP <- function (thetas) (thetas[,"mean_v.fa",, drop=F] - thetas[,"mean_v.HpP",, drop=F]) - (thetas[,"mean_v.fa",, drop=F] - thetas[,"mean_v.FpP",, drop=F])
-# HFreacpP <- function (thetas) (thetas[,"mean_v.fa",, drop=F] - thetas[,"mean_v.HpP",, drop=F]) - (thetas[,"mean_v.fa",, drop=F] - thetas[,"mean_v.FpP",, drop=F])
 
 
 # # # Proactive Control # # #

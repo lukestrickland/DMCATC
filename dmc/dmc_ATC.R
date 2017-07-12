@@ -8,7 +8,33 @@ require("data.table")
 theme_set(theme_simple())
 
 # 
+minp <- function (effect) min(ecdf(effect)(0), 1-ecdf(effect)(0))
 
+zandp <- function(samples, fun){
+  effect<- group.inference.dist(samples, fun)
+  Z <- mean(effect)/sd(effect) }
+  
+  Z.p.acrossexp <- function(samples1,samples2, fun){
+    effect1<- group.inference.dist(samples1, fun)
+    effect2 <- group.inference.dist(samples2, fun)
+    effect<- effect1 - effect2
+    Z <- mean(effect)/sd(effect)
+    p <- minp(effect)
+    paste(round(Z,2), "(", round(p,3), ")", sep="")
+  }
+
+##accepts a function and does it to the thetas for each subject then averages after
+group.inference.dist <- function (hsamples, fun) {
+  inference <- list()
+  for (i in 1:length(hsamples)) {
+    thetas <- hsamples[[i]]$theta
+    inference [[i]] <- fun (thetas)
+  }
+  inf2 <- unlist(inference)
+  dim3 <- c(dim(inference[[1]]), length(inf2)/prod(dim(inference[[1]])))
+  dim(inf2) <- dim3
+  apply(inf2, c(1,2,3), mean)
+}
 
 #The below function, post.predict.dmc.MATCHORDER, accepts a samples object and 
 #an okdats object. The latter must have the FULL original data frame for each

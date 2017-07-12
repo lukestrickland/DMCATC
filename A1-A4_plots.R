@@ -39,8 +39,16 @@ group.inference.dist <- function (hsamples, fun) {
     apply(inf2, c(1,2,3), mean)
 }
 
+minp <- function (effect) min(ecdf(effect)(0), 1-ecdf(effect)(0))
 
-# # # Load samples object # # #
+zandp <- function(samples, fun){
+    effect<- group.inference.dist(samples, fun)
+    Z <- mean(effect)/sd(effect)
+    p <- minp(effect)
+    paste(round(Z,2), "(", round(p,3), ")", sep="")
+}
+
+# # # Functions to get thresholds averaged over condition # # #
 #
 
 av.B.2C <- function (thetas) (thetas[,"B.A2C",, drop=F] + thetas[,"B.B2C",, drop=F] + thetas[,"B.C2C",, drop=F] + thetas[,"B.D2C",, drop=F])/4
@@ -274,99 +282,168 @@ ggplot(plot.reactive, aes(factor(Emphasis),M)) +
 #
 # # # Nondecision Time # # #
 
-t0 <- msds[grep("t0", rownames(msds)),]
+av.t0 <- function (thetas) thetas[,"t0",, drop=F]
+
+t0.A1 <- mean.sd(samples.A1,av.t0)
+t0.A2 <- mean.sd(samples.A2,av.t0)
+t0.A3 <- mean.sd(samples.A3,av.t0)
+t0.A4 <- mean.sd(samples.A4,av.t0)
+
+t0.A1
+t0 <- rbind(A1.t0=t0.A1,A2.t0=t0.A2,A3.t0=t0.A3,A4.t0=t0.A4)
 t0
 
-ggplot(t0, aes(factor(Emphasis),M)) +
-  geom_line(aes(y=M), linetype=2) +
-  geom_point(stat = "identity", aes(), size=3) +
-  geom_errorbar(aes(ymax = M + SD, ymin = M - SD, width = 0.2)) +
-  xlab("Task Emphasis") + ylab("t0") +
-  ylim(0.2,0.4) +
-  theme(text = element_text()) +
-  theme(
-    axis.line.x = element_line(),
-    axis.line.y = element_line()
-  ) + ggtitle("Nondecision Time by Task Emphasis")
+t0$Emphasis <- NA;
+
+t0$Emphasis[grep ("A1", rownames(t0))] <- "Neutral"
+t0$Emphasis[grep ("A2", rownames(t0))] <- "Ongoing"
+t0$Emphasis[grep ("A3", rownames(t0))] <- "Speed"
+t0$Emphasis[grep ("A4", rownames(t0))] <- "PM"
+
+plot.t0 <- t0
+plot.t0$Emphasis <- factor(plot.t0$Emphasis, levels=c("Neutral","Ongoing","Speed","PM"))
+
+ggplot(plot.t0, aes(factor(Emphasis),M)) +
+    geom_line(aes(y=M), linetype=2) +
+    geom_point(stat = "identity", aes(), size=3) +
+    geom_errorbar(aes(ymax = M + SD, ymin = M - SD, width = 0.2)) +
+    xlab("Task Emphasis") + ylab("t0") +
+    scale_shape_discrete("Response:") +
+    ylim(0.25,0.4) +
+    theme(text = element_text()) +
+    theme(
+        axis.line.x = element_line(),
+        axis.line.y = element_line()
+    ) + ggtitle("Nondecision Time by Task Emphasis")
+
+###########
 
 
-# # # Thresholds # # #
-
-
-# # # Rates # # #
-
-mvs <- msds[grep ("mean_v", rownames(msds)),]
-mvs
-mvs <- data.frame(mvs)
-mvs$S <- NA; mvs$Block <- NA; mvs$Condition <- NA; mvs$R <- NA
-mvs
-
-mvs$S[grep ("cc", rownames(mvs))] <- "Conflict"
-mvs$S[grep ("nn", rownames(mvs))] <- "Nonconflict"
-mvs$S[grep ("pc", rownames(mvs))] <- "PM (Conflict)"
-mvs$S[grep ("pn", rownames(mvs))] <- "PM (Nonconflict)"
-mvs$S[grep ("FA", rownames(mvs))] <- "Ongoing"
-mvs
-
-mvs$Block[grep ("2", mvs$Parameter)] <- "Control"
-mvs$Block[grep ("3", mvs$Parameter)] <- "PM"
-mvs$Block[grep ("PMV", mvs$Parameter)] <- "PM"
-mvs
-
-mvs$Condition[grep ("A2", mvs$Parameter)] <- "Low/Low"
-mvs$Condition[grep ("A3", mvs$Parameter)] <- "Low/Low"
-mvs$Condition[grep ("B2", mvs$Parameter)] <- "High/Low"
-mvs$Condition[grep ("B3", mvs$Parameter)] <- "High/Low"
-mvs$Condition[grep ("C2", mvs$Parameter)] <- "Low/High"
-mvs$Condition[grep ("C3", mvs$Parameter)] <- "Low/High"
-mvs$Condition[grep ("D2", mvs$Parameter)] <- "High/High"
-mvs$Condition[grep ("D3", mvs$Parameter)] <- "High/High"
-mvs$Condition[grep ("PMV", mvs$Parameter)] <- "ABCD"
-mvs
-
-mvs$R[grep ("2N", rownames(mvs))] <- "NR"
-mvs$R[grep ("3N", rownames(mvs))] <- "NR"
-mvs$R[grep ("2C", rownames(mvs))] <- "CR"
-mvs$R[grep ("3C", rownames(mvs))] <- "CR"
-mvs$R[grep ("2P", rownames(mvs))] <- "PMR"
-mvs$R[grep ("3P", rownames(mvs))] <- "PMR"
-mvs$R[grep ("PMV", rownames(mvs))] <- "PMV"
-mvs
-
+# # # Capacity (Difference in Drift between Control and PM blocks) # # #
 #
-plot.df <- mvs
-plot.df$S <- factor(plot.df$S)
-plot.df$Block <- factor(plot.df$Block)
-plot.df$Condition <- factor(plot.df$Condition)
-plot.df$R <- factor(plot.df$R)
+Capacity.ccC <- function (thetas) ((thetas[,"mean_v.ccA3C",, drop=F] - thetas[,"mean_v.ccA2C",, drop=F]) +
+                                       (thetas[,"mean_v.ccB3C",, drop=F] - thetas[,"mean_v.ccB2C",, drop=F]) +
+                                       (thetas[,"mean_v.ccC3C",, drop=F] - thetas[,"mean_v.ccC2C",, drop=F]) +
+                                       (thetas[,"mean_v.ccD3C",, drop=F] - thetas[,"mean_v.ccD2C",, drop=F]))/4
 
-dim(plot.df)
-plot.df <- plot.df[plot.df$R!="PMV",]
-str(plot.df)
-plot.df
+Capacity.nnN <- function (thetas) ((thetas[,"mean_v.nnA3N",, drop=F] - thetas[,"mean_v.nnA2N",, drop=F]) +
+                                       (thetas[,"mean_v.nnB3N",, drop=F] - thetas[,"mean_v.nnB2N",, drop=F]) +
+                                       (thetas[,"mean_v.nnC3N",, drop=F] - thetas[,"mean_v.nnC2N",, drop=F]) +
+                                       (thetas[,"mean_v.nnD3N",, drop=F] - thetas[,"mean_v.nnD2N",, drop=F]))/4
 
-plot.correct <- plot.df[((plot.df$S=="Conflict" & plot.df$R=="CR")|(plot.df$S=="Nonconflict" & plot.df$R=="NR")|(plot.df$S=="PM (Conflict)" & plot.df$R=="PMR")|(plot.df$S=="PM (Nonconflict)" & plot.df$R=="PMR")),]
-plot.correct
-plot.correct.noPM <- plot.df[((plot.df$S=="Conflict" & plot.df$R=="CR")|(plot.df$S=="Nonconflict" & plot.df$R=="NR")),]
-plot.correct.noPM
-plot.reactive <- plot.df[((plot.df$S=="Conflict" & plot.df$R=="CR")|(plot.df$S=="Nonconflict" & plot.df$R=="NR")|(plot.df$S=="PM (Conflict)" & plot.df$R=="CR")|(plot.df$S=="PM (Nonconflict)" & plot.df$R=="NR")),]
-plot.reactive
-plot.ongoing <- plot.df[((plot.df$S=="Conflict" & plot.df$R=="CR")|(plot.df$S=="Nonconflict" & plot.df$R=="NR")|(plot.df$S=="Conflict" & plot.df$R=="NR")|(plot.df$S=="Nonconflict" & plot.df$R=="CR")),]
-plot.ongoing
+Capacity.nnC <- function (thetas) ((thetas[,"mean_v.nnA3C",, drop=F] - thetas[,"mean_v.nnA2C",, drop=F]) +
+                                       (thetas[,"mean_v.nnB3C",, drop=F] - thetas[,"mean_v.nnB2C",, drop=F]) +
+                                       (thetas[,"mean_v.nnC3C",, drop=F] - thetas[,"mean_v.nnC2C",, drop=F]) +
+                                       (thetas[,"mean_v.nnD3C",, drop=F] - thetas[,"mean_v.nnD2C",, drop=F]))/4
 
-ggplot(plot.reactive[ (plot.reactive$Block=="PM" & (plot.reactive$Condition=="Low/Low" |
-                                                      plot.reactive$Condition=="High/High")),], aes(factor(Emphasis),M)) +
-  geom_line(aes(group=Condition, y=M), linetype=2) +
-  geom_point(stat = "identity", aes(shape=Condition), size=3) +
-  geom_errorbar(aes(ymax = M + SD, ymin = M - SD, width = 0.2)) +
-  xlab("Task Emphasis") + ylab("V") +
-  scale_shape_discrete("Time Pressure/\nTraffic Load:") +
-  ylim(0.2,2) +
-  theme(text = element_text(size=24)) +
-  theme(
-    axis.line.x = element_line(),
-    axis.line.y = element_line()
-  ) + ggtitle("Reactive Control by Task Emphasis by Time Pressure/Traffic Load") +
-  facet_grid(. ~ S + R)
+Capacity.ccN <- function (thetas) ((thetas[,"mean_v.ccA3N",, drop=F] - thetas[,"mean_v.ccA2N",, drop=F]) +
+                                       (thetas[,"mean_v.ccB3N",, drop=F] - thetas[,"mean_v.ccB2N",, drop=F]) +
+                                       (thetas[,"mean_v.ccC3N",, drop=F] - thetas[,"mean_v.ccC2N",, drop=F]) +
+                                       (thetas[,"mean_v.ccD3N",, drop=F] - thetas[,"mean_v.ccD2N",, drop=F]))/4
 
-# ggsave("V.Reactive.Control.png", plot = last_plot())
+
+cap.ccC.A1 <- mean.sd(samples.A1,Capacity.ccC)
+cap.nnN.A1 <- mean.sd(samples.A1,Capacity.nnN)
+cap.nnC.A1 <- mean.sd(samples.A1,Capacity.nnC)
+cap.ccN.A1 <- mean.sd(samples.A1,Capacity.ccN)
+
+cap.ccC.A2 <- mean.sd(samples.A2,Capacity.ccC)
+cap.nnN.A2 <- mean.sd(samples.A2,Capacity.nnN)
+cap.nnC.A2 <- mean.sd(samples.A2,Capacity.nnC)
+cap.ccN.A2 <- mean.sd(samples.A2,Capacity.ccN)
+
+cap.ccC.A3 <- mean.sd(samples.A3,Capacity.ccC)
+cap.nnN.A3 <- mean.sd(samples.A3,Capacity.nnN)
+cap.nnC.A3 <- mean.sd(samples.A3,Capacity.nnC)
+cap.ccN.A3 <- mean.sd(samples.A3,Capacity.ccN)
+
+cap.ccC.A4 <- mean.sd(samples.A4,Capacity.ccC)
+cap.nnN.A4 <- mean.sd(samples.A4,Capacity.nnN)
+cap.nnC.A4 <- mean.sd(samples.A4,Capacity.nnC)
+cap.ccN.A4 <- mean.sd(samples.A4,Capacity.ccN)
+
+capacity <- rbind(A1.cap.ccC=cap.ccC.A1,
+                  A1.cap.nnN=cap.nnN.A1,
+                  A1.cap.nnC=cap.nnC.A1,
+                  A1.cap.ccN=cap.ccN.A1,
+
+                  A2.cap.ccC=cap.ccC.A2,
+                  A2.cap.nnN=cap.nnN.A2,
+                  A2.cap.nnC=cap.nnC.A2,
+                  A2.cap.ccN=cap.ccN.A2,
+
+                  A3.cap.ccC=cap.ccC.A3,
+                  A3.cap.nnN=cap.nnN.A3,
+                  A3.cap.nnC=cap.nnC.A3,
+                  A3.cap.ccN=cap.ccN.A3,
+
+                  A4.cap.ccC=cap.ccC.A4,
+                  A4.cap.nnN=cap.nnN.A4,
+                  A4.cap.nnC=cap.nnC.A4,
+                  A4.cap.ccN=cap.ccN.A4)
+capacity
+
+capacity$S <- NA; capacity$R <- NA; capacity$Emphasis <- NA;
+
+capacity$S[grep ("cc", rownames(capacity))] <- "Conflict"
+capacity$S[grep ("nn", rownames(capacity))] <- "Nonconflict"
+
+capacity$R[grep ("ccC", rownames(capacity))] <- "Correct"
+capacity$R[grep ("nnN", rownames(capacity))] <- "Correct"
+capacity$R[grep ("nnC", rownames(capacity))] <- "Error"
+capacity$R[grep ("ccN", rownames(capacity))] <- "Error"
+
+capacity$Emphasis[grep ("A1", rownames(capacity))] <- "Neutral"
+capacity$Emphasis[grep ("A2", rownames(capacity))] <- "Ongoing"
+capacity$Emphasis[grep ("A3", rownames(capacity))] <- "Speed"
+capacity$Emphasis[grep ("A4", rownames(capacity))] <- "PM"
+
+
+plot.capacity <- capacity
+plot.capacity$Emphasis <- factor(plot.capacity$Emphasis, levels=c("Neutral","Ongoing","Speed","PM"))
+
+ggplot(plot.capacity, aes(factor(Emphasis),M)) +
+    geom_line(aes(group=R, y=M), linetype=2) +
+    geom_point(stat = "identity", aes(shape=R), size=3) +
+    geom_errorbar(aes(ymax = M + SD, ymin = M - SD, width = 0.2)) +
+    xlab("Task Emphasis") + ylab("V") +
+    scale_shape_discrete("Response:") +
+    ylim(0,0.5) +
+    theme(text = element_text()) +
+    theme(
+        axis.line.x = element_line(),
+        axis.line.y = element_line()
+    ) + ggtitle("PM-Control Drift Rate Differences (Capacity) by Task Emphasis") +
+    facet_grid(. ~ S)
+
+A1=c(zandp(samples.A1, Capacity.ccC),
+     zandp(samples.A1, Capacity.nnN),
+     zandp(samples.A1, Capacity.nnC),
+     zandp(samples.A1, Capacity.ccN))
+
+A2=c(zandp(samples.A2, Capacity.ccC),
+     zandp(samples.A2, Capacity.nnN),
+     zandp(samples.A2, Capacity.nnC),
+     zandp(samples.A2, Capacity.ccN))
+
+A3=c(zandp(samples.A3, Capacity.ccC),
+     zandp(samples.A3, Capacity.nnN),
+     zandp(samples.A3, Capacity.nnC),
+     zandp(samples.A3, Capacity.ccN))
+
+A4=c(zandp(samples.A4, Capacity.ccC),
+     zandp(samples.A4, Capacity.nnN),
+     zandp(samples.A4, Capacity.nnC),
+     zandp(samples.A4, Capacity.ccN))
+
+Capacity.Table <- data.frame(rbind(A1,A2,A3,A4))
+colnames(Capacity.Table) <- c("Conflict","Nonconflict","Conflict (Error)","Nonconflict (Error)")
+Capacity.Table
+
+# > Capacity.Table
+#    Conflict Nonconflict Conflict (Error) Nonconflict (Error)
+# A1 17.96(0)    13.95(0)         13.16(0)            17.16(0)
+# A2 14.25(0)     8.97(0)         11.62(0)            14.82(0)
+# A3 11.57(0)      9.4(0)         13.41(0)            16.11(0)
+# A4 18.65(0)     16.9(0)         16.33(0)            21.54(0)
+
