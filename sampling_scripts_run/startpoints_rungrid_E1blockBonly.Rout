@@ -1,0 +1,586 @@
+
+R version 3.4.0 (2017-04-21) -- "You Stupid Darkness"
+Copyright (C) 2017 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> rm(list=ls()) 
+> setwd("~/DMCATC_grid")
+> source ("dmc/dmc.R")
+Loading required package: msm
+Loading required package: coda
+Loading required package: loo
+This is loo version 1.1.0
+Loading required package: hypergeo
+Loading required package: statmod
+Loading required package: pracma
+Loading required package: numDeriv
+
+Attaching package: ‘numDeriv’
+
+The following objects are masked from ‘package:pracma’:
+
+    grad, hessian, jacobian
+
+Loading required package: vioplot
+Loading required package: sm
+Package 'sm', version 2.2-5.4: type help(sm) for summary information
+
+Attaching package: ‘sm’
+
+The following object is masked from ‘package:pracma’:
+
+    nile
+
+Loading required package: ggplot2
+Loading required package: gridExtra
+> load_model ("LBA","lbaN_B.R")
+Loading required package: rtdists
+> 
+> 
+> load("okdats.E1.RData")
+> 
+> 
+> #     S * cond * R
+> #
+> #     1 PM False Alarm Rate
+> #
+> #     N Rates = 41
+> 
+> mapmeanv <- empty.map(list(S=c("cc","nn","pc","pn"),
++                            cond=c("A","B","C","D"),
++                            block=c("2","3"),
++                            R=c("C","N","P")),
++                       
++                       levels=c("ccAC","nnAC","pcAC","pnAC",
++                                "ccBC","nnBC","pcBC","pnBC",
++                                "ccCC","nnCC","pcCC","pnCC",
++                                "ccDC","nnDC","pcDC","pnDC",
++                                
++                                "ccAN","nnAN","pcAN","pnAN",
++                                "ccBN","nnBN","pcBN","pnBN",
++                                "ccCN","nnCN","pcCN","pnCN",
++                                "ccDN","nnDN","pcDN","pnDN",
++                                
++                                "pcAP","pnAP",
++                                "pcBP","pnBP",
++                                "pcCP","pnCP",
++                                "pcDP","pnDP",
++                                
++                                "PMFA",
++                                
++                                "FAKERATE"))
+> 
+> mapmeanv
+cc.A.2.C nn.A.2.C pc.A.2.C pn.A.2.C cc.B.2.C nn.B.2.C pc.B.2.C pn.B.2.C 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.C.2.C nn.C.2.C pc.C.2.C pn.C.2.C cc.D.2.C nn.D.2.C pc.D.2.C pn.D.2.C 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.A.3.C nn.A.3.C pc.A.3.C pn.A.3.C cc.B.3.C nn.B.3.C pc.B.3.C pn.B.3.C 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.C.3.C nn.C.3.C pc.C.3.C pn.C.3.C cc.D.3.C nn.D.3.C pc.D.3.C pn.D.3.C 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.A.2.N nn.A.2.N pc.A.2.N pn.A.2.N cc.B.2.N nn.B.2.N pc.B.2.N pn.B.2.N 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.C.2.N nn.C.2.N pc.C.2.N pn.C.2.N cc.D.2.N nn.D.2.N pc.D.2.N pn.D.2.N 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.A.3.N nn.A.3.N pc.A.3.N pn.A.3.N cc.B.3.N nn.B.3.N pc.B.3.N pn.B.3.N 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.C.3.N nn.C.3.N pc.C.3.N pn.C.3.N cc.D.3.N nn.D.3.N pc.D.3.N pn.D.3.N 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.A.2.P nn.A.2.P pc.A.2.P pn.A.2.P cc.B.2.P nn.B.2.P pc.B.2.P pn.B.2.P 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.C.2.P nn.C.2.P pc.C.2.P pn.C.2.P cc.D.2.P nn.D.2.P pc.D.2.P pn.D.2.P 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.A.3.P nn.A.3.P pc.A.3.P pn.A.3.P cc.B.3.P nn.B.3.P pc.B.3.P pn.B.3.P 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.C.3.P nn.C.3.P pc.C.3.P pn.C.3.P cc.D.3.P nn.D.3.P pc.D.3.P pn.D.3.P 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+42 Levels: ccAC nnAC pcAC pnAC ccBC nnBC pcBC pnBC ccCC nnCC pcCC pnCC ... FAKERATE
+> 
+> mapmeanv[1:96] <- c("ccAC","nnAC","FAKERATE","FAKERATE",
++                     "ccBC","nnBC","FAKERATE","FAKERATE",
++                     "ccCC","nnCC","FAKERATE","FAKERATE",
++                     "ccDC","nnDC","FAKERATE","FAKERATE",
++                     
++                     "ccAC","nnAC","pcAC","pnAC",
++                     "ccBC","nnBC","pcBC","pnBC",
++                     "ccCC","nnCC","pcCC","pnCC",
++                     "ccDC","nnDC","pcDC","pnDC",
++                     
++                     "ccAN","nnAN","FAKERATE","FAKERATE",
++                     "ccBN","nnBN","FAKERATE","FAKERATE",
++                     "ccCN","nnCN","FAKERATE","FAKERATE",
++                     "ccDN","nnDN","FAKERATE","FAKERATE",
++                     
++                     "ccAN","nnAN","pcAN","pnAN",
++                     "ccBN","nnBN","pcBN","pnBN",
++                     "ccCN","nnCN","pcCN","pnCN",
++                     "ccDN","nnDN","pcDN","pnDN",
++                     
++                     "FAKERATE","FAKERATE","FAKERATE","FAKERATE",
++                     "FAKERATE","FAKERATE","FAKERATE","FAKERATE",
++                     "FAKERATE","FAKERATE","FAKERATE","FAKERATE",
++                     "FAKERATE","FAKERATE","FAKERATE","FAKERATE",
++                     
++                     "PMFA","PMFA","pcAP","pnAP",
++                     "PMFA","PMFA","pcBP","pnBP",
++                     "PMFA","PMFA","pcCP","pnCP",
++                     "PMFA","PMFA","pcDP","pnDP")
+> 
+> mapmeanv
+cc.A.2.C nn.A.2.C pc.A.2.C pn.A.2.C cc.B.2.C nn.B.2.C pc.B.2.C pn.B.2.C 
+    ccAC     nnAC FAKERATE FAKERATE     ccBC     nnBC FAKERATE FAKERATE 
+cc.C.2.C nn.C.2.C pc.C.2.C pn.C.2.C cc.D.2.C nn.D.2.C pc.D.2.C pn.D.2.C 
+    ccCC     nnCC FAKERATE FAKERATE     ccDC     nnDC FAKERATE FAKERATE 
+cc.A.3.C nn.A.3.C pc.A.3.C pn.A.3.C cc.B.3.C nn.B.3.C pc.B.3.C pn.B.3.C 
+    ccAC     nnAC     pcAC     pnAC     ccBC     nnBC     pcBC     pnBC 
+cc.C.3.C nn.C.3.C pc.C.3.C pn.C.3.C cc.D.3.C nn.D.3.C pc.D.3.C pn.D.3.C 
+    ccCC     nnCC     pcCC     pnCC     ccDC     nnDC     pcDC     pnDC 
+cc.A.2.N nn.A.2.N pc.A.2.N pn.A.2.N cc.B.2.N nn.B.2.N pc.B.2.N pn.B.2.N 
+    ccAN     nnAN FAKERATE FAKERATE     ccBN     nnBN FAKERATE FAKERATE 
+cc.C.2.N nn.C.2.N pc.C.2.N pn.C.2.N cc.D.2.N nn.D.2.N pc.D.2.N pn.D.2.N 
+    ccCN     nnCN FAKERATE FAKERATE     ccDN     nnDN FAKERATE FAKERATE 
+cc.A.3.N nn.A.3.N pc.A.3.N pn.A.3.N cc.B.3.N nn.B.3.N pc.B.3.N pn.B.3.N 
+    ccAN     nnAN     pcAN     pnAN     ccBN     nnBN     pcBN     pnBN 
+cc.C.3.N nn.C.3.N pc.C.3.N pn.C.3.N cc.D.3.N nn.D.3.N pc.D.3.N pn.D.3.N 
+    ccCN     nnCN     pcCN     pnCN     ccDN     nnDN     pcDN     pnDN 
+cc.A.2.P nn.A.2.P pc.A.2.P pn.A.2.P cc.B.2.P nn.B.2.P pc.B.2.P pn.B.2.P 
+FAKERATE FAKERATE FAKERATE FAKERATE FAKERATE FAKERATE FAKERATE FAKERATE 
+cc.C.2.P nn.C.2.P pc.C.2.P pn.C.2.P cc.D.2.P nn.D.2.P pc.D.2.P pn.D.2.P 
+FAKERATE FAKERATE FAKERATE FAKERATE FAKERATE FAKERATE FAKERATE FAKERATE 
+cc.A.3.P nn.A.3.P pc.A.3.P pn.A.3.P cc.B.3.P nn.B.3.P pc.B.3.P pn.B.3.P 
+    PMFA     PMFA     pcAP     pnAP     PMFA     PMFA     pcBP     pnBP 
+cc.C.3.P nn.C.3.P pc.C.3.P pn.C.3.P cc.D.3.P nn.D.3.P pc.D.3.P pn.D.3.P 
+    PMFA     PMFA     pcCP     pnCP     PMFA     PMFA     pcDP     pnDP 
+42 Levels: ccAC nnAC pcAC pnAC ccBC nnBC pcBC pnBC ccCC nnCC pcCC pnCC ... FAKERATE
+> 
+> 
+> # # # MAPB # # # 
+> #
+> #     cond * block * R
+> #
+> #     N Thresholds = 20
+> 
+> mapB <- empty.map(list(S=c("cc","nn","pc","pn"),
++                        cond=c("A","B","C","D"),
++                        block=c("2","3"),
++                        R=c("C","N","P")),
++                   
++                   levels=c("A2C",
++                            "B2C",
++                            "C2C",
++                            "D2C",
++                            
++                            "A3C",
++                            "B3C",
++                            "C3C",
++                            "D3C",
++                            
++                            "A2N",
++                            "B2N",
++                            "C2N",
++                            "D2N",
++                            
++                            "A3N",
++                            "B3N",
++                            "C3N",
++                            "D3N",
++                            
++                            "A3P",
++                            "B3P",
++                            "C3P",
++                            "D3P",
++                            
++                            "FAKEB"))
+> 
+> # mapB
+> 
+> mapB[1:96] <- c("A2C","A2C","FAKEB","FAKEB",
++                 "B2C","B2C","FAKEB","FAKEB",
++                 "C2C","C2C","FAKEB","FAKEB",
++                 "D2C","D2C","FAKEB","FAKEB",
++                 
++                 "A3C","A3C","A3C","A3C",
++                 "B3C","B3C","B3C","B3C",
++                 "C3C","C3C","C3C","C3C",
++                 "D3C","D3C","D3C","D3C",
++                 
++                 "A2N","A2N","FAKEB","FAKEB",
++                 "B2N","B2N","FAKEB","FAKEB",
++                 "C2N","C2N","FAKEB","FAKEB",
++                 "D2N","D2N","FAKEB","FAKEB",
++                 
++                 "A3N","A3N","A3N","A3N",
++                 "B3N","B3N","B3N","B3N",
++                 "C3N","C3N","C3N","C3N",
++                 "D3N","D3N","D3N","D3N",
++                 
++                 "FAKEB","FAKEB","FAKEB","FAKEB",
++                 "FAKEB","FAKEB","FAKEB","FAKEB",
++                 "FAKEB","FAKEB","FAKEB","FAKEB",
++                 "FAKEB","FAKEB","FAKEB","FAKEB",
++                 
++                 "A3P","A3P","A3P","A3P",
++                 "B3P","B3P","B3P","B3P",
++                 "C3P","C3P","C3P","C3P",
++                 "D3P","D3P","D3P","D3P")
+> 
+> # mapB
+> 
+> 
+> # # # MAPSDV # # # 
+> #
+> #     S * R
+> #
+> #     1 PM False Alarm Rate
+> #
+> #     N SDVs = 11
+> 
+> mapsdv <- empty.map(list(S=c("cc","nn","pc","pn"),
++                          cond=c("A","B","C","D"),
++                          block=c("2","3"),
++                          R=c("C","N","P")),
++                     
++                     levels=c("ccC","nnC","pcC","pnC",
++                              
++                              "ccN","nnN","pcN","pnN",
++                              
++                              "pcP","pnP",
++                              
++                              "PMFAsdv",
++                              
++                              "FAKESDV"))
+> 
+> mapsdv
+cc.A.2.C nn.A.2.C pc.A.2.C pn.A.2.C cc.B.2.C nn.B.2.C pc.B.2.C pn.B.2.C 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.C.2.C nn.C.2.C pc.C.2.C pn.C.2.C cc.D.2.C nn.D.2.C pc.D.2.C pn.D.2.C 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.A.3.C nn.A.3.C pc.A.3.C pn.A.3.C cc.B.3.C nn.B.3.C pc.B.3.C pn.B.3.C 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.C.3.C nn.C.3.C pc.C.3.C pn.C.3.C cc.D.3.C nn.D.3.C pc.D.3.C pn.D.3.C 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.A.2.N nn.A.2.N pc.A.2.N pn.A.2.N cc.B.2.N nn.B.2.N pc.B.2.N pn.B.2.N 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.C.2.N nn.C.2.N pc.C.2.N pn.C.2.N cc.D.2.N nn.D.2.N pc.D.2.N pn.D.2.N 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.A.3.N nn.A.3.N pc.A.3.N pn.A.3.N cc.B.3.N nn.B.3.N pc.B.3.N pn.B.3.N 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.C.3.N nn.C.3.N pc.C.3.N pn.C.3.N cc.D.3.N nn.D.3.N pc.D.3.N pn.D.3.N 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.A.2.P nn.A.2.P pc.A.2.P pn.A.2.P cc.B.2.P nn.B.2.P pc.B.2.P pn.B.2.P 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.C.2.P nn.C.2.P pc.C.2.P pn.C.2.P cc.D.2.P nn.D.2.P pc.D.2.P pn.D.2.P 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.A.3.P nn.A.3.P pc.A.3.P pn.A.3.P cc.B.3.P nn.B.3.P pc.B.3.P pn.B.3.P 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.C.3.P nn.C.3.P pc.C.3.P pn.C.3.P cc.D.3.P nn.D.3.P pc.D.3.P pn.D.3.P 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+Levels: ccC nnC pcC pnC ccN nnN pcN pnN pcP pnP PMFAsdv FAKESDV
+> 
+> mapsdv[1:96] <- c("ccC","nnC","FAKESDV","FAKESDV",
++                   "ccC","nnC","FAKESDV","FAKESDV",
++                   "ccC","nnC","FAKESDV","FAKESDV",
++                   "ccC","nnC","FAKESDV","FAKESDV",
++                   
++                   "ccC","nnC","pcC","pnC",
++                   "ccC","nnC","pcC","pnC",
++                   "ccC","nnC","pcC","pnC",
++                   "ccC","nnC","pcC","pnC",
++                   
++                   "ccN","nnN","FAKESDV","FAKESDV",
++                   "ccN","nnN","FAKESDV","FAKESDV",
++                   "ccN","nnN","FAKESDV","FAKESDV",
++                   "ccN","nnN","FAKESDV","FAKESDV",
++                   
++                   "ccN","nnN","pcN","pnN",
++                   "ccN","nnN","pcN","pnN",
++                   "ccN","nnN","pcN","pnN",
++                   "ccN","nnN","pcN","pnN",
++                   
++                   "FAKESDV","FAKESDV","FAKESDV","FAKESDV",
++                   "FAKESDV","FAKESDV","FAKESDV","FAKESDV",
++                   "FAKESDV","FAKESDV","FAKESDV","FAKESDV",
++                   "FAKESDV","FAKESDV","FAKESDV","FAKESDV",
++                   
++                   "PMFAsdv","PMFAsdv","pcP","pnP",
++                   "PMFAsdv","PMFAsdv","pcP","pnP",
++                   "PMFAsdv","PMFAsdv","pcP","pnP",
++                   "PMFAsdv","PMFAsdv","pcP","pnP")
+> 
+> mapsdv
+cc.A.2.C nn.A.2.C pc.A.2.C pn.A.2.C cc.B.2.C nn.B.2.C pc.B.2.C pn.B.2.C 
+     ccC      nnC  FAKESDV  FAKESDV      ccC      nnC  FAKESDV  FAKESDV 
+cc.C.2.C nn.C.2.C pc.C.2.C pn.C.2.C cc.D.2.C nn.D.2.C pc.D.2.C pn.D.2.C 
+     ccC      nnC  FAKESDV  FAKESDV      ccC      nnC  FAKESDV  FAKESDV 
+cc.A.3.C nn.A.3.C pc.A.3.C pn.A.3.C cc.B.3.C nn.B.3.C pc.B.3.C pn.B.3.C 
+     ccC      nnC      pcC      pnC      ccC      nnC      pcC      pnC 
+cc.C.3.C nn.C.3.C pc.C.3.C pn.C.3.C cc.D.3.C nn.D.3.C pc.D.3.C pn.D.3.C 
+     ccC      nnC      pcC      pnC      ccC      nnC      pcC      pnC 
+cc.A.2.N nn.A.2.N pc.A.2.N pn.A.2.N cc.B.2.N nn.B.2.N pc.B.2.N pn.B.2.N 
+     ccN      nnN  FAKESDV  FAKESDV      ccN      nnN  FAKESDV  FAKESDV 
+cc.C.2.N nn.C.2.N pc.C.2.N pn.C.2.N cc.D.2.N nn.D.2.N pc.D.2.N pn.D.2.N 
+     ccN      nnN  FAKESDV  FAKESDV      ccN      nnN  FAKESDV  FAKESDV 
+cc.A.3.N nn.A.3.N pc.A.3.N pn.A.3.N cc.B.3.N nn.B.3.N pc.B.3.N pn.B.3.N 
+     ccN      nnN      pcN      pnN      ccN      nnN      pcN      pnN 
+cc.C.3.N nn.C.3.N pc.C.3.N pn.C.3.N cc.D.3.N nn.D.3.N pc.D.3.N pn.D.3.N 
+     ccN      nnN      pcN      pnN      ccN      nnN      pcN      pnN 
+cc.A.2.P nn.A.2.P pc.A.2.P pn.A.2.P cc.B.2.P nn.B.2.P pc.B.2.P pn.B.2.P 
+ FAKESDV  FAKESDV  FAKESDV  FAKESDV  FAKESDV  FAKESDV  FAKESDV  FAKESDV 
+cc.C.2.P nn.C.2.P pc.C.2.P pn.C.2.P cc.D.2.P nn.D.2.P pc.D.2.P pn.D.2.P 
+ FAKESDV  FAKESDV  FAKESDV  FAKESDV  FAKESDV  FAKESDV  FAKESDV  FAKESDV 
+cc.A.3.P nn.A.3.P pc.A.3.P pn.A.3.P cc.B.3.P nn.B.3.P pc.B.3.P pn.B.3.P 
+ PMFAsdv  PMFAsdv      pcP      pnP  PMFAsdv  PMFAsdv      pcP      pnP 
+cc.C.3.P nn.C.3.P pc.C.3.P pn.C.3.P cc.D.3.P nn.D.3.P pc.D.3.P pn.D.3.P 
+ PMFAsdv  PMFAsdv      pcP      pnP  PMFAsdv  PMFAsdv      pcP      pnP 
+Levels: ccC nnC pcC pnC ccN nnN pcN pnN pcP pnP PMFAsdv FAKESDV
+> 
+> 
+> # # # Build model # # # 
+> 
+> model <- model.dmc(p.map = list(A="1",
++                                 B=c("MAPB"),
++                                 t0="1",
++                                 mean_v=c("MAPMV"),
++                                 sd_v=c("MAPSDV"),
++                                 st0="1",
++                                 N="block"), 
++                    
++                    match.map = list(M=list(cc="C",nn="N",pc="P",pn="P"),
++                                     
++                                     MAPB=mapB,
++                                     MAPMV=mapmeanv,
++                                     MAPSDV=mapsdv
++                                     
++                    ),
++                    
++                    factors = list(S=c("cc","nn","pc","pn"),
++                                   cond=c("A","B","C","D"),
++                                   block=c("2","3")),
++                    
++                    constants = c(N.2=2,N.3=3,sd_v.PMFAsdv=0.5,st0=0,
++                                  
++                                  B.FAKEB=Inf,
++                                  mean_v.FAKERATE=1,
++                                  sd_v.FAKESDV=1
++                                  
++                    ), 
++                    
++                    responses = c("C","N","P"),
++                    
++                    type = "normN")
+
+Parameter vector names are: ( see attr(,"p.vector") )
+ [1] "A"           "B.A2C"       "B.B2C"       "B.C2C"       "B.D2C"      
+ [6] "B.A3C"       "B.B3C"       "B.C3C"       "B.D3C"       "B.A2N"      
+[11] "B.B2N"       "B.C2N"       "B.D2N"       "B.A3N"       "B.B3N"      
+[16] "B.C3N"       "B.D3N"       "B.A3P"       "B.B3P"       "B.C3P"      
+[21] "B.D3P"       "t0"          "mean_v.ccAC" "mean_v.nnAC" "mean_v.pcAC"
+[26] "mean_v.pnAC" "mean_v.ccBC" "mean_v.nnBC" "mean_v.pcBC" "mean_v.pnBC"
+[31] "mean_v.ccCC" "mean_v.nnCC" "mean_v.pcCC" "mean_v.pnCC" "mean_v.ccDC"
+[36] "mean_v.nnDC" "mean_v.pcDC" "mean_v.pnDC" "mean_v.ccAN" "mean_v.nnAN"
+[41] "mean_v.pcAN" "mean_v.pnAN" "mean_v.ccBN" "mean_v.nnBN" "mean_v.pcBN"
+[46] "mean_v.pnBN" "mean_v.ccCN" "mean_v.nnCN" "mean_v.pcCN" "mean_v.pnCN"
+[51] "mean_v.ccDN" "mean_v.nnDN" "mean_v.pcDN" "mean_v.pnDN" "mean_v.pcAP"
+[56] "mean_v.pnAP" "mean_v.pcBP" "mean_v.pnBP" "mean_v.pcCP" "mean_v.pnCP"
+[61] "mean_v.pcDP" "mean_v.pnDP" "mean_v.PMFA" "sd_v.ccC"    "sd_v.nnC"   
+[66] "sd_v.pcC"    "sd_v.pnC"    "sd_v.ccN"    "sd_v.nnN"    "sd_v.pcN"   
+[71] "sd_v.pnN"    "sd_v.pcP"    "sd_v.pnP"   
+
+Constants are (see attr(,"constants") ):
+            N.2             N.3    sd_v.PMFAsdv             st0         B.FAKEB 
+            2.0             3.0             0.5             0.0             Inf 
+mean_v.FAKERATE    sd_v.FAKESDV 
+            1.0             1.0 
+
+Model type = normN 
+
+> 
+> 
+> # # # Create parameter vector # # # 
+> 
+> p.vector <- c(t0=0.3, A=3,
++               sd_v.ccC=0.5,  sd_v.nnC=0.5,  sd_v.pnC=0.5,  sd_v.pcC=0.5,  
++               sd_v.ccN=0.5,  sd_v.nnN=0.5,  sd_v.pnN=0.5,  sd_v.pcN=0.5,       
++               sd_v.pnP=0.5,  sd_v.pcP=0.5,      
++               
++               B.A2C=2,  B.B2C=2,  B.C2C=2,  B.D2C=2,  
++               B.A3C=2,  B.B3C=2,  B.C3C=2,  B.D3C=2,  
++               
++               B.A2N=2,  B.B2N=2,  B.C2N=2,  B.D2N=2,  
++               B.A3N=2,  B.B3N=2,  B.C3N=2,  B.D3N=2,  
++               
++               B.A3P=2,  B.B3P=2,  B.C3P=2,  B.D3P=2,
++               
++               mean_v.ccAC=1, mean_v.nnAC=0, mean_v.pnAC=0, mean_v.pcAC=1, 
++               mean_v.ccAN=0, mean_v.nnAN=1, mean_v.pnAN=1, mean_v.pcAN=0,
++                                             mean_v.pnAP=1, mean_v.pcAP=1,
++               
++               mean_v.ccBC=1, mean_v.nnBC=0, mean_v.pnBC=0, mean_v.pcBC=1, 
++               mean_v.ccBN=0, mean_v.nnBN=1, mean_v.pnBN=1, mean_v.pcBN=0,
++                                             mean_v.pnBP=1, mean_v.pcBP=1,
++               
++               mean_v.ccCC=1, mean_v.nnCC=0, mean_v.pnCC=0, mean_v.pcCC=1, 
++               mean_v.ccCN=0, mean_v.nnCN=1, mean_v.pnCN=1, mean_v.pcCN=0,
++                                             mean_v.pnCP=1, mean_v.pcCP=1,
++               
++               mean_v.ccDC=1, mean_v.nnDC=0, mean_v.pnDC=0, mean_v.pcDC=1, 
++               mean_v.ccDN=0, mean_v.nnDN=1, mean_v.pnDN=1, mean_v.pcDN=0,
++                                             mean_v.pnDP=1, mean_v.pcDP=1,
++               
++               mean_v.PMFA=0
++ )
+> 
+> # # # Check parameter vector matches model # # # 
+> 
+> check.p.vector(p.vector, model)
+> 
+> # simulate.dmc(p.vector, model)
+> 
+> 
+> # # # Set priors # # #  
+> 
+> p.prior <- prior.p.dmc(
++   dists = c("beta",rep("tnorm", length(p.vector)-1)),
++   p1=c(t0=1, p.vector[-1]),                           
++   p2=c(1, 1, 
++        rep(1,10), 
++        rep(1,20), 
++        rep(2,41)), 
++   lower=c(0.1, 0, rep(0,10), rep(0,20), rep(NA,41)),
++   upper=c(1, 10, rep(Inf, length(p.vector)-2))
++ )
+> 
+> E1.block.B_cond.B.V <- data.model.dmc(okdats, model)
+> 
+> 
+> E1.blockBonly.samples <- h.samples.dmc(nmc=120, p.prior, E1.block.B_cond.B.V  , thin=20)
+Generating start points for each subject: ................................................
+> save(E1.blockBonly.samples, file="E1.blockBonly.samples.RData")
+> 
+> 
+> rm(list=ls()) 
+> setwd("~/DMCATC_grid")
+> source ("dmc/dmc.R")
+> load_model ("LBA","lbaN_B.R")
+> 
+> 
+> run.grid.dmc("E1.blockBonly.samples",model.dir="LBA",model.file="lbaN_B.R",user="ljs392",n.add=40,wall.hours=30,GB=5)  
+2 E1.blockBonly.samples.o2333225.22 
+ 3 E1.blockBonly.samples.o2333225.36 
+3 E1.blockBonly.samples.o2333225.24 
+4 E1.blockBonly.samples.o2333225.15 
+5 E1.blockBonly.samples.o2333225.35 
+6 E1.blockBonly.samples.o2333225.33 
+7 E1.blockBonly.samples.o2333225.47 
+8 E1.blockBonly.samples.o2333225.39 
+9 E1.blockBonly.samples.o2333225.18 
+10 E1.blockBonly.samples.o2333225.29 
+11 E1.blockBonly.samples.o2333225.13 
+12 E1.blockBonly.samples.o2333225.42 
+13 E1.blockBonly.samples.o2333225.16 
+14 E1.blockBonly.samples.o2333225.20 
+15 E1.blockBonly.samples.o2333225.41 
+16 E1.blockBonly.samples.o2333225.43 
+17 E1.blockBonly.samples.o2333225.45 
+18 E1.blockBonly.samples.o2333225.38 
+19 E1.blockBonly.samples.o2333225.40 
+20 E1.blockBonly.samples.o2333225.46 
+21 E1.blockBonly.samples.o2333225.31 
+22 E1.blockBonly.samples.o2333225.23 
+23 E1.blockBonly.samples.o2333225.21 
+24 E1.blockBonly.samples.o2333225.12 
+25 E1.blockBonly.samples.o2333225.14 
+26 E1.blockBonly.samples.o2333225.44 
+27 E1.blockBonly.samples.o2333225.19 
+28 E1.blockBonly.samples.o2333225.9 
+29 E1.blockBonly.samples.o2333225.25 
+30 E1.blockBonly.samples.o2333225.32 
+31 E1.blockBonly.samples.o2333225.30 
+32 E1.blockBonly.samples.o2333225.27 
+33 E1.blockBonly.samples.o2333225.28 
+34 E1.blockBonly.samples.o2333225.37 
+35 E1.blockBonly.samples.o2333225.11 
+36 E1.blockBonly.samples.o2333225.17 
+37 E1.blockBonly.samples.o2333225.1 
+38 E1.blockBonly.samples.o2333225.4 
+39 E1.blockBonly.samples.o2333225.3 
+40 E1.blockBonly.samples.o2333225.48 
+41 E1.blockBonly.samples.o2333225.8 
+42 E1.blockBonly.samples.o2333225.26 
+43 E1.blockBonly.samples.o2333225.6 
+44 E1.blockBonly.samples.o2333225.34 
+45 E1.blockBonly.samples.o2333225.2 
+46 E1.blockBonly.samples.o2333225.5 
+47 E1.blockBonly.samples.o2333225.10 
+48 E1.blockBonly.samples.o2333225.7 
+Harvesting files: s.1 : 4 
+s.2 : 4 
+s.3 : 3 
+s.4 : 2 
+s.5 : 4 
+s.6 : 3 
+s.7 : 8 
+s.8 : 3 
+s.9 : 1 
+s.10 : 5 
+s.11 : 2 
+s.12 : 3 
+s.13 : 2 
+s.14 : 3 
+s.15 : 1 
+s.16 : 2 
+s.17 : 4 
+s.18 : 1 
+s.19 : 4 
+s.20 : 3 
+s.21 : 4 
+s.22 : 1 
+s.23 : 2 
+s.24 : 1 
+s.25 : 3 
+s.26 : 5 
+s.27 : 3 
+s.28 : 3 
+s.29 : 1 
+s.30 : 3 
+s.31 : 2 
+s.32 : 3 
+s.33 : 1 
+s.34 : 6 
+s.35 : 1 
+s.36 : 1 
+s.37 : 4 
+s.38 : 2 
+s.39 : 1 
+s.40 : 3 
+s.41 : 2 
+s.42 : 2 
+s.43 : 2 
+s.44 : 3 
+s.45 : 2 
+s.46 : 2 
+s.47 : 1 
+s.48 : 7 
+
+> 
+> 
+> proc.time()
+     user    system   elapsed 
+  511.516   769.221 39290.969 

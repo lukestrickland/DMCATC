@@ -1,0 +1,559 @@
+
+R version 3.4.0 (2017-04-21) -- "You Stupid Darkness"
+Copyright (C) 2017 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> rm(list=ls()) 
+> setwd("~/DMCATC_grid")
+> source ("dmc/dmc.R")
+Loading required package: msm
+Loading required package: coda
+Loading required package: loo
+This is loo version 1.1.0
+Loading required package: hypergeo
+Loading required package: statmod
+Loading required package: pracma
+Loading required package: numDeriv
+
+Attaching package: ‘numDeriv’
+
+The following objects are masked from ‘package:pracma’:
+
+    grad, hessian, jacobian
+
+Loading required package: vioplot
+Loading required package: sm
+Package 'sm', version 2.2-5.4: type help(sm) for summary information
+
+Attaching package: ‘sm’
+
+The following object is masked from ‘package:pracma’:
+
+    nile
+
+Loading required package: ggplot2
+Loading required package: gridExtra
+> load_model ("LBA","lbaN_B.R")
+Loading required package: rtdists
+> 
+> 
+> load("okdats.E1.RData")
+> 
+> mapmeanv <- empty.map(list(S=c("cc","nn","pc","pn"),
++                            cond=c("A","B","C","D"),
++                            block=c("2","3"),
++                            R=c("C","N","P")),
++                       
++                       levels=c("cc2C","nn2C",
++                                
++                                "cc3C","nn3C","pc3C","pn3C",
++                                
++                                "cc2N","nn2N",
++                                
++                                "cc3N","nn3N","pc3N","pn3N",
++                                
++                                "pc3P","pn3P",
++                                
++                                "PMFA",
++                                
++                                "FAKERATE"))
+> 
+> mapmeanv
+cc.A.2.C nn.A.2.C pc.A.2.C pn.A.2.C cc.B.2.C nn.B.2.C pc.B.2.C pn.B.2.C 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.C.2.C nn.C.2.C pc.C.2.C pn.C.2.C cc.D.2.C nn.D.2.C pc.D.2.C pn.D.2.C 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.A.3.C nn.A.3.C pc.A.3.C pn.A.3.C cc.B.3.C nn.B.3.C pc.B.3.C pn.B.3.C 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.C.3.C nn.C.3.C pc.C.3.C pn.C.3.C cc.D.3.C nn.D.3.C pc.D.3.C pn.D.3.C 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.A.2.N nn.A.2.N pc.A.2.N pn.A.2.N cc.B.2.N nn.B.2.N pc.B.2.N pn.B.2.N 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.C.2.N nn.C.2.N pc.C.2.N pn.C.2.N cc.D.2.N nn.D.2.N pc.D.2.N pn.D.2.N 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.A.3.N nn.A.3.N pc.A.3.N pn.A.3.N cc.B.3.N nn.B.3.N pc.B.3.N pn.B.3.N 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.C.3.N nn.C.3.N pc.C.3.N pn.C.3.N cc.D.3.N nn.D.3.N pc.D.3.N pn.D.3.N 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.A.2.P nn.A.2.P pc.A.2.P pn.A.2.P cc.B.2.P nn.B.2.P pc.B.2.P pn.B.2.P 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.C.2.P nn.C.2.P pc.C.2.P pn.C.2.P cc.D.2.P nn.D.2.P pc.D.2.P pn.D.2.P 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.A.3.P nn.A.3.P pc.A.3.P pn.A.3.P cc.B.3.P nn.B.3.P pc.B.3.P pn.B.3.P 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.C.3.P nn.C.3.P pc.C.3.P pn.C.3.P cc.D.3.P nn.D.3.P pc.D.3.P pn.D.3.P 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+16 Levels: cc2C nn2C cc3C nn3C pc3C pn3C cc2N nn2N cc3N nn3N pc3N pn3N ... FAKERATE
+> 
+> mapmeanv[1:96] <- c("cc2C","nn2C","FAKERATE","FAKERATE",
++                     "cc2C","nn2C","FAKERATE","FAKERATE",
++                     "cc2C","nn2C","FAKERATE","FAKERATE",
++                     "cc2C","nn2C","FAKERATE","FAKERATE",
++                     
++                     "cc3C","nn3C","pc3C","pn3C",
++                     "cc3C","nn3C","pc3C","pn3C",
++                     "cc3C","nn3C","pc3C","pn3C",
++                     "cc3C","nn3C","pc3C","pn3C",
++                     
++                     "cc2N","nn2N","FAKERATE","FAKERATE",
++                     "cc2N","nn2N","FAKERATE","FAKERATE",
++                     "cc2N","nn2N","FAKERATE","FAKERATE",
++                     "cc2N","nn2N","FAKERATE","FAKERATE",
++                     
++                     "cc3N","nn3N","pc3N","pn3N",
++                     "cc3N","nn3N","pc3N","pn3N",
++                     "cc3N","nn3N","pc3N","pn3N",
++                     "cc3N","nn3N","pc3N","pn3N",
++                     
++                     "FAKERATE","FAKERATE","FAKERATE","FAKERATE",
++                     "FAKERATE","FAKERATE","FAKERATE","FAKERATE",
++                     "FAKERATE","FAKERATE","FAKERATE","FAKERATE",
++                     "FAKERATE","FAKERATE","FAKERATE","FAKERATE",
++                     
++                     "PMFA","PMFA","pc3P","pn3P",
++                     "PMFA","PMFA","pc3P","pn3P",
++                     "PMFA","PMFA","pc3P","pn3P",
++                     "PMFA","PMFA","pc3P","pn3P")
+> 
+> mapmeanv
+cc.A.2.C nn.A.2.C pc.A.2.C pn.A.2.C cc.B.2.C nn.B.2.C pc.B.2.C pn.B.2.C 
+    cc2C     nn2C FAKERATE FAKERATE     cc2C     nn2C FAKERATE FAKERATE 
+cc.C.2.C nn.C.2.C pc.C.2.C pn.C.2.C cc.D.2.C nn.D.2.C pc.D.2.C pn.D.2.C 
+    cc2C     nn2C FAKERATE FAKERATE     cc2C     nn2C FAKERATE FAKERATE 
+cc.A.3.C nn.A.3.C pc.A.3.C pn.A.3.C cc.B.3.C nn.B.3.C pc.B.3.C pn.B.3.C 
+    cc3C     nn3C     pc3C     pn3C     cc3C     nn3C     pc3C     pn3C 
+cc.C.3.C nn.C.3.C pc.C.3.C pn.C.3.C cc.D.3.C nn.D.3.C pc.D.3.C pn.D.3.C 
+    cc3C     nn3C     pc3C     pn3C     cc3C     nn3C     pc3C     pn3C 
+cc.A.2.N nn.A.2.N pc.A.2.N pn.A.2.N cc.B.2.N nn.B.2.N pc.B.2.N pn.B.2.N 
+    cc2N     nn2N FAKERATE FAKERATE     cc2N     nn2N FAKERATE FAKERATE 
+cc.C.2.N nn.C.2.N pc.C.2.N pn.C.2.N cc.D.2.N nn.D.2.N pc.D.2.N pn.D.2.N 
+    cc2N     nn2N FAKERATE FAKERATE     cc2N     nn2N FAKERATE FAKERATE 
+cc.A.3.N nn.A.3.N pc.A.3.N pn.A.3.N cc.B.3.N nn.B.3.N pc.B.3.N pn.B.3.N 
+    cc3N     nn3N     pc3N     pn3N     cc3N     nn3N     pc3N     pn3N 
+cc.C.3.N nn.C.3.N pc.C.3.N pn.C.3.N cc.D.3.N nn.D.3.N pc.D.3.N pn.D.3.N 
+    cc3N     nn3N     pc3N     pn3N     cc3N     nn3N     pc3N     pn3N 
+cc.A.2.P nn.A.2.P pc.A.2.P pn.A.2.P cc.B.2.P nn.B.2.P pc.B.2.P pn.B.2.P 
+FAKERATE FAKERATE FAKERATE FAKERATE FAKERATE FAKERATE FAKERATE FAKERATE 
+cc.C.2.P nn.C.2.P pc.C.2.P pn.C.2.P cc.D.2.P nn.D.2.P pc.D.2.P pn.D.2.P 
+FAKERATE FAKERATE FAKERATE FAKERATE FAKERATE FAKERATE FAKERATE FAKERATE 
+cc.A.3.P nn.A.3.P pc.A.3.P pn.A.3.P cc.B.3.P nn.B.3.P pc.B.3.P pn.B.3.P 
+    PMFA     PMFA     pc3P     pn3P     PMFA     PMFA     pc3P     pn3P 
+cc.C.3.P nn.C.3.P pc.C.3.P pn.C.3.P cc.D.3.P nn.D.3.P pc.D.3.P pn.D.3.P 
+    PMFA     PMFA     pc3P     pn3P     PMFA     PMFA     pc3P     pn3P 
+16 Levels: cc2C nn2C cc3C nn3C pc3C pn3C cc2N nn2N cc3N nn3N pc3N pn3N ... FAKERATE
+> 
+> 
+> # # # MAPB # # # 
+> #
+> #     cond * block * R
+> #
+> #     N Thresholds = 20
+> 
+> mapB <- empty.map(list(S=c("cc","nn","pc","pn"),
++                        cond=c("A","B","C","D"),
++                        block=c("2","3"),
++                        R=c("C","N","P")),
++                   
++                   levels=c("A2C",
++                            "B2C",
++                            "C2C",
++                            "D2C",
++                            
++                            "A3C",
++                            "B3C",
++                            "C3C",
++                            "D3C",
++                            
++                            "A2N",
++                            "B2N",
++                            "C2N",
++                            "D2N",
++                            
++                            "A3N",
++                            "B3N",
++                            "C3N",
++                            "D3N",
++                            
++                            "A3P",
++                            "B3P",
++                            "C3P",
++                            "D3P",
++                            
++                            "FAKEB"))
+> 
+> # mapB
+> 
+> mapB[1:96] <- c("A2C","A2C","FAKEB","FAKEB",
++                 "B2C","B2C","FAKEB","FAKEB",
++                 "C2C","C2C","FAKEB","FAKEB",
++                 "D2C","D2C","FAKEB","FAKEB",
++                 
++                 "A3C","A3C","A3C","A3C",
++                 "B3C","B3C","B3C","B3C",
++                 "C3C","C3C","C3C","C3C",
++                 "D3C","D3C","D3C","D3C",
++                 
++                 "A2N","A2N","FAKEB","FAKEB",
++                 "B2N","B2N","FAKEB","FAKEB",
++                 "C2N","C2N","FAKEB","FAKEB",
++                 "D2N","D2N","FAKEB","FAKEB",
++                 
++                 "A3N","A3N","A3N","A3N",
++                 "B3N","B3N","B3N","B3N",
++                 "C3N","C3N","C3N","C3N",
++                 "D3N","D3N","D3N","D3N",
++                 
++                 "FAKEB","FAKEB","FAKEB","FAKEB",
++                 "FAKEB","FAKEB","FAKEB","FAKEB",
++                 "FAKEB","FAKEB","FAKEB","FAKEB",
++                 "FAKEB","FAKEB","FAKEB","FAKEB",
++                 
++                 "A3P","A3P","A3P","A3P",
++                 "B3P","B3P","B3P","B3P",
++                 "C3P","C3P","C3P","C3P",
++                 "D3P","D3P","D3P","D3P")
+> 
+> # mapB
+> 
+> 
+> # # # MAPSDV # # # 
+> #
+> #     S * R
+> #
+> #     1 PM False Alarm Rate
+> #
+> #     N SDVs = 11
+> 
+> mapsdv <- empty.map(list(S=c("cc","nn","pc","pn"),
++                          cond=c("A","B","C","D"),
++                          block=c("2","3"),
++                          R=c("C","N","P")),
++                     
++                     levels=c("ccC","nnC","pcC","pnC",
++                              
++                              "ccN","nnN","pcN","pnN",
++                              
++                              "pcP","pnP",
++                              
++                              "PMFAsdv",
++                              
++                              "FAKESDV"))
+> 
+> mapsdv
+cc.A.2.C nn.A.2.C pc.A.2.C pn.A.2.C cc.B.2.C nn.B.2.C pc.B.2.C pn.B.2.C 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.C.2.C nn.C.2.C pc.C.2.C pn.C.2.C cc.D.2.C nn.D.2.C pc.D.2.C pn.D.2.C 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.A.3.C nn.A.3.C pc.A.3.C pn.A.3.C cc.B.3.C nn.B.3.C pc.B.3.C pn.B.3.C 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.C.3.C nn.C.3.C pc.C.3.C pn.C.3.C cc.D.3.C nn.D.3.C pc.D.3.C pn.D.3.C 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.A.2.N nn.A.2.N pc.A.2.N pn.A.2.N cc.B.2.N nn.B.2.N pc.B.2.N pn.B.2.N 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.C.2.N nn.C.2.N pc.C.2.N pn.C.2.N cc.D.2.N nn.D.2.N pc.D.2.N pn.D.2.N 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.A.3.N nn.A.3.N pc.A.3.N pn.A.3.N cc.B.3.N nn.B.3.N pc.B.3.N pn.B.3.N 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.C.3.N nn.C.3.N pc.C.3.N pn.C.3.N cc.D.3.N nn.D.3.N pc.D.3.N pn.D.3.N 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.A.2.P nn.A.2.P pc.A.2.P pn.A.2.P cc.B.2.P nn.B.2.P pc.B.2.P pn.B.2.P 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.C.2.P nn.C.2.P pc.C.2.P pn.C.2.P cc.D.2.P nn.D.2.P pc.D.2.P pn.D.2.P 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.A.3.P nn.A.3.P pc.A.3.P pn.A.3.P cc.B.3.P nn.B.3.P pc.B.3.P pn.B.3.P 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+cc.C.3.P nn.C.3.P pc.C.3.P pn.C.3.P cc.D.3.P nn.D.3.P pc.D.3.P pn.D.3.P 
+    <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA>     <NA> 
+Levels: ccC nnC pcC pnC ccN nnN pcN pnN pcP pnP PMFAsdv FAKESDV
+> 
+> mapsdv[1:96] <- c("ccC","nnC","FAKESDV","FAKESDV",
++                   "ccC","nnC","FAKESDV","FAKESDV",
++                   "ccC","nnC","FAKESDV","FAKESDV",
++                   "ccC","nnC","FAKESDV","FAKESDV",
++                   
++                   "ccC","nnC","pcC","pnC",
++                   "ccC","nnC","pcC","pnC",
++                   "ccC","nnC","pcC","pnC",
++                   "ccC","nnC","pcC","pnC",
++                   
++                   "ccN","nnN","FAKESDV","FAKESDV",
++                   "ccN","nnN","FAKESDV","FAKESDV",
++                   "ccN","nnN","FAKESDV","FAKESDV",
++                   "ccN","nnN","FAKESDV","FAKESDV",
++                   
++                   "ccN","nnN","pcN","pnN",
++                   "ccN","nnN","pcN","pnN",
++                   "ccN","nnN","pcN","pnN",
++                   "ccN","nnN","pcN","pnN",
++                   
++                   "FAKESDV","FAKESDV","FAKESDV","FAKESDV",
++                   "FAKESDV","FAKESDV","FAKESDV","FAKESDV",
++                   "FAKESDV","FAKESDV","FAKESDV","FAKESDV",
++                   "FAKESDV","FAKESDV","FAKESDV","FAKESDV",
++                   
++                   "PMFAsdv","PMFAsdv","pcP","pnP",
++                   "PMFAsdv","PMFAsdv","pcP","pnP",
++                   "PMFAsdv","PMFAsdv","pcP","pnP",
++                   "PMFAsdv","PMFAsdv","pcP","pnP")
+> 
+> mapsdv
+cc.A.2.C nn.A.2.C pc.A.2.C pn.A.2.C cc.B.2.C nn.B.2.C pc.B.2.C pn.B.2.C 
+     ccC      nnC  FAKESDV  FAKESDV      ccC      nnC  FAKESDV  FAKESDV 
+cc.C.2.C nn.C.2.C pc.C.2.C pn.C.2.C cc.D.2.C nn.D.2.C pc.D.2.C pn.D.2.C 
+     ccC      nnC  FAKESDV  FAKESDV      ccC      nnC  FAKESDV  FAKESDV 
+cc.A.3.C nn.A.3.C pc.A.3.C pn.A.3.C cc.B.3.C nn.B.3.C pc.B.3.C pn.B.3.C 
+     ccC      nnC      pcC      pnC      ccC      nnC      pcC      pnC 
+cc.C.3.C nn.C.3.C pc.C.3.C pn.C.3.C cc.D.3.C nn.D.3.C pc.D.3.C pn.D.3.C 
+     ccC      nnC      pcC      pnC      ccC      nnC      pcC      pnC 
+cc.A.2.N nn.A.2.N pc.A.2.N pn.A.2.N cc.B.2.N nn.B.2.N pc.B.2.N pn.B.2.N 
+     ccN      nnN  FAKESDV  FAKESDV      ccN      nnN  FAKESDV  FAKESDV 
+cc.C.2.N nn.C.2.N pc.C.2.N pn.C.2.N cc.D.2.N nn.D.2.N pc.D.2.N pn.D.2.N 
+     ccN      nnN  FAKESDV  FAKESDV      ccN      nnN  FAKESDV  FAKESDV 
+cc.A.3.N nn.A.3.N pc.A.3.N pn.A.3.N cc.B.3.N nn.B.3.N pc.B.3.N pn.B.3.N 
+     ccN      nnN      pcN      pnN      ccN      nnN      pcN      pnN 
+cc.C.3.N nn.C.3.N pc.C.3.N pn.C.3.N cc.D.3.N nn.D.3.N pc.D.3.N pn.D.3.N 
+     ccN      nnN      pcN      pnN      ccN      nnN      pcN      pnN 
+cc.A.2.P nn.A.2.P pc.A.2.P pn.A.2.P cc.B.2.P nn.B.2.P pc.B.2.P pn.B.2.P 
+ FAKESDV  FAKESDV  FAKESDV  FAKESDV  FAKESDV  FAKESDV  FAKESDV  FAKESDV 
+cc.C.2.P nn.C.2.P pc.C.2.P pn.C.2.P cc.D.2.P nn.D.2.P pc.D.2.P pn.D.2.P 
+ FAKESDV  FAKESDV  FAKESDV  FAKESDV  FAKESDV  FAKESDV  FAKESDV  FAKESDV 
+cc.A.3.P nn.A.3.P pc.A.3.P pn.A.3.P cc.B.3.P nn.B.3.P pc.B.3.P pn.B.3.P 
+ PMFAsdv  PMFAsdv      pcP      pnP  PMFAsdv  PMFAsdv      pcP      pnP 
+cc.C.3.P nn.C.3.P pc.C.3.P pn.C.3.P cc.D.3.P nn.D.3.P pc.D.3.P pn.D.3.P 
+ PMFAsdv  PMFAsdv      pcP      pnP  PMFAsdv  PMFAsdv      pcP      pnP 
+Levels: ccC nnC pcC pnC ccN nnN pcN pnN pcP pnP PMFAsdv FAKESDV
+> 
+> 
+> # # # Build model # # # 
+> 
+> model <- model.dmc(p.map = list(A="1",
++                                 B=c("MAPB"),
++                                 t0="1",
++                                 mean_v=c("MAPMV"),
++                                 sd_v=c("MAPSDV"),
++                                 st0="1",
++                                 N="block"), 
++                    
++                    match.map = list(M=list(cc="C",nn="N",pc="P",pn="P"),
++                                     
++                                     MAPB=mapB,
++                                     MAPMV=mapmeanv,
++                                     MAPSDV=mapsdv
++                                     
++                    ),
++                    
++                    factors = list(S=c("cc","nn","pc","pn"),
++                                   cond=c("A","B","C","D"),
++                                   block=c("2","3")),
++                    
++                    constants = c(N.2=2,N.3=3,sd_v.nnC=0.5,st0=0,
++                                  
++                                  B.FAKEB=Inf,
++                                  mean_v.FAKERATE=1,
++                                  sd_v.FAKESDV=1
++                                  
++                    ), 
++                    
++                    responses = c("C","N","P"),
++                    
++                    type = "normN")
+
+Parameter vector names are: ( see attr(,"p.vector") )
+ [1] "A"            "B.A2C"        "B.B2C"        "B.C2C"        "B.D2C"       
+ [6] "B.A3C"        "B.B3C"        "B.C3C"        "B.D3C"        "B.A2N"       
+[11] "B.B2N"        "B.C2N"        "B.D2N"        "B.A3N"        "B.B3N"       
+[16] "B.C3N"        "B.D3N"        "B.A3P"        "B.B3P"        "B.C3P"       
+[21] "B.D3P"        "t0"           "mean_v.cc2C"  "mean_v.nn2C"  "mean_v.cc3C" 
+[26] "mean_v.nn3C"  "mean_v.pc3C"  "mean_v.pn3C"  "mean_v.cc2N"  "mean_v.nn2N" 
+[31] "mean_v.cc3N"  "mean_v.nn3N"  "mean_v.pc3N"  "mean_v.pn3N"  "mean_v.pc3P" 
+[36] "mean_v.pn3P"  "mean_v.PMFA"  "sd_v.ccC"     "sd_v.pcC"     "sd_v.pnC"    
+[41] "sd_v.ccN"     "sd_v.nnN"     "sd_v.pcN"     "sd_v.pnN"     "sd_v.pcP"    
+[46] "sd_v.pnP"     "sd_v.PMFAsdv"
+
+Constants are (see attr(,"constants") ):
+            N.2             N.3        sd_v.nnC             st0         B.FAKEB 
+            2.0             3.0             0.5             0.0             Inf 
+mean_v.FAKERATE    sd_v.FAKESDV 
+            1.0             1.0 
+
+Model type = normN 
+
+> 
+> 
+> # # # Create parameter vector # # # 
+> 
+> p.vector <- c(t0=0.3, A=3,
++               sd_v.ccC=0.5,                 sd_v.pnC=0.5,  sd_v.pcC=0.5,  
++               sd_v.ccN=0.5,  sd_v.nnN=0.5,  sd_v.pnN=0.5,  sd_v.pcN=0.5,       
++               sd_v.pnP=0.5,  sd_v.pcP=0.5,  sd_v.PMFAsdv=0.5,   
++               
++               B.A2C=2,  B.B2C=2,  B.C2C=2,  B.D2C=2,  
++               B.A3C=2,  B.B3C=2,  B.C3C=2,  B.D3C=2,  
++               
++               B.A2N=2,  B.B2N=2,  B.C2N=2,  B.D2N=2,  
++               B.A3N=2,  B.B3N=2,  B.C3N=2,  B.D3N=2,  
++               
++               B.A3P=2,  B.B3P=2,  B.C3P=2,  B.D3P=2,
++               
++               mean_v.cc2C=1, mean_v.nn2C=0,  
++               mean_v.cc2N=0, mean_v.nn2N=1, 
++               
++               mean_v.cc3C=1, mean_v.nn3C=0, mean_v.pn3C=0, mean_v.pc3C=1, 
++               mean_v.cc3N=0, mean_v.nn3N=1, mean_v.pn3N=1, mean_v.pc3N=0,
++                                             mean_v.pn3P=1, mean_v.pc3P=1,
++               
++               mean_v.PMFA=0
++ )
+> 
+> 
+> # # # Check parameter vector matches model # # # 
+> 
+> check.p.vector(p.vector, model)
+> 
+> # simulate.dmc(p.vector, model)
+> 
+> 
+> # # # Set priors # # #  
+> 
+> p.prior <- prior.p.dmc(
++   dists = c("beta",rep("tnorm", length(p.vector)-1)),
++   p1=c(t0=1, p.vector[-1]),                           
++   p2=c(1, 1, 
++        rep(1,10), 
++        rep(1,20), 
++        rep(2,15)), 
++   lower=c(0.1, 0, rep(0,10), rep(0,20), rep(NA,15)),
++   upper=c(1, 10, rep(Inf, length(p.vector)-2))
++ )
+> 
+> E1.block.B.V_cond.B <- data.model.dmc(okdats, model)
+> 
+> E1.condBonly.samples <- h.samples.dmc(nmc=120, p.prior, E1.block.B.V_cond.B , thin=20)
+Generating start points for each subject: ................................................
+> 
+> save(E1.condBonly.samples, file="E1.condBonly.samples.RData")
+> 
+> 
+> rm(list=ls()) 
+> setwd("~/DMCATC_grid")
+> source ("dmc/dmc.R")
+> load_model ("LBA","lbaN_B.R")
+> 
+> 
+> run.grid.dmc("E1.condBonly.samples",model.dir="LBA",model.file="lbaN_B.R",user="ljs392",n.add=40,wall.hours=30,GB=5)  
+2 E1.condBonly.samples.o2331795.24 
+ 3 E1.condBonly.samples.o2331795.5 
+3 E1.condBonly.samples.o2331795.7 
+4 E1.condBonly.samples.o2331795.6 
+5 E1.condBonly.samples.o2331795.4 
+6 E1.condBonly.samples.o2331795.14 
+7 E1.condBonly.samples.o2331795.36 
+8 E1.condBonly.samples.o2331795.2 
+9 E1.condBonly.samples.o2331795.11 
+10 E1.condBonly.samples.o2331795.30 
+11 E1.condBonly.samples.o2331795.29 
+12 E1.condBonly.samples.o2331795.33 
+13 E1.condBonly.samples.o2331795.8 
+14 E1.condBonly.samples.o2331795.3 
+15 E1.condBonly.samples.o2331795.10 
+16 E1.condBonly.samples.o2331795.13 
+17 E1.condBonly.samples.o2331795.23 
+18 E1.condBonly.samples.o2331795.15 
+19 E1.condBonly.samples.o2331795.16 
+20 E1.condBonly.samples.o2331795.26 
+21 E1.condBonly.samples.o2331795.20 
+22 E1.condBonly.samples.o2331795.39 
+23 E1.condBonly.samples.o2331795.35 
+24 E1.condBonly.samples.o2331795.37 
+25 E1.condBonly.samples.o2331795.31 
+26 E1.condBonly.samples.o2331795.47 
+27 E1.condBonly.samples.o2331795.22 
+28 E1.condBonly.samples.o2331795.25 
+29 E1.condBonly.samples.o2331795.17 
+30 E1.condBonly.samples.o2331795.28 
+31 E1.condBonly.samples.o2331795.44 
+32 E1.condBonly.samples.o2331795.27 
+33 E1.condBonly.samples.o2331795.42 
+34 E1.condBonly.samples.o2331795.46 
+35 E1.condBonly.samples.o2331795.32 
+36 E1.condBonly.samples.o2331795.21 
+37 E1.condBonly.samples.o2331795.9 
+38 E1.condBonly.samples.o2331795.43 
+39 E1.condBonly.samples.o2331795.41 
+40 E1.condBonly.samples.o2331795.40 
+41 E1.condBonly.samples.o2331795.1 
+42 E1.condBonly.samples.o2331795.38 
+43 E1.condBonly.samples.o2331795.12 
+44 E1.condBonly.samples.o2331795.34 
+45 E1.condBonly.samples.o2331795.18 
+46 E1.condBonly.samples.o2331795.48 
+47 E1.condBonly.samples.o2331795.45 
+48 E1.condBonly.samples.o2331795.19 
+Harvesting files: s.1 : 1 
+s.2 : 2 
+s.3 : 1 
+s.4 : 1 
+s.5 : 1 
+s.6 : 1 
+s.7 : 1 
+s.8 : 2 
+s.9 : 2 
+s.10 : 1 
+s.11 : 1 
+s.12 : 2 
+s.13 : 1 
+s.14 : 1 
+s.15 : 1 
+s.16 : 1 
+s.17 : 1 
+s.18 : 2 
+s.19 : 6 
+s.20 : 1 
+s.21 : 1 
+s.22 : 1 
+s.23 : 1 
+s.24 : 1 
+s.25 : 1 
+s.26 : 1 
+s.27 : 1 
+s.28 : 1 
+s.29 : 1 
+s.30 : 1 
+s.31 : 1 
+s.32 : 1 
+s.33 : 1 
+s.34 : 2 
+s.35 : 1 
+s.36 : 1 
+s.37 : 1 
+s.38 : 1 
+s.39 : 1 
+s.40 : 1 
+s.41 : 1 
+s.42 : 1 
+s.43 : 1 
+s.44 : 1 
+s.45 : 1 
+s.46 : 1 
+s.47 : 1 
+s.48 : 1 
+
+> 
+> 
+> proc.time()
+     user    system   elapsed 
+  236.148   287.668 15896.572 
