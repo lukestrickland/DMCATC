@@ -2,7 +2,9 @@
 title: "Parameter and Posterior Inference Tables for ATC Experiment E1"
 author: "Russell Boag"
 date: "12 July 2017"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -10,6 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r load and prep data, echo=FALSE, include=FALSE}
+
 
 
 rm(list=ls())
@@ -244,7 +247,7 @@ sdv.Table <- data.frame(rbind(sdv.ccC=sdv.ccC,
                               sdv.ppP=sdv.ppP))
 sdv.Table
 
-# # # Thresholds Averaged over Condition # # #
+# # # Thresholds by PM Block (averaged over Time Pressure) # # #
 #
 av.B.2o <- function (thetas) (thetas[,"B.A2C",, drop=F] + thetas[,"B.B2C",, drop=F] +
                                   thetas[,"B.C2C",, drop=F] + thetas[,"B.D2C",, drop=F] +
@@ -290,7 +293,7 @@ av.Bs.PM.Table <- av.Bs.PM.Table[ ,c("PM_Block", "M", "SD")]
 av.Bs.PM.Table$PM_Block[grep ("2", rownames(av.Bs.PM.Table))] <- "Control"; av.Bs.PM.Table$PM_Block[grep ("3", rownames(av.Bs.PM.Table))] <- "PM"
 av.Bs.PM.Table
 
-# # # Thresholds Averaged over PM Block # # #
+# # # Thresholds by Time Pressure (averaged over PM Block) # # #
 #
 av.B.Ao <- function (thetas) (thetas[,"B.A2C",, drop=F] + thetas[,"B.A3C",, drop=F] +
                                  thetas[,"B.A2N",, drop=F] + thetas[,"B.A3N",, drop=F])/4
@@ -334,95 +337,164 @@ av.Bs.TP.Table$Time_Pressure[grep ("\\.D", rownames(av.Bs.TP.Table))] <- "D"
 av.Bs.TP.Table
 
 
-# # # Rates (Correct) Averaged over Condition # # #
+# # # Rates by PM Block (averaged over Time Pressure) # # #
 #
-av.v.cc2o <- function (thetas) (thetas[,"mean_v.ccA2C",, drop=F] + thetas[,"mean_v.ccB2C",, drop=F] +
+av.V.cor2o <- function (thetas) (thetas[,"mean_v.ccA2C",, drop=F] + thetas[,"mean_v.ccB2C",, drop=F] +
                                     thetas[,"mean_v.ccC2C",, drop=F] + thetas[,"mean_v.ccD2C",, drop=F] +
                                     thetas[,"mean_v.nnA2N",, drop=F] + thetas[,"mean_v.nnB2N",, drop=F] +
                                     thetas[,"mean_v.nnC2N",, drop=F] + thetas[,"mean_v.nnD2N",, drop=F])/8
-av.v.cc3o <- function (thetas) (thetas[,"mean_v.ccA3C",, drop=F] + thetas[,"mean_v.ccB3C",, drop=F] +
+av.V.cor3o <- function (thetas) (thetas[,"mean_v.ccA3C",, drop=F] + thetas[,"mean_v.ccB3C",, drop=F] +
                                     thetas[,"mean_v.ccC3C",, drop=F] + thetas[,"mean_v.ccD3C",, drop=F] +
                                     thetas[,"mean_v.nnA3N",, drop=F] + thetas[,"mean_v.nnB3N",, drop=F] +
                                     thetas[,"mean_v.nnC3N",, drop=F] + thetas[,"mean_v.nnD3N",, drop=F])/8
+av.V.err2o <- function (thetas) (thetas[,"mean_v.nnA2C",, drop=F] + thetas[,"mean_v.nnB2C",, drop=F] +
+                                     thetas[,"mean_v.nnC2C",, drop=F] + thetas[,"mean_v.nnD2C",, drop=F] +
+                                     thetas[,"mean_v.ccA2N",, drop=F] + thetas[,"mean_v.ccB2N",, drop=F] +
+                                     thetas[,"mean_v.ccC2N",, drop=F] + thetas[,"mean_v.ccD2N",, drop=F])/8
+av.V.err3o <- function (thetas) (thetas[,"mean_v.nnA3C",, drop=F] + thetas[,"mean_v.nnB3C",, drop=F] +
+                                     thetas[,"mean_v.nnC3C",, drop=F] + thetas[,"mean_v.nnD3C",, drop=F] +
+                                     thetas[,"mean_v.ccA3N",, drop=F] + thetas[,"mean_v.ccB3N",, drop=F] +
+                                     thetas[,"mean_v.ccC3N",, drop=F] + thetas[,"mean_v.ccD3N",, drop=F])/8
 
-av.v.cc2C <- function (thetas) (thetas[,"mean_v.ccA2C",, drop=F] + thetas[,"mean_v.ccB2C",, drop=F] +
+av.V.cc2C <- function (thetas) (thetas[,"mean_v.ccA2C",, drop=F] + thetas[,"mean_v.ccB2C",, drop=F] +
                                     thetas[,"mean_v.ccC2C",, drop=F] + thetas[,"mean_v.ccD2C",, drop=F])/4
-av.v.cc3C <- function (thetas) (thetas[,"mean_v.ccA3C",, drop=F] + thetas[,"mean_v.ccB3C",, drop=F] +
+av.V.cc3C <- function (thetas) (thetas[,"mean_v.ccA3C",, drop=F] + thetas[,"mean_v.ccB3C",, drop=F] +
                                     thetas[,"mean_v.ccC3C",, drop=F] + thetas[,"mean_v.ccD3C",, drop=F])/4
-av.v.pc3C <- function (thetas) (thetas[,"mean_v.pcA3C",, drop=F] + thetas[,"mean_v.pcB3C",, drop=F] +
+av.V.pc3C <- function (thetas) (thetas[,"mean_v.pcA3C",, drop=F] + thetas[,"mean_v.pcB3C",, drop=F] +
                                     thetas[,"mean_v.pcC3C",, drop=F] + thetas[,"mean_v.pcD3C",, drop=F])/4
 
-av.v.nn2C <- function (thetas) (thetas[,"mean_v.nnA2C",, drop=F] + thetas[,"mean_v.nnB2C",, drop=F] +
+av.V.nn2C <- function (thetas) (thetas[,"mean_v.nnA2C",, drop=F] + thetas[,"mean_v.nnB2C",, drop=F] +
                                     thetas[,"mean_v.nnC2C",, drop=F] + thetas[,"mean_v.nnD2C",, drop=F])/4
-av.v.nn3C <- function (thetas) (thetas[,"mean_v.nnA3C",, drop=F] + thetas[,"mean_v.nnB3C",, drop=F] +
+av.V.nn3C <- function (thetas) (thetas[,"mean_v.nnA3C",, drop=F] + thetas[,"mean_v.nnB3C",, drop=F] +
                                     thetas[,"mean_v.nnC3C",, drop=F] + thetas[,"mean_v.nnD3C",, drop=F])/4
-av.v.pn3C <- function (thetas) (thetas[,"mean_v.pnA3C",, drop=F] + thetas[,"mean_v.pnB3C",, drop=F] +
+av.V.pn3C <- function (thetas) (thetas[,"mean_v.pnA3C",, drop=F] + thetas[,"mean_v.pnB3C",, drop=F] +
                                     thetas[,"mean_v.pnC3C",, drop=F] + thetas[,"mean_v.pnD3C",, drop=F])/4
 
-av.v.nn2N <- function (thetas) (thetas[,"mean_v.nnA2N",, drop=F] + thetas[,"mean_v.nnB2N",, drop=F] +
+av.V.nn2N <- function (thetas) (thetas[,"mean_v.nnA2N",, drop=F] + thetas[,"mean_v.nnB2N",, drop=F] +
                                     thetas[,"mean_v.nnC2N",, drop=F] + thetas[,"mean_v.nnD2N",, drop=F])/4
-av.v.nn3N <- function (thetas) (thetas[,"mean_v.nnA3N",, drop=F] + thetas[,"mean_v.nnB3N",, drop=F] +
+av.V.nn3N <- function (thetas) (thetas[,"mean_v.nnA3N",, drop=F] + thetas[,"mean_v.nnB3N",, drop=F] +
                                     thetas[,"mean_v.nnC3N",, drop=F] + thetas[,"mean_v.nnD3N",, drop=F])/4
-av.v.pn3N <- function (thetas) (thetas[,"mean_v.pnA3N",, drop=F] + thetas[,"mean_v.pnB3N",, drop=F] +
+av.V.pn3N <- function (thetas) (thetas[,"mean_v.pnA3N",, drop=F] + thetas[,"mean_v.pnB3N",, drop=F] +
                                     thetas[,"mean_v.pnC3N",, drop=F] + thetas[,"mean_v.pnD3N",, drop=F])/4
 
-av.v.cc2N <- function (thetas) (thetas[,"mean_v.ccA2N",, drop=F] + thetas[,"mean_v.ccB2N",, drop=F] +
+av.V.cc2N <- function (thetas) (thetas[,"mean_v.ccA2N",, drop=F] + thetas[,"mean_v.ccB2N",, drop=F] +
                                     thetas[,"mean_v.ccC2N",, drop=F] + thetas[,"mean_v.ccD2N",, drop=F])/4
-av.v.cc3N <- function (thetas) (thetas[,"mean_v.ccA3N",, drop=F] + thetas[,"mean_v.ccB3N",, drop=F] +
+av.V.cc3N <- function (thetas) (thetas[,"mean_v.ccA3N",, drop=F] + thetas[,"mean_v.ccB3N",, drop=F] +
                                     thetas[,"mean_v.ccC3N",, drop=F] + thetas[,"mean_v.ccD3N",, drop=F])/4
-av.v.pc3N <- function (thetas) (thetas[,"mean_v.pcA3N",, drop=F] + thetas[,"mean_v.pcB3N",, drop=F] +
+av.V.pc3N <- function (thetas) (thetas[,"mean_v.pcA3N",, drop=F] + thetas[,"mean_v.pcB3N",, drop=F] +
                                     thetas[,"mean_v.pcC3N",, drop=F] + thetas[,"mean_v.pcD3N",, drop=F])/4
 
-av.v.pp3P <- function (thetas) (thetas[,"mean_v.ppA3P",, drop=F] + thetas[,"mean_v.ppB3P",, drop=F] +
+av.V.pp3P <- function (thetas) (thetas[,"mean_v.ppA3P",, drop=F] + thetas[,"mean_v.ppB3P",, drop=F] +
                                     thetas[,"mean_v.ppC3P",, drop=F] + thetas[,"mean_v.ppD3P",, drop=F])/4
 
 
-v.cc2o <- mean.sd(samples.E1,av.v.cc2o)
-v.cc3o <- mean.sd(samples.E1,av.v.cc3o)
+V.cor2o <- mean.sd(samples.E1,av.V.cor2o)
+V.cor3o <- mean.sd(samples.E1,av.V.cor3o)
+V.err2o <- mean.sd(samples.E1,av.V.err2o)
+V.err3o <- mean.sd(samples.E1,av.V.err3o)
 
-v.cc2C <- mean.sd(samples.E1,av.v.cc2C)
-v.cc3C <- mean.sd(samples.E1,av.v.cc3C)
-v.pc3C <- mean.sd(samples.E1,av.v.pc3C)
+V.cc2C <- mean.sd(samples.E1,av.V.cc2C)
+V.cc3C <- mean.sd(samples.E1,av.V.cc3C)
+V.pc3C <- mean.sd(samples.E1,av.V.pc3C)
 
-v.nn2C <- mean.sd(samples.E1,av.v.nn2C)
-v.nn3C <- mean.sd(samples.E1,av.v.nn3C)
-v.pn3C <- mean.sd(samples.E1,av.v.pn3C)
+V.nn2C <- mean.sd(samples.E1,av.V.nn2C)
+V.nn3C <- mean.sd(samples.E1,av.V.nn3C)
+V.pn3C <- mean.sd(samples.E1,av.V.pn3C)
 
-v.nn2N <- mean.sd(samples.E1,av.v.nn2N)
-v.nn3N <- mean.sd(samples.E1,av.v.nn3N)
-v.pn3N <- mean.sd(samples.E1,av.v.pn3N)
+V.nn2N <- mean.sd(samples.E1,av.V.nn2N)
+V.nn3N <- mean.sd(samples.E1,av.V.nn3N)
+V.pn3N <- mean.sd(samples.E1,av.V.pn3N)
 
-v.cc2N <- mean.sd(samples.E1,av.v.cc2N)
-v.cc3N <- mean.sd(samples.E1,av.v.cc3N)
-v.pc3N <- mean.sd(samples.E1,av.v.pc3N)
+V.cc2N <- mean.sd(samples.E1,av.V.cc2N)
+V.cc3N <- mean.sd(samples.E1,av.V.cc3N)
+V.pc3N <- mean.sd(samples.E1,av.V.pc3N)
 
-v.pp3P <- mean.sd(samples.E1,av.v.pp3P)
+V.pp3P <- mean.sd(samples.E1,av.V.pp3P)
 
-av.vs.PM.Table <- data.frame(rbind(v.cc2_Ongoing=v.cc2o,
-                                   v.cc3_Ongoing=v.cc3o,
+av.Vs.PM.Table <- data.frame(rbind(V.cor2_Ongoing=V.cor2o,
+                                   V.cor3_Ongoing=V.cor3o,
+                                   V.err2_Ongoing=V.err2o,
+                                   V.err3_Ongoing=V.err3o,
 
-                                   v.cc2_Conflict=v.cc2C,
-                                   v.cc3_Conflict=v.cc3C,
-                                   v.pc3_Conflict_RC =v.pc3C,
+                                   V.cc2_Conflict=V.cc2C,
+                                   V.cc3_Conflict=V.cc3C,
+                                   V.pc3_Conflict_RC =V.pc3C,
 
-                                   v.nn2_Conflict=v.nn2C,
-                                   v.nn3_Conflict=v.nn3C,
-                                   v.pn3_Conflict_RC=v.pn3C,
+                                   V.nn2_Conflict=V.nn2C,
+                                   V.nn3_Conflict=V.nn3C,
+                                   V.pn3_Conflict_RC=V.pn3C,
 
-                                   v.nn2_Nonconflict=v.nn2N,
-                                   v.nn3_Nonconflict=v.nn3N,
-                                   v.pn3_Nonconflict_RC =v.pn3N,
+                                   V.nn2_Nonconflict=V.nn2N,
+                                   V.nn3_Nonconflict=V.nn3N,
+                                   V.pn3_Nonconflict_RC =V.pn3N,
 
-                                   v.cc2_Nonconflict=v.cc2N,
-                                   v.cc3_Nonconflict=v.cc3N,
-                                   v.pc3_Nonconflict_RC =v.pc3N,
+                                   V.cc2_Nonconflict=V.cc2N,
+                                   V.cc3_Nonconflict=V.cc3N,
+                                   V.pc3_Nonconflict_RC =V.pc3N,
 
-                                   v.pp3_PM=v.pp3P))
-av.vs.PM.Table$PM_Block <- NA;
-av.vs.PM.Table <- av.vs.PM.Table[ ,c("PM_Block", "M", "SD")]
-av.vs.PM.Table$PM_Block[grep ("2", rownames(av.vs.PM.Table))] <- "Control"; av.vs.PM.Table$PM_Block[grep ("3", rownames(av.vs.PM.Table))] <- "PM"
-av.vs.PM.Table
+                                   V.pp3_PM=V.pp3P))
+av.Vs.PM.Table$PM_Block <- NA;
+av.Vs.PM.Table <- av.Vs.PM.Table[ ,c("PM_Block", "M", "SD")]
+av.Vs.PM.Table$PM_Block[grep ("2", rownames(av.Vs.PM.Table))] <- "Control"; av.Vs.PM.Table$PM_Block[grep ("3", rownames(av.Vs.PM.Table))] <- "PM"
+av.Vs.PM.Table
 
+# # # Rates by Time Pressure (averaged over PM Block) # # #
+#
+av.V.corAo <- function (thetas) (thetas[,"mean_v.ccA2C",, drop=F] + thetas[,"mean_v.ccA3C",, drop=F] +
+                                    thetas[,"mean_v.nnA2N",, drop=F] + thetas[,"mean_v.nnA3N",, drop=F])/4
+av.V.corBo <- function (thetas) (thetas[,"mean_v.ccB2C",, drop=F] + thetas[,"mean_v.ccB3C",, drop=F] +
+                                    thetas[,"mean_v.nnB2N",, drop=F] + thetas[,"mean_v.nnB3N",, drop=F])/4
+av.V.corCo <- function (thetas) (thetas[,"mean_v.ccC2C",, drop=F] + thetas[,"mean_v.ccC3C",, drop=F] +
+                                    thetas[,"mean_v.nnC2N",, drop=F] + thetas[,"mean_v.nnC3N",, drop=F])/4
+av.V.corDo <- function (thetas) (thetas[,"mean_v.ccD2C",, drop=F] + thetas[,"mean_v.ccD3C",, drop=F] +
+                                    thetas[,"mean_v.nnD2N",, drop=F] + thetas[,"mean_v.nnD3N",, drop=F])/4
+
+av.V.errAo <- function (thetas) (thetas[,"mean_v.nnA2C",, drop=F] + thetas[,"mean_v.nnA3C",, drop=F] +
+                                     thetas[,"mean_v.ccA2N",, drop=F] + thetas[,"mean_v.ccA3N",, drop=F])/4
+av.V.errBo <- function (thetas) (thetas[,"mean_v.nnB2C",, drop=F] + thetas[,"mean_v.nnB3C",, drop=F] +
+                                     thetas[,"mean_v.ccB2N",, drop=F] + thetas[,"mean_v.ccB3N",, drop=F])/4
+av.V.errCo <- function (thetas) (thetas[,"mean_v.nnC2C",, drop=F] + thetas[,"mean_v.nnC3C",, drop=F] +
+                                     thetas[,"mean_v.ccC2N",, drop=F] + thetas[,"mean_v.ccC3N",, drop=F])/4
+av.V.errDo <- function (thetas) (thetas[,"mean_v.nnD2C",, drop=F] + thetas[,"mean_v.nnD3C",, drop=F] +
+                                     thetas[,"mean_v.ccD2N",, drop=F] + thetas[,"mean_v.ccD3N",, drop=F])/4
+
+av.V.ppAP <- function (thetas) (thetas[,"mean_v.ppA3P",, drop=F])
+av.V.ppBP <- function (thetas) (thetas[,"mean_v.ppB3P",, drop=F])
+av.V.ppCP <- function (thetas) (thetas[,"mean_v.ppC3P",, drop=F])
+av.V.ppDP <- function (thetas) (thetas[,"mean_v.ppD3P",, drop=F])
+
+V.corAo <- mean.sd(samples.E1,av.V.corAo)
+V.corBo <- mean.sd(samples.E1,av.V.corBo)
+V.corCo <- mean.sd(samples.E1,av.V.corCo)
+V.corDo <- mean.sd(samples.E1,av.V.corDo)
+
+V.errAo <- mean.sd(samples.E1,av.V.errAo)
+V.errBo <- mean.sd(samples.E1,av.V.errBo)
+V.errCo <- mean.sd(samples.E1,av.V.errCo)
+V.errDo <- mean.sd(samples.E1,av.V.errDo)
+
+V.ppAP <- mean.sd(samples.E1,av.V.ppAP)
+V.ppBP <- mean.sd(samples.E1,av.V.ppBP)
+V.ppCP <- mean.sd(samples.E1,av.V.ppCP)
+V.ppDP <- mean.sd(samples.E1,av.V.ppDP)
+
+av.Vs.TP.Table <- data.frame(rbind(V.corA_Ongoing=V.corAo,
+                                   V.corB_Ongoing=V.corBo,
+                                   V.corC_Ongoing=V.corCo,
+                                   V.corD_Ongoing=V.corDo,
+
+                                   V.errA_Ongoing=V.errAo,
+                                   V.errB_Ongoing=V.errBo,
+                                   V.errC_Ongoing=V.errCo,
+                                   V.errD_Ongoing=V.errDo,
+
+                                   V.ppA_PM=V.ppAP,
+                                   V.ppB_PM=V.ppBP,
+                                   V.ppC_PM=V.ppCP,
+                                   V.ppD_PM=V.ppDP
+
+                                   ))
+av.Vs.TP.Table
 
 # # # Z-score and P-value Tables # # #
 #
@@ -455,7 +527,7 @@ colnames(Reactive.Table) <- c("Conflict","Nonconflict","Conflict (Error)","Nonco
 # Reactive.Table
 
 #
-Proactive.Table <- data.frame(rbind(
+Proactive.PM.Table <- data.frame(rbind(
     A.PM.minus.Control=c(zandp(samples.E1, Proactive.AC),
         zandp(samples.E1, Proactive.AN)
     ),
@@ -472,7 +544,7 @@ Proactive.Table <- data.frame(rbind(
         zandp(samples.E1, Proactive.DN)
     )
 ))
-colnames(Proactive.Table) <- c("Conflict","Nonconflict")
+colnames(Proactive.PM.Table) <- c("Conflict","Nonconflict")
 # Proactive.Table
 
 #
@@ -505,7 +577,7 @@ colnames(Capacity.Table) <- c("Conflict","Nonconflict","Conflict (Error)","Nonco
 # Capacity.Table
 
 #
-ProactiveTP.Table <- data.frame(rbind(
+Proactive.TP.Table <- data.frame(rbind(
     PM.Cost.A.minus.B=c(zandp(samples.E1, ProactiveTP.ABC),zandp(samples.E1, ProactiveTP.ABN)
     ),
 
@@ -515,11 +587,11 @@ ProactiveTP.Table <- data.frame(rbind(
     PM.Cost.C.minus.D=c(zandp(samples.E1, ProactiveTP.CDC),zandp(samples.E1, ProactiveTP.CDN)
     )
 ))
-colnames(ProactiveTP.Table) <- c("Conflict","Nonconflict")
+colnames(Proactive.TP.Table) <- c("Conflict","Nonconflict")
 # ProactiveTP.Table
 
 #
-Effort.by.TP.Table.Wide <- data.frame(rbind(
+Effort.TP.Table.Wide <- data.frame(rbind(
     Conflict=c(zandp(samples.E1, Effort.TPccCABC),
                zandp(samples.E1, Effort.TPccCBCC),
                zandp(samples.E1, Effort.TPccCCDC),
@@ -581,7 +653,7 @@ Effort.by.TP.Table.Wide <- data.frame(rbind(
                          zandp(samples.E1, Effort.TPpcPMCDN)
     )
 ))
-colnames(Effort.by.TP.Table.Wide) <- c("A-B (Control)","B-C (Control)","C-D (Control)","A-B (PM)","B-C (PM)","C-D (PM)")
+colnames(Effort.TP.Table.Wide) <- c("A-B (Control)","B-C (Control)","C-D (Control)","A-B (PM)","B-C (PM)","C-D (PM)")
 
 
 # # # Tables # # #
@@ -589,17 +661,191 @@ t0.Table
 sdv.Table
 av.Bs.PM.Table
 av.Bs.TP.Table
-av.vs.PM.Table
+av.Vs.PM.Table
+av.Vs.TP.Table
 
-Reactive.Table
-Proactive.Table
 Capacity.Table
-ProactiveTP.Table
-Effort.by.TP.Table.Wide
+Reactive.Table
+Proactive.PM.Table
+Proactive.TP.Table
+Effort.TP.Table.Wide
+
+# # # Plots # # #
+
+## Reactive Control Plot (Drift lower for PM than Non-PM Stimuli)
+av.Vs.PM.Table
+rc.plot.df <- av.Vs.PM.Table[ c(6,7,9,10,12,13,15,16), ]
+rc.plot.df
+rc.plot.df$R <- NA; rc.plot.df$S <- NA; rc.plot.df$C <- NA
+rc.plot.df$R[grep ("Conflict", rownames(rc.plot.df))] <- "Conflict"
+rc.plot.df$R[grep ("Nonconflict", rownames(rc.plot.df))] <- "Nonconflict"
+rc.plot.df$S[grep ("cc", rownames(rc.plot.df))] <- "Non-PM"
+rc.plot.df$S[grep ("nn", rownames(rc.plot.df))] <- "Non-PM"
+rc.plot.df$S[grep ("pc", rownames(rc.plot.df))] <- "PM"
+rc.plot.df$S[grep ("pn", rownames(rc.plot.df))] <- "PM"
+rc.plot.df$C[grep ("c3_C", rownames(rc.plot.df))] <- "Correct"
+rc.plot.df$C[grep ("n3_N", rownames(rc.plot.df))] <- "Correct"
+rc.plot.df$C[grep ("c3_N", rownames(rc.plot.df))] <- "Error"
+rc.plot.df$C[grep ("n3_C", rownames(rc.plot.df))] <- "Error"
+
+Reactive.Plot <- ggplot(rc.plot.df, aes(factor(S),M)) +
+    geom_point(stat = "identity",aes(shape=C), size=3) +
+    geom_errorbar(aes(ymax = M + SD, ymin = M - SD, width = 0.2)) +
+    xlab("Stimulus Type") + ylab("V") +
+    scale_shape_discrete("Response:") +
+    ylim(-0.3,1.8) +
+    theme(text = element_text()) +
+    theme(
+        axis.line.x = element_line(),
+        axis.line.y = element_line()
+    ) + geom_line(aes(group=C, y=M), linetype=2) +
+    ggtitle("Reactive Inhibition: \nOngoing Task Rates for Non-PM and PM Stimuli") +
+    facet_grid(. ~ R)
+Reactive.Plot
+
+## Effort/Arousal Plot (Drift Increases by PM Block)
+effPM.plot.df <- av.Vs.PM.Table[ c(5,6,8,9,11,12,14,15), ]
+effPM.plot.df
+effPM.plot.df$C <- NA; effPM.plot.df$S <- NA
+effPM.plot.df$S[grep ("cc", rownames(effPM.plot.df))] <- "Conflict"
+effPM.plot.df$S[grep ("nn", rownames(effPM.plot.df))] <- "Nonconflict"
+effPM.plot.df$C[grep ("c2_C", rownames(effPM.plot.df))] <- "Correct"
+effPM.plot.df$C[grep ("n2_N", rownames(effPM.plot.df))] <- "Correct"
+effPM.plot.df$C[grep ("c2_N", rownames(effPM.plot.df))] <- "Error"
+effPM.plot.df$C[grep ("n2_C", rownames(effPM.plot.df))] <- "Error"
+effPM.plot.df$C[grep ("c3_C", rownames(effPM.plot.df))] <- "Correct"
+effPM.plot.df$C[grep ("n3_N", rownames(effPM.plot.df))] <- "Correct"
+effPM.plot.df$C[grep ("c3_N", rownames(effPM.plot.df))] <- "Error"
+effPM.plot.df$C[grep ("n3_C", rownames(effPM.plot.df))] <- "Error"
+
+Effort.PM.Plot <- ggplot(effPM.plot.df, aes(factor(PM_Block),M)) +
+    geom_point(stat = "identity",aes(shape=C), size=3) +
+    geom_errorbar(aes(ymax = M + SD, ymin = M - SD, width = 0.2)) +
+    xlab("PM Block") + ylab("V") +
+    scale_shape_discrete("Response:") +
+    ylim(0,1.8) +
+    theme(text = element_text()) +
+    theme(
+        axis.line.x = element_line(),
+        axis.line.y = element_line()
+    ) + geom_line(aes(group=C, y=M), linetype=2) +
+    ggtitle("Effort/Arousal: \nOngoing Task Rates by PM Block") +
+    facet_grid(. ~ S)
+Effort.PM.Plot
+
+# Effort/Arousal by Time Pressure Plot
+av.Vs.TP.Table
+effTP.plot.df <- av.Vs.TP.Table[ 1:8, ]
+effTP.plot.df
+# effTP.plot.df$S <- NA;
+effTP.plot.df$TP <- NA; effTP.plot.df$C <- NA; effTP.plot.df$Load <- NA
+# effTP.plot.df$S[grep ("Ongoing", rownames(effTP.plot.df))] <- "Ongoing"
+# effTP.plot.df$S[grep ("PM", rownames(effTP.plot.df))] <- "PM"
+effTP.plot.df$TP[grep ("A", rownames(effTP.plot.df))] <- "Low"
+effTP.plot.df$TP[grep ("B", rownames(effTP.plot.df))] <- "High"
+effTP.plot.df$TP[grep ("C", rownames(effTP.plot.df))] <- "Low"
+effTP.plot.df$TP[grep ("D", rownames(effTP.plot.df))] <- "High"
+effTP.plot.df$Load[grep ("A", rownames(effTP.plot.df))] <- "2 decisions per trial"
+effTP.plot.df$Load[grep ("B", rownames(effTP.plot.df))] <- "2 decisions per trial"
+effTP.plot.df$Load[grep ("C", rownames(effTP.plot.df))] <- "5 decisions per trial"
+effTP.plot.df$Load[grep ("D", rownames(effTP.plot.df))] <- "5 decisions per trial"
+effTP.plot.df$C[grep ("cor", rownames(effTP.plot.df))] <- "Correct"
+effTP.plot.df$C[grep ("err", rownames(effTP.plot.df))] <- "Error"
+# effTP.plot.df$C[grep ("pp", rownames(effTP.plot.df))] <- "Correct"
+
+effTP.plot.df$TP <- factor(effTP.plot.df$TP, levels=c("Low","High"))
+
+Effort.TP.Plot <- ggplot(effTP.plot.df, aes(factor(TP),M)) +
+    geom_point(stat = "identity",aes(shape=C), size=3) +
+    geom_errorbar(aes(ymax = M + SD, ymin = M - SD, width = 0.2)) +
+    xlab("Time Pressure") + ylab("V") +
+    scale_shape_discrete("Response:") +
+    ylim(0.2,1.8) +
+    theme(text = element_text()) +
+    theme(
+        axis.line.x = element_line(),
+        axis.line.y = element_line()
+    ) + geom_line(aes(group=C, y=M), linetype=2) +
+    ggtitle("Effort/Arousal: \nOngoing Task Rates by Time Pressure and Traffic Load") +
+    facet_grid(. ~ Load)
+Effort.TP.Plot
+
+Effort.Plots <- grid.arrange(Effort.PM.Plot, Effort.TP.Plot, layout_matrix = cbind(
+    c(1,1,2,2), c(1,1,2,2)))
+
+grid.arrange(Reactive.Plot, Effort.PM.Plot, Effort.TP.Plot, layout_matrix = cbind(
+    c(1,1,2,2,3,3), c(1,1,2,2,3,3)))
+
+
+
+# Proactive Control by PM Block Plot
+av.Bs.PM.Table
+pcPM.plot.df <- av.Bs.PM.Table[ 3:6, ]
+pcPM.plot.df
+pcPM.plot.df$R <- NA
+pcPM.plot.df$R[grep ("Conflict", rownames(pcPM.plot.df))] <- "Conflict Threshold"
+pcPM.plot.df$R[grep ("Nonconflict", rownames(pcPM.plot.df))] <- "Nonconflict Threshold"
+
+Proactive.PM.Plot <- ggplot(pcPM.plot.df, aes(factor(PM_Block),M)) +
+    geom_point(stat = "identity",aes(), size=3) +
+    geom_errorbar(aes(ymax = M + SD, ymin = M - SD, width = 0.2)) +
+    xlab("PM Block") + ylab("B") +
+    scale_shape_discrete("") +
+    ylim(1.4,2.6) +
+    theme(text = element_text()) +
+    theme(
+        axis.line.x = element_line(),
+        axis.line.y = element_line()
+    ) + geom_line(aes(group=R, y=M), linetype=2) +
+    ggtitle("Proactive Control: \nResponse Thresholds by PM Block") +
+    facet_grid(. ~ R)
+Proactive.PM.Plot
+
+# Proactive Control by Time Pressure Plot
+av.Bs.TP.Table
+pcTP.plot.df <- av.Bs.TP.Table
+pcTP.plot.df
+pcTP.plot.df$S <- NA;
+pcTP.plot.df$TP <- NA; pcTP.plot.df$Load <- NA
+pcTP.plot.df$S[grep ("Ongoing", rownames(pcTP.plot.df))] <- "Ongoing Task Thresholds"
+pcTP.plot.df$S[grep ("PM", rownames(pcTP.plot.df))] <- "PM Threshold"
+pcTP.plot.df$TP[grep (".A", rownames(pcTP.plot.df))] <- "Low"
+pcTP.plot.df$TP[grep (".B", rownames(pcTP.plot.df))] <- "High"
+pcTP.plot.df$TP[grep (".C", rownames(pcTP.plot.df))] <- "Low"
+pcTP.plot.df$TP[grep (".D", rownames(pcTP.plot.df))] <- "High"
+pcTP.plot.df$Load[grep (".A", rownames(pcTP.plot.df))] <- "2 decisions per trial"
+pcTP.plot.df$Load[grep (".B", rownames(pcTP.plot.df))] <- "2 decisions per trial"
+pcTP.plot.df$Load[grep (".C", rownames(pcTP.plot.df))] <- "5 decisions per trial"
+pcTP.plot.df$Load[grep (".D", rownames(pcTP.plot.df))] <- "5 decisions per trial"
+
+pcTP.plot.df$TP <- factor(pcTP.plot.df$TP, levels=c("Low","High"))
+
+Proactive.TP.Plot <- ggplot(pcTP.plot.df, aes(factor(TP),M)) +
+    geom_point(stat = "identity",aes(), size=3) +
+    geom_errorbar(aes(ymax = M + SD, ymin = M - SD, width = 0.2)) +
+    xlab("Time Pressure") + ylab("B") +
+    scale_shape_discrete("Response:") +
+    ylim(1.3,2.6) +
+    theme(text = element_text()) +
+    theme(
+        axis.line.x = element_line(),
+        axis.line.y = element_line()
+    ) + geom_line(aes(group=S, y=M), linetype=2) +
+    ggtitle("Proactive Control: \nResponse Thresholds by Time Pressure and Traffic Load") +
+    facet_grid(S ~ Load)
+Proactive.TP.Plot
+
+Proactive.Plots <- grid.arrange(Proactive.PM.Plot, Proactive.TP.Plot, layout_matrix = cbind(
+    c(1,1,1,2,2,2,2,2), c(1,1,1,2,2,2,2,2)))
+
+
 
 ```
 
-## Parameter Table: Nondecision Time
+
+## Nondecision Time
+
+### Parameter Table: Nondecision Time
 
 ```{r t0, echo=FALSE}
 
@@ -611,7 +857,10 @@ pander(table)
 
 ```
 
-## Parameter Table: sdv
+
+## SDV
+
+### Parameter Table: sdv
 
 ```{r sdv, echo=FALSE}
 
@@ -624,67 +873,17 @@ pander(table)
 ```
 
 
-## Parameter Table: Thresholds by PM Block
+## Capacity Sharing
 
-```{r thresholds by pm block, echo=FALSE}
+```{r post inf effort plots, echo=FALSE, fig.height=7, fig.width=7}
 
-panderOptions("digits", 3)
+plot <- Effort.Plots
 
-table <- av.Bs.PM.Table
-
-pander(table)
+plot(plot)
 
 ```
 
-## Parameter Table: Thresholds by Time Pressure
-
-```{r thresholds by time pressure, echo=FALSE}
-
-panderOptions("digits", 3)
-
-table <- av.Bs.TP.Table
-
-pander(table)
-
-```
-
-## Parameter Table: Drift Rates by PM Block
-
-```{r rates by pm block, echo=FALSE}
-
-panderOptions("digits", 3)
-
-table <- av.vs.PM.Table
-
-pander(table)
-
-```
-
-## Posterior Inference Table: Reactive Inhibition
-
-```{r post inf reactive inhibition, echo=FALSE}
-
-panderOptions("digits", 3)
-
-table <- Reactive.Table
-
-pander(table)
-
-```
-
-## Posterior Inference Table: Proactive Control
-
-```{r post inf proactive control pm, echo=FALSE}
-
-panderOptions("digits", 3)
-
-table <- Proactive.Table
-
-pander(table)
-
-```
-
-## Posterior Inference Table: Capacity Sharing
+### Posterior Inference Z Table: Capacity Sharing
 
 ```{r post inf capacity sharing, echo=FALSE}
 
@@ -696,26 +895,170 @@ pander(table)
 
 ```
 
-## Posterior Inference Table: Proactive Control by Time Pressure
+### Parameter Table: Drift Rates by PM Block
+
+```{r rates by pm block, echo=FALSE}
+
+panderOptions("digits", 3)
+
+table <- av.Vs.PM.Table
+
+pander(table)
+
+```
+
+
+## Proactive Control
+
+```{r post inf proactive plots, echo=FALSE, fig.height=9, fig.width=7}
+
+plot <- Proactive.Plots
+
+plot(plot)
+
+```
+
+### Posterior Inference Z Table: Proactive Control
+
+```{r post inf proactive control pm, echo=FALSE}
+
+panderOptions("digits", 3)
+
+table <- Proactive.PM.Table
+
+pander(table)
+
+```
+
+### Parameter Table: Thresholds by PM Block
+
+```{r thresholds by pm block, echo=FALSE}
+
+panderOptions("digits", 3)
+
+table <- av.Bs.PM.Table
+
+pander(table)
+
+```
+
+
+## Reactive Control
+
+```{r post inf reactive control plots, echo=FALSE, fig.height=4, fig.width=7}
+
+plot <- Reactive.Plot
+# ggsave("figures/E1.Reactive.Inhibition.png", plot = plot)
+plot(plot)
+
+```
+
+### Posterior Inference Z Table: Reactive Inhibition
+
+```{r post inf reactive inhibition, echo=FALSE}
+
+panderOptions("digits", 3)
+
+table <- Reactive.Table
+
+pander(table)
+
+```
+
+### Parameter Table: Drift Rates by PM Block
+
+```{r rates by pm block (duplicate), echo=FALSE}
+
+panderOptions("digits", 3)
+
+table <- av.Vs.PM.Table
+
+pander(table)
+
+```
+
+
+## Proactive Control by Time Pressure
+
+```{r post inf proactive plots (duplicate), echo=FALSE, fig.height=9, fig.width=7}
+
+plot <- Proactive.Plots
+# ggsave("figures/E1.Proactive.Control.png", plot = plot)
+plot(plot)
+
+```
+
+### Posterior Inference Z Table: Proactive Control by Time Pressure
 
 ```{r post inf proactive control time pressure, echo=FALSE}
 
 panderOptions("digits", 3)
 
-table <- ProactiveTP.Table
+table <- Proactive.TP.Table
 
 pander(table)
 
 ```
 
-## Posterior Inference Table: Effort/Arousal by Time Pressure
+### Parameter Table: Thresholds by Time Pressure
+
+```{r thresholds by time pressure, echo=FALSE}
+
+panderOptions("digits", 3)
+
+table <- av.Bs.TP.Table
+
+pander(table)
+
+```
+
+
+## Effort/Arousal by Time Pressure
+
+```{r post inf effort plots (duplicate), echo=FALSE, fig.height=7, fig.width=7}
+
+plot <- Effort.Plots
+# ggsave("figures/E1.Effort.Arousal.png", plot = plot)
+plot(plot)
+
+```
+
+### Posterior Inference Z Table: Effort/Arousal by Time Pressure
 
 ```{r post inf effort arousal time pressure, echo=FALSE}
 
 panderOptions("digits", 3)
 
-table <- Effort.by.TP.Table.Wide
+table <- Effort.TP.Table.Wide
 
 pander(table)
 
 ```
+
+### Parameter Table: Drift Rates by Time Pressure
+
+```{r rates by time pressure, echo=FALSE}
+
+panderOptions("digits", 3)
+
+table <- av.Vs.TP.Table
+
+pander(table)
+
+```
+
+## Parameter Plots
+
+![Effort/Arousal](figures/E1/E1.Effort.Arousal.png)
+
+![Proactive Control](figures/E1/E1.Proactive.Control.png)
+
+![Reactive Inhibition](figures/E1/E1.Reactive.Inhibition.png)
+
+## Model Exploration
+
+![Model Exploration PM Contrasts](figures/E1/E1.ModelExpPMContrasts.png)
+
+![Model Exploration TP Contrasts Ongoing](figures/E1/E1.ModelExpTPContrastsOngoing.png)
+
+![Model Exploration TP Contrasts PM and Control Mechanisms](figures/E1/E1.ModelExpTPContrastsPM_ControlMech.png)

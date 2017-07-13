@@ -213,7 +213,7 @@ E1.RT.plots.PM <- PM.RTgraph
 
 ```
 
-```{r compute nonresponse predictions, echo=FALSE, include=FALSE, eval=FALSE}
+```{r compute nonresponse predictions, echo=FALSE, include=FALSE, eval=TRUE}
 
 # Do out of sample predictions of non-responses to see whether they are
 # consistent with the model.
@@ -247,8 +247,8 @@ NR.plot <- NR.plot + geom_point(size=3) + geom_errorbar(aes(ymax = upper, ymin =
                                                         width=0.2) +
     geom_point(aes(cond, data), pch=21, size=4,
                colour="black")+geom_line(aes(group = 1, y=data), linetype=2) +
-    ylab("Probability of non-response") +
-    xlab("Time Pressure/ Traffic Load") +
+    ylab("Probability of Non-Response") +
+    xlab("Time Pressure/Traffic Load") +
     ggtitle("Predicted Probability of Nonresponse by Time Pressure")
 # NR.plot
 # ggsave(NR.plot, file="E1.NR.Prob.png", width = 9, height = 4.5)
@@ -411,7 +411,7 @@ V.corr.graph <- ggplot(plot.corr, aes(factor(cond),M)) +
     axis.line.x = element_line(),
     axis.line.y = element_line()
   ) + geom_line(aes(group=PM, y=M), linetype=2) +
-  ggtitle("Drift Rates for Ongoing Task and PM Correct Responses by Time Pressure") +
+  ggtitle("Rates for Ongoing Task and PM Correct Responses by Time Pressure") +
   facet_grid(. ~ S + R)
 
 # V.corr.graph
@@ -447,7 +447,7 @@ V.ongoing.FA.graph <- ggplot(plot.FA, aes(factor(cond),M)) +
     axis.line.x = element_line(),
     axis.line.y = element_line()
   ) + geom_line(aes(group=PM, y=M), linetype=2) +
-  ggtitle("Drift Rates for Ongoing Task False Alarms by Time Pressure") +
+  ggtitle("Rates for Ongoing Task Errors by Time Pressure") +
   facet_grid(. ~ S + R)
 
 # V.ongoing.FA.graph
@@ -465,7 +465,7 @@ V.reactive.graph <- ggplot(plot.reactive, aes(factor(cond),M)) +
     axis.line.x = element_line(),
     axis.line.y = element_line()
   ) + geom_line(aes(group=PM, y=M), linetype=2) +
-  ggtitle("Reactive Inhibition of Ongoing Task Drift Rates by Time Pressure") +
+  ggtitle("Reactive Inhibition: \nOngoing Task Rates by Time Pressure") +
   facet_grid(. ~ S + R)
 
 # V.reactive.graph
@@ -484,7 +484,7 @@ V.plots <- grid.arrange(V.corr.graph, V.ongoing.FA.graph, V.reactive.graph, layo
 ```{r plot accuracy fits, echo=FALSE, fig.height=9, fig.width=7}
 
 plot <- E1.acc.plots
-
+ggsave("figures/E1/E1.Fits.Accuracy.png", plot = plot)
 plot(plot)
 
 ```
@@ -494,34 +494,34 @@ plot(plot)
 ```{r plot RT fits ongoing, echo=FALSE, fig.height=12, fig.width=7}
 
 plot <- E1.RT.plots.ongoing 
-
+ggsave("figures/E1/E1.Fits.RT.Ongoing.png", plot = plot)
 plot(plot)
 
 ```
 
 ## Model Fits to RT (PM)
 
-```{r plot RT fits PM, echo=FALSE, fig.height=3, fig.width=7}
+```{r plot RT fits PM, echo=FALSE, fig.height=4, fig.width=7}
 
 plot <- E1.RT.plots.PM
-
+ggsave("figures/E1/E1.Fits.RT.PM.png", plot = plot)
 plot(plot)
 
 ```
 
 ## Out of Sample Predicted Nonresponse Proportions
 
-```{r plot nonresponse proportions, echo=FALSE, eval=FALSE, fig.height=3, fig.width=7}
+```{r plot nonresponse proportions, echo=FALSE, fig.height=4, fig.width=7}
 
 plot <- NR.plot
-
+ggsave("figures/E1/E1.Fits.NR.png", plot = plot)
 plot(plot)
 
 ```
 
 ## Parameter Plots: Thresholds
 
-```{r plot thresholds, echo=FALSE, fig.height=4.5, fig.width=7}
+```{r plot thresholds, eval=FALSE, fig.height=4, fig.width=7}
 
 plot <- B.plot
 
@@ -531,7 +531,7 @@ plot(plot)
 
 ## Parameter Plots: Rates
 
-```{r plot rates, echo=FALSE, fig.height=12, fig.width=7}
+```{r plot rates, eval=FALSE, fig.height=12, fig.width=7}
 
 plot <- V.plots
 
@@ -539,10 +539,3 @@ plot(plot)
 
 ```
 
-## Parameter Tables
-
-```{r parameter tables, echo=FALSE}
-
-
-
-```
