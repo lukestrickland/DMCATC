@@ -1,5 +1,5 @@
 ---
-title: "Parameter and Posterior Inference Tables for ATC Experiment E1"
+title: "Parameter Plots and Posterior Inference Tables for ATC Experiment E1"
 author: "Russell Boag"
 date: "12 July 2017"
 output:
@@ -855,6 +855,8 @@ table <- t0.Table
 
 pander(table)
 
+write.csv(table, file = "analysis/t0.E1.csv")
+
 ```
 
 
@@ -869,6 +871,8 @@ panderOptions("digits", 3)
 table <- sdv.Table
 
 pander(table)
+
+write.csv(table, file = "analysis/sdvs.E1.csv")
 
 ```
 
@@ -893,6 +897,8 @@ table <- Capacity.Table
 
 pander(table)
 
+write.csv(table, file = "analysis/Z.Capacity.E1.csv")
+
 ```
 
 ### Parameter Table: Drift Rates by PM Block
@@ -904,6 +910,8 @@ panderOptions("digits", 3)
 table <- av.Vs.PM.Table
 
 pander(table)
+
+write.csv(table, file = "analysis/mean_vs.PM.E1.csv")
 
 ```
 
@@ -928,6 +936,8 @@ table <- Proactive.PM.Table
 
 pander(table)
 
+write.csv(table, file = "analysis/Z.Proactive.PM.E1.csv")
+
 ```
 
 ### Parameter Table: Thresholds by PM Block
@@ -939,6 +949,8 @@ panderOptions("digits", 3)
 table <- av.Bs.PM.Table
 
 pander(table)
+
+write.csv(table, file = "analysis/mean_Bs.PM.E1.csv")
 
 ```
 
@@ -962,6 +974,8 @@ panderOptions("digits", 3)
 table <- Reactive.Table
 
 pander(table)
+
+write.csv(table, file = "analysis/Z.Reactive.E1.csv")
 
 ```
 
@@ -998,6 +1012,8 @@ table <- Proactive.TP.Table
 
 pander(table)
 
+write.csv(table, file = "analysis/Z.Proactive.TP.E1.csv")
+
 ```
 
 ### Parameter Table: Thresholds by Time Pressure
@@ -1009,6 +1025,8 @@ panderOptions("digits", 3)
 table <- av.Bs.TP.Table
 
 pander(table)
+
+write.csv(table, file = "analysis/mean_Bs.TP.E1.csv")
 
 ```
 
@@ -1033,6 +1051,8 @@ table <- Effort.TP.Table.Wide
 
 pander(table)
 
+write.csv(table, file = "analysis/Z.Effort.TP.E1.csv")
+
 ```
 
 ### Parameter Table: Drift Rates by Time Pressure
@@ -1045,7 +1065,18 @@ table <- av.Vs.TP.Table
 
 pander(table)
 
+write.csv(table, file = "analysis/mean_vs.TP.E1.csv")
+
 ```
+## Model Fit Plots
+
+![Model Fits: Accuracy](figures/E1/E1.Fits.Accuracy.png)
+
+![Model Fits: Ongoing Task RT](figures/E1/E1.Fits.RT.Ongoing.png)
+
+![Model Fits: PM RT](figures/E1/E1.Fits.RT.PM.png)
+
+![Model Fits: Nonresponse Proportions](figures/E1/E1.Fits.NR.png)
 
 ## Parameter Plots
 

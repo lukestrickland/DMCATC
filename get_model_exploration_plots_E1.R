@@ -28,9 +28,7 @@ Enam="E1"
 source("generate_postexploration_E1.R")
 ##The above g
 
-###bLOCK EFFECTS with params averaged
-
-
+###block effects with params averaged
 plot1 <- ggplot(all_effects_predictives.block, aes(S, mean))
 plot1 <- plot1 + facet_grid(DV  ~  model, scales = "free", space = "fixed") + geom_point(size=3) + geom_errorbar(aes(ymax = upper, ymin = lower), width= 0.2) +
     geom_point(aes(S, data), pch=21, size=4, colour="black") + xlab("Stimulus")+
@@ -38,11 +36,14 @@ plot1 <- plot1 + facet_grid(DV  ~  model, scales = "free", space = "fixed") + ge
     ggtitle("Model Exploration: \nObserved vs Predicted Ongoing Task Accuracy and RT (PM-Control Contrasts)")
 plot1
 
+plot1$data
+Block.Effects.Percent <- plot1$data$mean/plot1$data$data*100
+Block.Effects.Percent <- data.frame(Block.Effects.Percent)
+rownames(Block.Effects.Percent) <- rownames(plot1$data)
+Block.Effects.Percent
+
 
 #cond effects with params averaged
-all_effects_predictives.cond$contrast
-all_effects_predictives.cond$contrast[ is.na(all_effects_predictives.cond$contrast) ] <- "C-D"
-
 plotC <- ggplot(all_effects_predictives.cond[all_effects_predictives.cond$S=="Conflict",], aes(contrast, mean))
 plotC <- plotC+
     facet_grid(DV  ~ model, scales = "free", space = "fixed") +
@@ -94,9 +95,27 @@ grid.arrange(plotC, plotN, layout_matrix = cbind(c(1,1,1,2,2,2),
 
 ))
 plotP
+
+Cond.C.Percent <- plotC$data$mean/plotC$data$data*100
+Cond.C.Percent <- data.frame(Cond.C.Percent)
+rownames(Cond.C.Percent) <- rownames(plotC$data)
+Cond.C.Percent
+
+Cond.N.Percent <- plotN$data$mean/plotN$data$data*100
+Cond.N.Percent <- data.frame(Cond.N.Percent)
+rownames(Cond.N.Percent) <- rownames(plotN$data)
+Cond.N.Percent
+
+Cond.P.Percent <- plotP$data$mean/plotP$data$data*100
+Cond.P.Percent <- data.frame(Cond.P.Percent)
+rownames(Cond.P.Percent) <- rownames(plotP$data)
+Cond.P.Percent
 ##Turning off PM control mechanisms systematically and examining PM accuracy/
 #PM RT
-PM_control_mechanisms$data
+Cog.Control.Percent <- PM_control_mechanisms$mean/PM_control_mechanisms$data*100
+Cog.Control.Percent <- data.frame(Cog.Control.Percent)
+rownames(Cog.Control.Percent) <- rownames(PM_control_mechanisms)
+Cog.Control.Percent
 
 plot2 <- ggplot(PM_control_mechanisms, aes(model, mean))
 plot2 <- plot2 + facet_grid(DV  ~ ., scales = "free", space = "fixed") +

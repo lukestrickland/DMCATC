@@ -49,8 +49,7 @@ samples <- samples[names(samples) != "p17"]  # Exclude p17 E1 due to no PM respo
 # plot.dmc(samples[[1]], p.prior= samples[[1]]$p.prior)
 
 #
-# E1PP <- h.post.predict.dmc(samples, save.simulation=
-#                              TRUE)
+# E1PP <- h.post.predict.dmc(samples, save.simulation=TRUE)
 # save(E1PP, file="data/after_sampling/E1PP.RData")
 # # <<<<<<< HEAD
 load("data/after_sampling/E1PP.RData")
@@ -206,6 +205,12 @@ E1.RT.plots.ongoing <- grid.arrange(corr.RTgraph, err.RTgraph, layout_matrix = c
 # Do out of sample predictions of non-responses to see whether they are
 # consistent with the model.
 load("data/exp_data/okdats.E1.NR.RData")
+
+# Exclude p17 E1 due to no PM responses
+okdats <- okdats[ okdats$s!="p17",]
+okdats$s <- factor(okdats$s)
+str(okdats)
+
 names(okdats)[length(okdats)] <- "trial.pos"
 levels(okdats$block)<- c("2", "3")
 
@@ -235,7 +240,7 @@ NR.plot <- NR.plot + geom_point(size=3) + geom_errorbar(aes(ymax = upper, ymin =
                                                         width=0.2) +
     geom_point(aes(cond, data), pch=21, size=4,
                colour="black")+geom_line(aes(group = 1, y=data), linetype=2) +
-    ylab("Probability of non-response") +
+    ylab("Probability of Nonresponse") +
     xlab("Time Pressure/ Traffic Load") +
     ggtitle("Predicted Probability of Nonresponse by Time Pressure")
 NR.plot
@@ -272,7 +277,7 @@ fixedeffects.meanthetas <- function(samples){
 #
 # # setwd("data/after_sampling")
 # av.thetas.E1 <- fixedeffects.meanthetas(samples)[[1]]
-# save(av.thetas.E1, file="data/after_sampling/av.thetas.E1.PMV.RData")
+# save(av.thetas.E1, file="data/after_sampling/av.thetas.E1.RData")
 load("data/after_sampling/av.thetas.E1.RData")
 
 msds <- cbind(apply(av.thetas.E1, 2, mean), apply(av.thetas.E1, 2, sd))

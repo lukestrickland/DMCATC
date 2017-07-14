@@ -218,6 +218,12 @@ E1.RT.plots.PM <- PM.RTgraph
 # Do out of sample predictions of non-responses to see whether they are
 # consistent with the model.
 load("data/exp_data/okdats.E1.NR.RData")
+
+# Exclude p17 E1 due to no PM responses
+okdats <- okdats[ okdats$s!="p17",]
+okdats$s <- factor(okdats$s)
+# str(okdats)
+
 names(okdats)[length(okdats)] <- "trial.pos"
 levels(okdats$block)<- c("2", "3")
 
