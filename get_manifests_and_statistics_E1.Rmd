@@ -106,7 +106,7 @@ rownames(CDT.Acc.TABLE.E1) <- c("Stimulus","PM Block","Time Pressure",
                                 "Stimulus by PM Block by Time Pressure")
 colnames(CDT.Acc.TABLE.E1) <- c("Chi-square","df","p")
 # CDT.Acc.TABLE.E1
-
+# write.csv(CDT.Acc.TABLE.E1, file="analysis/CDT.Acc.TABLE.E1.csv")
 
 # PMT.Acc.glmer.E1 <- glmer(C ~ S*cond+(1|s), data=PMT, family=binomial(link="probit"))
 # save(PMT.Acc.glmer.E1, file="PMT.Acc.glmer.E1.RData")
@@ -122,6 +122,7 @@ rownames(PMT.Acc.TABLE.E1) <- c("Stimulus","Time Pressure",
                                 "Stimulus by Time Pressure")
 colnames(PMT.Acc.TABLE.E1) <- c("Chi-square","df","p")
 # PMT.Acc.TABLE.E1
+# write.csv(PMT.Acc.TABLE.E1, file="analysis/PMT.Acc.TABLE.E1.csv")
 
 setwd("C:/Users/Russell Boag/Documents/GitHub/DMCATC")
 ```
@@ -159,7 +160,7 @@ rownames(CDT.RT.TABLE.E1) <- c("Stimulus","PM Block","Time Pressure",
                                "Stimulus by PM Block by Time Pressure")
 colnames(CDT.RT.TABLE.E1) <- c("Chi-square","df","p")
 # CDT.RT.TABLE.E1
-
+# write.csv(CDT.RT.TABLE.E1, file="analysis/CDT.RT.TABLE.E1.csv")
 
 # PMTC.RT.lmer.E1 <- lmer(y ~ S*cond+(1|s), data=PMT.RT)
 # save(PMTC.RT.lmer.E1, file="PMTC.RT.lmer.E1.RData")
@@ -174,6 +175,7 @@ rownames(PMT.RT.TABLE.E1) <- c("Stimulus","Time Pressure",
                                 "Stimulus by Time Pressure")
 colnames(PMT.RT.TABLE.E1) <- c("Chi-square","df","p")
 # PMT.RT.TABLE.E1
+# write.csv(PMT.RT.TABLE.E1, file="analysis/PMT.RT.TABLE.E1.csv")
 
 setwd("C:/Users/Russell Boag/Documents/GitHub/DMCATC")
 
@@ -474,6 +476,12 @@ pander(means3)
 pander(contrasts)
 xtable(lmer)
 
+write.csv(lmer, file="analysis/CDT.Acc.TABLE.E1.csv")
+write.csv(means1, file="analysis/CDT.Acc.S.E1.csv")
+write.csv(means2, file="analysis/CDT.Acc.Block.E1.csv")
+write.csv(means3, file="analysis/CDT.Acc.Cond.E1.csv")
+# write.csv(contrasts, file="analysis/CDT.Acc.Contrasts.E1.csv")
+
 ```
 
 ## Ongoing Task RT LMER
@@ -495,6 +503,12 @@ pander(means3)
 pander(contrasts)
 xtable(lmer)
 
+write.csv(lmer, file="analysis/CDT.RT.TABLE.E1.csv")
+write.csv(means1, file="analysis/CDT.RT.S.E1.csv")
+write.csv(means2, file="analysis/CDT.RT.Block.E1.csv")
+write.csv(means3, file="analysis/CDT.RT.Cond.E1.csv")
+# write.csv(contrasts, file="analysis/CDT.RT.Contrasts.E1.csv")
+
 ```
 
 ## PM Accuracy GLMER
@@ -513,6 +527,11 @@ pander(means1)
 pander(means2)
 pander(contrasts)
 xtable(lmer)
+
+write.csv(lmer, file="analysis/PMT.Acc.TABLE.E1.csv")
+write.csv(means1, file="analysis/PMT.Acc.S.E1.csv")
+write.csv(means2, file="analysis/PMT.Acc.Cond.E1.csv")
+# write.csv(contrasts, file="analysis/PMT.Acc.Contrasts.E1.csv")
 
 ```
 
@@ -533,6 +552,11 @@ pander(means2)
 pander(contrasts)
 xtable(lmer)
 
+write.csv(lmer, file="analysis/PMT.RT.TABLE.E1.csv")
+write.csv(means1, file="analysis/PMT.RT.S.E1.csv")
+write.csv(means2, file="analysis/PMT.RT.Cond.E1.csv")
+# write.csv(contrasts, file="analysis/PMT.RT.Contrasts.E1.csv")
+
 ```
 
 ## Reactive Control RT Check LMER
@@ -551,5 +575,9 @@ pander(lmer)
 pander(means1)
 pander(contrasts)
 xtable(lmer)
+
+write.csv(lmer, file="analysis/CDT.Reactive.TABLE.E1.csv")
+write.csv(means1, file="analysis/CDT.Reactive.S.E1.csv")
+# write.csv(contrasts, file="analysis/CDT.Reactive.Contrasts.E1.csv")
 
 ```
