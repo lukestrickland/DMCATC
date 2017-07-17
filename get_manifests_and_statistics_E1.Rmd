@@ -1,36 +1,96 @@
+---
+title: "Statistical Analyses and Manifests for ATC Experiment E1"
+author: "Russell J. Boag"
+date: "11 July 2017"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r load data, echo=FALSE, include=FALSE}
+rm(list=ls())
+# setwd("~/russ_model_analyses")
+setwd("C:/Users/Russell Boag/Documents/GitHub/DMCATC")
+source("dmc/dmc.R")
+load_model ("LBA","lbaN_B.R")
+source("LSAnova.R")
+require("lsr")
+require("lme4")
+require("car")
+pkgs <- c("plyr", "dplyr", "tidyr", "broom", "pander", "xtable")
+# install.packages(pkgs) #install
+sapply(pkgs, require, character.only = T) #load
+# load("~/Modelling/x1/samples/okdats.E1.RData")  # Original data
+load("C:/Users/Russell Boag/Documents/GitHub/DMCATC/data/samples/E1.block.B.V_cond.B.V.PMV.samples.RData")  # Samples object
+samples.E1 <- E1.block.B.V_cond.B.V.PMV.samples
+rm(E1.block.B.V_cond.B.V.PMV.samples)
+```
+
+```{r prep data, echo=FALSE, include=FALSE}
+# samples.E1[["p17"]]$data[ (samples.E1[["p17"]]$data$S=="pc" | samples.E1[["p17"]]$data$S=="pn"  ) & samples.E1[["p17"]]$data$S=="P" ]
+
+# names(samples.E1) != "p17"
+samples.E1 <- samples.E1[names(samples.E1) != "p17"]  # Exclude p17 E1 due to no PM responses
+
+# # # Get data from samples object # # #
+#
+get.hdata.dmc <- function(hsamples){
+  list.wind<-lapply(seq_along(hsamples), function(samples, n, i) cbind(n[[i]], samples[[i]]$data),
+                    samples= hsamples, n = names(hsamples))
+  out<-do.call(rbind, list.wind)
+  names(out)[1] <- "s"
+  out
+}
+
+#
+
 data.E1 <- get.hdata.dmc(samples.E1)  # Get data from samples object
-head(data.E1)
+# head(data.E1)
 # save(data.E1, file="data.E1.RData")
+
 # all.equal(datE1[order(datE1$s),], data2)  # Check recovered data matches original data
+
+
 # # # Add logical S-R match factor 'C' # # #
 #
 data.E1$C <- rep(0,length(data.E1$RT))
 for(i in 1:length(data.E1$RT)){
-if(data.E1$S[i]=="cc" & data.E1$R[i]=="C"){
-data.E1$C[i] <- 1
-} else if(data.E1$S[i]=="nn" & data.E1$R[i]=="N"){
-data.E1$C[i] <- 1
-} else if(data.E1$S[i]=="pc" & data.E1$R[i]=="P"){
-data.E1$C[i] <- 1
-} else if(data.E1$S[i]=="pn" & data.E1$R[i]=="P"){
-data.E1$C[i] <- 1
-}
+  if(data.E1$S[i]=="cc" & data.E1$R[i]=="C"){
+    data.E1$C[i] <- 1
+  } else if(data.E1$S[i]=="nn" & data.E1$R[i]=="N"){
+    data.E1$C[i] <- 1
+  } else if(data.E1$S[i]=="pc" & data.E1$R[i]=="P"){
+    data.E1$C[i] <- 1
+  } else if(data.E1$S[i]=="pn" & data.E1$R[i]=="P"){
+    data.E1$C[i] <- 1
+  }
 }
 #
+```
+
+```{r run GLMER accuracy analyses, echo=FALSE, include=FALSE}
+
 # # # Prep dataframes for analysis # # #
 #
 setwd("C:/Users/Russell Boag/Documents/GitHub/DMCATC/analysis")
+
 # Conflict Detection Task trials only (no PM)
 CDT <- data.E1[!(data.E1$S=="pc" | data.E1$S=="pn"),]
 CDT$S <- factor(as.character(CDT$S)); CDT$R <- factor(as.character(CDT$R))
-str(CDT)
-head(CDT)
+# str(CDT)
+# head(CDT)
+
 # PM Task trials only
 PMT <- data.E1[(data.E1$S=="pc" | data.E1$S=="pn"),]
 PMT$S <- factor(as.character(PMT$S)); PMT$block <- factor(as.character(PMT$block))
-str(PMT)
-head(PMT)
+# str(PMT)
+# head(PMT)
 #
+
 # CDT.Acc.glmer.E1 <- glmer(C ~ S*block*cond+(1|s), data=CDT, family=binomial(link="probit"))
 # save(CDT.Acc.glmer.E1, file="CDT.Acc.glmer.E1.RData")
 load("CDT.Acc.glmer.E1.RData")
@@ -42,10 +102,12 @@ CDT.Acc.TABLE.E1$CDT.Acc.glm.E1.Chisq <- round(CDT.Acc.TABLE.E1$CDT.Acc.glm.E1.C
 CDT.Acc.TABLE.E1$CDT.Acc.glm.E1.Pr <- format.pval(CDT.Acc.TABLE.E1$CDT.Acc.glm.E1.Pr, digits=2, eps= 0.001)
 CDT.Acc.TABLE.E1$CDT.Acc.glm.E1.Pr <- gsub("0\\.", ".", CDT.Acc.TABLE.E1$CDT.Acc.glm.E1.Pr)
 rownames(CDT.Acc.TABLE.E1) <- c("Stimulus","PM Block","Time Pressure",
-"Stimulus by PM Block","Stimulus by Time Pressure","PM Block by Time Pressure",
-"Stimulus by PM Block by Time Pressure")
+                                "Stimulus by PM Block","Stimulus by Time Pressure","PM Block by Time Pressure",
+                                "Stimulus by PM Block by Time Pressure")
 colnames(CDT.Acc.TABLE.E1) <- c("Chi-square","df","p")
-CDT.Acc.TABLE.E1
+# CDT.Acc.TABLE.E1
+# write.csv(CDT.Acc.TABLE.E1, file="analysis/CDT.Acc.TABLE.E1.csv")
+
 # PMT.Acc.glmer.E1 <- glmer(C ~ S*cond+(1|s), data=PMT, family=binomial(link="probit"))
 # save(PMT.Acc.glmer.E1, file="PMT.Acc.glmer.E1.RData")
 load("PMT.Acc.glmer.E1.RData")
@@ -57,23 +119,33 @@ PMT.Acc.TABLE.E1$PMT.Acc.glm.E1.Chisq <- round(PMT.Acc.TABLE.E1$PMT.Acc.glm.E1.C
 PMT.Acc.TABLE.E1$PMT.Acc.glm.E1.Pr <- format.pval(PMT.Acc.TABLE.E1$PMT.Acc.glm.E1.Pr, digits=2, eps= 0.001)
 PMT.Acc.TABLE.E1$PMT.Acc.glm.E1.Pr <- gsub("0\\.", ".", PMT.Acc.TABLE.E1$PMT.Acc.glm.E1.Pr)
 rownames(PMT.Acc.TABLE.E1) <- c("Stimulus","Time Pressure",
-"Stimulus by Time Pressure")
+                                "Stimulus by Time Pressure")
 colnames(PMT.Acc.TABLE.E1) <- c("Chi-square","df","p")
-PMT.Acc.TABLE.E1
+# PMT.Acc.TABLE.E1
+# write.csv(PMT.Acc.TABLE.E1, file="analysis/PMT.Acc.TABLE.E1.csv")
+
+setwd("C:/Users/Russell Boag/Documents/GitHub/DMCATC")
+```
+
+```{r run LMER RT analyses, echo=FALSE, include=FALSE}
 # # # Prep RT dataframes for analysis (keep correct RTs only) # # #
 #
 setwd("C:/Users/Russell Boag/Documents/GitHub/DMCATC/analysis")
+
 # Conflict Detection Task correct response trials only (no PM)
 CDT.RT <- arr2df(tapply(CDT$RT[CDT$C==1],
-list(s=CDT$s[CDT$C==1], block=CDT$block[CDT$C==1],
-cond=CDT$cond[CDT$C==1], S=CDT$S[CDT$C==1]), mean))
-head(CDT.RT)
-str(CDT.RT)
+                         list(s=CDT$s[CDT$C==1], block=CDT$block[CDT$C==1],
+                              cond=CDT$cond[CDT$C==1], S=CDT$S[CDT$C==1]), mean))
+# head(CDT.RT)
+# str(CDT.RT)
+
 # PM Task correct response trials only
 PMT.RT <- arr2df(tapply(PMT$RT[PMT$C==1],
-list(s=PMT$s[PMT$C==1], cond=PMT$cond[PMT$C==1], S=PMT$S[PMT$C==1]), mean))
-head(PMT.RT)
-str(PMT.RT)
+                        list(s=PMT$s[PMT$C==1], cond=PMT$cond[PMT$C==1], S=PMT$S[PMT$C==1]), mean))
+# head(PMT.RT)
+# str(PMT.RT)
+
+
 # CDTC.RT.lmer.E1 <- lmer(y ~ S*block*cond+(1|s), data=CDT.RT)
 # save(CDTC.RT.lmer.E1, file="CDTC.RT.lmer.E1.RData")
 load("CDTC.RT.lmer.E1.RData")
@@ -84,12 +156,14 @@ CDT.RT.TABLE.E1$CDT.RT.glm.E1.Chisq <- round(CDT.RT.TABLE.E1$CDT.RT.glm.E1.Chisq
 CDT.RT.TABLE.E1$CDT.RT.glm.E1.Pr <- format.pval(CDT.RT.TABLE.E1$CDT.RT.glm.E1.Pr, digits=2, eps= 0.001)
 CDT.RT.TABLE.E1$CDT.RT.glm.E1.Pr <- gsub("0\\.", ".", CDT.RT.TABLE.E1$CDT.RT.glm.E1.Pr)
 rownames(CDT.RT.TABLE.E1) <- c("Stimulus","PM Block","Time Pressure",
-"Stimulus by PM Block","Stimulus by Time Pressure","PM Block by Time Pressure",
-"Stimulus by PM Block by Time Pressure")
+                               "Stimulus by PM Block","Stimulus by Time Pressure","PM Block by Time Pressure",
+                               "Stimulus by PM Block by Time Pressure")
 colnames(CDT.RT.TABLE.E1) <- c("Chi-square","df","p")
 # CDT.RT.TABLE.E1
-PMTC.RT.lmer.E1 <- lmer(y ~ S*cond+(1|s), data=PMT.RT)
-save(PMTC.RT.lmer.E1, file="PMTC.RT.lmer.E1.RData")
+# write.csv(CDT.RT.TABLE.E1, file="analysis/CDT.RT.TABLE.E1.csv")
+
+# PMTC.RT.lmer.E1 <- lmer(y ~ S*cond+(1|s), data=PMT.RT)
+# save(PMTC.RT.lmer.E1, file="PMTC.RT.lmer.E1.RData")
 load("PMTC.RT.lmer.E1.RData")
 PMT.RT.glm.E1 <- Anova(PMTC.RT.lmer.E1,type="II")
 # PMT.RT.glm.E1
@@ -98,39 +172,52 @@ PMT.RT.TABLE.E1$PMT.RT.glm.E1.Chisq <- round(PMT.RT.TABLE.E1$PMT.RT.glm.E1.Chisq
 PMT.RT.TABLE.E1$PMT.RT.glm.E1.Pr <- format.pval(PMT.RT.TABLE.E1$PMT.RT.glm.E1.Pr, digits=2, eps= 0.001)
 PMT.RT.TABLE.E1$PMT.RT.glm.E1.Pr <- gsub("0\\.", ".", PMT.RT.TABLE.E1$PMT.RT.glm.E1.Pr)
 rownames(PMT.RT.TABLE.E1) <- c("Stimulus","Time Pressure",
-"Stimulus by Time Pressure")
+                                "Stimulus by Time Pressure")
 colnames(PMT.RT.TABLE.E1) <- c("Chi-square","df","p")
 # PMT.RT.TABLE.E1
+# write.csv(PMT.RT.TABLE.E1, file="analysis/PMT.RT.TABLE.E1.csv")
+
+setwd("C:/Users/Russell Boag/Documents/GitHub/DMCATC")
+
+```
+
+```{r calculate manifests and planned contrasts, echo=FALSE, include=FALSE}
+
+setwd("C:/Users/Russell Boag/Documents/GitHub/DMCATC/analysis")
 # # # ANOVA analysis: Ongoing Task Accuracy # # #
 #
 #
 # Ongoing Task Accuracy Object
 CDT.Acc <- arr2df(tapply(CDT$C,list(s=CDT$s, block=CDT$block, cond=CDT$cond, S=CDT$S),mean))
-str(CDT.Acc)
+
+# str(CDT.Acc)
 levels(CDT.Acc$block) <- c("Control","PM")
-levels(CDT.Acc$cond) <- c("LL.LT","LL.HT","HL.LT","HL.HT")
+# levels(CDT.Acc$cond) <- c("LL.LT","LL.HT","HL.LT","HL.HT")
 levels(CDT.Acc$S) <- c("Conflict","Nonconflict")
-wsAnova(CDT.Acc)
+# wsAnova(CDT.Acc)
 # Manifests: Ongoing Task Accuracy
 CDT.Acc.Means <- mneffects(CDT.Acc,list("S","block","cond",c("S","block"),c("S","cond"),c("block","cond"), digits=3))
 CDT.Acc.S <- data.frame(rbind(round(CDT.Acc.Means$S,3), round(se(CDT.Acc, facs=c("S")),3)))
 rownames(CDT.Acc.S)<- c("M","SE")
-CDT.Acc.S
+# CDT.Acc.S
+
 CDT.Acc.Block <- data.frame(rbind(round(CDT.Acc.Means$block,3), round(se(CDT.Acc, facs=c("block")),3)))
 rownames(CDT.Acc.Block)<- c("M","SE")
-CDT.Acc.Block
+# CDT.Acc.Block
+
 CDT.Acc.Cond <- data.frame(rbind(round(CDT.Acc.Means$cond,3), round(se(CDT.Acc, facs=c("cond")),3)))
 rownames(CDT.Acc.Cond)<- c("M","SE")
-CDT.Acc.Cond
-round(se(CDT.Acc, facs=c("S","block")),3)
-round(se(CDT.Acc, facs=c("S","cond")),3)
-round(se(CDT.Acc, facs=c("block","cond")),3)
+# CDT.Acc.Cond
+
+# round(se(CDT.Acc, facs=c("S","block")),3)
+# round(se(CDT.Acc, facs=c("S","cond")),3)
+# round(se(CDT.Acc, facs=c("block","cond")),3)
 # Split up data object for cond comparisons
 CDT.Acc$S <- as.numeric(factor(CDT.Acc$S))
 bonf.CDT.Acc <- data.frame()
 bonf.CDT.Acc <- tapply(CDT.Acc$y,
-list(s=CDT.Acc$s,
-cond=factor(CDT.Acc$cond)), mean)
+                                list(s=CDT.Acc$s,
+                                     cond=factor(CDT.Acc$cond)), mean)
 # bonf.CDT.Acc
 tAB <- t.test (bonf.CDT.Acc[,1], bonf.CDT.Acc[,2], paired=T)
 dAB <- cohensD(x=bonf.CDT.Acc[,1], y=bonf.CDT.Acc[,2], method="paired")
@@ -138,86 +225,102 @@ tBC <- t.test (bonf.CDT.Acc[,2], bonf.CDT.Acc[,3], paired=T)
 dBC <- cohensD(x=bonf.CDT.Acc[,2], y=bonf.CDT.Acc[,3], method="paired")
 tAC <- t.test (bonf.CDT.Acc[,1], bonf.CDT.Acc[,3], paired=T)
 dAC <- cohensD(x=bonf.CDT.Acc[,1], y=bonf.CDT.Acc[,3], method="paired")
+
 tCD <- t.test (bonf.CDT.Acc[,3], bonf.CDT.Acc[,4], paired=T)
 dCD <- cohensD(x=bonf.CDT.Acc[,3], y=bonf.CDT.Acc[,4], method="paired")
 tBD <- t.test (bonf.CDT.Acc[,2], bonf.CDT.Acc[,4], paired=T)
 dBD <- cohensD(x=bonf.CDT.Acc[,2], y=bonf.CDT.Acc[,4], method="paired")
 tAD <- t.test (bonf.CDT.Acc[,1], bonf.CDT.Acc[,4], paired=T)
 dAD <- cohensD(x=bonf.CDT.Acc[,1], y=bonf.CDT.Acc[,4], method="paired")
+
 contrasts.CDT.Acc <- data.frame(cbind(rbind(tAB, tBC, tCD),rbind(dAB, dBC, dCD)))
 colnames(contrasts.CDT.Acc) <- c("t","df","p","95% CI","Mean Diff","H0","H1","Method","Data","Cohen's d")
 contrasts.CDT.Acc <- contrasts.CDT.Acc[, c(1,2,3,5,10)]
-contrasts.CDT.Acc
+row.names(contrasts.CDT.Acc) <- c("A-B","B-C","C-D")
+# contrasts.CDT.Acc
+
 # # # ANOVA analysis: Ongoing Task RT # # #
 #
 #
 # Ongoing Task RT Object
 CDT.RT <- arr2df(tapply(CDT$RT[CDT$C==1],
-list(s=CDT$s[CDT$C==1], block=CDT$block[CDT$C==1],
-cond=CDT$cond[CDT$C==1], S=CDT$S[CDT$C==1]), mean))
-str(CDT.RT)
+                        list(s=CDT$s[CDT$C==1], block=CDT$block[CDT$C==1],
+                             cond=CDT$cond[CDT$C==1], S=CDT$S[CDT$C==1]), mean))
+# str(CDT.RT)
 levels(CDT.RT$block) <- c("Control","PM")
-levels(CDT.RT$cond) <- c("LL.LT","LL.HT","HL.LT","HL.HT")
+# levels(CDT.RT$cond) <- c("LL.LT","LL.HT","HL.LT","HL.HT")
 levels(CDT.RT$S) <- c("Conflict","Nonconflict")
-wsAnova(CDT.RT)
+# wsAnova(CDT.RT)
 # Manifests: Ongoing Task RT
 CDT.RT.Means <- mneffects(CDT.RT,list("S","block","cond",c("S","block"),c("S","cond"), digits=3))
+
 CDT.RT.S <- data.frame(rbind(round(CDT.RT.Means$S,3), round(se(CDT.RT, facs=c("S")),3)))
 rownames(CDT.RT.S)<- c("M","SE")
-CDT.RT.S
+# CDT.RT.S
+
 CDT.RT.Block <- data.frame(rbind(round(CDT.RT.Means$block,3), round(se(CDT.RT, facs=c("block")),3)))
 rownames(CDT.RT.Block)<- c("M","SE")
-CDT.RT.Block
+# CDT.RT.Block
+
 CDT.RT.Cond <- data.frame(rbind(round(CDT.RT.Means$cond,3), round(se(CDT.RT, facs=c("cond")),3)))
 rownames(CDT.RT.Cond)<- c("M","SE")
-CDT.RT.Cond
+# CDT.RT.Cond
+
 round(se(CDT.RT, facs=c("S","cond")),3)
 # Split up data object for cond comparisons
 CDT.RT$S <- as.numeric(factor(CDT.RT$S))
 bonf.CDT.RT <- data.frame()
 bonf.CDT.RT <- tapply(CDT.RT$y,
-list(s=CDT.RT$s,
-cond=factor(CDT.RT$cond)), mean)
-bonf.CDT.RT
+                       list(s=CDT.RT$s,
+                            cond=factor(CDT.RT$cond)), mean)
+# bonf.CDT.RT
 tAB <- t.test (bonf.CDT.RT[,1], bonf.CDT.RT[,2], paired=T)
 dAB <- cohensD(x=bonf.CDT.RT[,1], y=bonf.CDT.RT[,2], method="paired")
 tBC <- t.test (bonf.CDT.RT[,2], bonf.CDT.RT[,3], paired=T)
 dBC <- cohensD(x=bonf.CDT.RT[,2], y=bonf.CDT.RT[,3], method="paired")
 tAC <- t.test (bonf.CDT.RT[,1], bonf.CDT.RT[,3], paired=T)
 dAC <- cohensD(x=bonf.CDT.RT[,1], y=bonf.CDT.RT[,3], method="paired")
+
 tCD <- t.test (bonf.CDT.RT[,3], bonf.CDT.RT[,4], paired=T)
 dCD <- cohensD(x=bonf.CDT.RT[,3], y=bonf.CDT.RT[,4], method="paired")
 tBD <- t.test (bonf.CDT.RT[,2], bonf.CDT.RT[,4], paired=T)
 dBD <- cohensD(x=bonf.CDT.RT[,2], y=bonf.CDT.RT[,4], method="paired")
 tAD <- t.test (bonf.CDT.RT[,1], bonf.CDT.RT[,4], paired=T)
 dAD <- cohensD(x=bonf.CDT.RT[,1], y=bonf.CDT.RT[,4], method="paired")
+
 contrasts.CDT.RT <- data.frame(cbind(rbind(tAB, tBC, tCD),rbind(dAB, dBC, dCD)))
 colnames(contrasts.CDT.RT) <- c("t","df","p","95% CI","Mean Diff","H0","H1","Method","Data","Cohen's d")
 contrasts.CDT.RT <- contrasts.CDT.RT[, c(1,2,3,5,10)]
-contrasts.CDT.RT
+row.names(contrasts.CDT.RT) <- c("A-B","B-C","C-D")
+# contrasts.CDT.RT
+
+
 # # # ANOVA analysis: PM Accuracy # # #
 #
 #
 # PM Accuracy Object
 PMT.Acc <- arr2df(tapply(PMT$C,
-list(s=PMT$s, cond=PMT$cond, S=PMT$S),mean))
-str(PMT.Acc)
-levels(PMT.Acc$cond) <- c("LL.LT","LL.HT","HL.LT","HL.HT")
+                         list(s=PMT$s, cond=PMT$cond, S=PMT$S),mean))
+# str(PMT.Acc)
+# levels(PMT.Acc$cond) <- c("LL.LT","LL.HT","HL.LT","HL.HT")
 levels(PMT.Acc$S) <- c("PM_Conflict","PM_Nonconflict")
-wsAnova(PMT.Acc)
+# wsAnova(PMT.Acc)
 PMT.Acc.Means <- mneffects(PMT.Acc,list("S","cond",c("S","cond"), digits=3))
+
 PMT.Acc.S <- data.frame(rbind(round(PMT.Acc.Means$S,3), round(se(PMT.Acc, facs=c("S")),3)))
 rownames(PMT.Acc.S)<- c("M","SE")
-PMT.Acc.S
+# PMT.Acc.S
+
 PMT.Acc.Cond <- data.frame(rbind(round(PMT.Acc.Means$cond,3), round(se(PMT.Acc, facs=c("cond")),3)))
 rownames(PMT.Acc.Cond)<- c("M","SE")
-PMT.Acc.Cond
+# PMT.Acc.Cond
+
 # Split up data object for cond comparisons
 PMT.Acc$S <- as.numeric(factor(PMT.Acc$S))
 bonf.PMT.Acc <- data.frame()
 bonf.PMT.Acc <- tapply(PMT.Acc$y,
-list(s=PMT.Acc$s,
-cond=factor(PMT.Acc$cond)), mean)
+                       list(s=PMT.Acc$s,
+                            cond=factor(PMT.Acc$cond)), mean)
 # bonf.PMT.Acc
 tAB <- t.test (bonf.PMT.Acc[,1], bonf.PMT.Acc[,2], paired=T)
 dAB <- cohensD(x=bonf.PMT.Acc[,1], y=bonf.PMT.Acc[,2], method="paired")
@@ -225,39 +328,46 @@ tBC <- t.test (bonf.PMT.Acc[,2], bonf.PMT.Acc[,3], paired=T)
 dBC <- cohensD(x=bonf.PMT.Acc[,2], y=bonf.PMT.Acc[,3], method="paired")
 tAC <- t.test (bonf.PMT.Acc[,1], bonf.PMT.Acc[,3], paired=T)
 dAC <- cohensD(x=bonf.PMT.Acc[,1], y=bonf.PMT.Acc[,3], method="paired")
+
 tCD <- t.test (bonf.PMT.Acc[,3], bonf.PMT.Acc[,4], paired=T)
 dCD <- cohensD(x=bonf.PMT.Acc[,3], y=bonf.PMT.Acc[,4], method="paired")
 tBD <- t.test (bonf.PMT.Acc[,2], bonf.PMT.Acc[,4], paired=T)
 dBD <- cohensD(x=bonf.PMT.Acc[,2], y=bonf.PMT.Acc[,4], method="paired")
 tAD <- t.test (bonf.PMT.Acc[,1], bonf.PMT.Acc[,4], paired=T)
 dAD <- cohensD(x=bonf.PMT.Acc[,1], y=bonf.PMT.Acc[,4], method="paired")
+
 contrasts.PMT.Acc <- data.frame(cbind(rbind(tAB, tBC, tCD),rbind(dAB, dBC, dCD)))
 colnames(contrasts.PMT.Acc) <- c("t","df","p","95% CI","Mean Diff","H0","H1","Method","Data","Cohen's d")
 contrasts.PMT.Acc <- contrasts.PMT.Acc[, c(1,2,3,5,10)]
+row.names(contrasts.PMT.Acc) <- c("A-B","B-C","C-D")
 # contrasts.PMT.Acc
+
 # # # ANOVA analysis: PM RT # # #
 #
 #
 # PM RT Object
 PMT.RT <- arr2df(tapply(PMT$RT[PMT$C==1],
-list(s=PMT$s[PMT$C==1], cond=PMT$cond[PMT$C==1], S=PMT$S[PMT$C==1]), mean))
-str(PMT.RT)
-levels(PMT.RT$cond) <- c("LL.LT","LL.HT","HL.LT","HL.HT")
+                        list(s=PMT$s[PMT$C==1], cond=PMT$cond[PMT$C==1], S=PMT$S[PMT$C==1]), mean))
+# str(PMT.RT)
+# levels(PMT.RT$cond) <- c("LL.LT","LL.HT","HL.LT","HL.HT")
 levels(PMT.RT$S) <- c("PM_Conflict","PM_Nonconflict")
-wsAnova(PMT.RT)
+# wsAnova(PMT.RT)
 PMT.RT.Means <- mneffects(PMT.RT,list("S","cond",c("S","cond"), digits=3))
+
 PMT.RT.S <- data.frame(rbind(round(PMT.RT.Means$S,3), round(se2(PMT.RT, facs=c("S")),3)))
 rownames(PMT.RT.S)<- c("M","SE")
-PMT.RT.S
+# PMT.RT.S
+
 PMT.RT.Cond <- data.frame(rbind(round(PMT.RT.Means$cond,3), round(se2(PMT.RT, facs=c("cond")),3)))
 rownames(PMT.RT.Cond)<- c("M","SE")
-PMT.RT.Cond
+# PMT.RT.Cond
+
 # Split up data object for cond comparisons
 PMT.RT$S <- as.numeric(factor(PMT.RT$S))
 bonf.PMT.RT <- data.frame()
 bonf.PMT.RT <- tapply(PMT.RT$y,
-list(s=PMT.RT$s,
-cond=factor(PMT.RT$cond)), mean)
+                      list(s=PMT.RT$s,
+                           cond=factor(PMT.RT$cond)), mean)
 # bonf.PMT.RT
 tAB <- t.test (bonf.PMT.RT[,1], bonf.PMT.RT[,2], paired=T)
 dAB <- cohensD(x=bonf.PMT.RT[,1], y=bonf.PMT.RT[,2], method="paired")
@@ -265,248 +375,209 @@ tBC <- t.test (bonf.PMT.RT[,2], bonf.PMT.RT[,3], paired=T)
 dBC <- cohensD(x=bonf.PMT.RT[,2], y=bonf.PMT.RT[,3], method="paired")
 tAC <- t.test (bonf.PMT.RT[,1], bonf.PMT.RT[,3], paired=T)
 dAC <- cohensD(x=bonf.PMT.RT[,1], y=bonf.PMT.RT[,3], method="paired")
+
 tCD <- t.test (bonf.PMT.RT[,3], bonf.PMT.RT[,4], paired=T)
 dCD <- cohensD(x=bonf.PMT.RT[,3], y=bonf.PMT.RT[,4], method="paired")
 tBD <- t.test (bonf.PMT.RT[,2], bonf.PMT.RT[,4], paired=T)
 dBD <- cohensD(x=bonf.PMT.RT[,2], y=bonf.PMT.RT[,4], method="paired")
 tAD <- t.test (bonf.PMT.RT[,1], bonf.PMT.RT[,4], paired=T)
 dAD <- cohensD(x=bonf.PMT.RT[,1], y=bonf.PMT.RT[,4], method="paired")
+
 contrasts.PMT.RT <- data.frame(cbind(rbind(tAB, tBC, tCD),rbind(dAB, dBC, dCD)))
 colnames(contrasts.PMT.RT) <- c("t","df","p","95% CI","Mean Diff","H0","H1","Method","Data","Cohen's d")
 contrasts.PMT.RT <- contrasts.PMT.RT[, c(1,2,3,5,10)]
-contrasts.PMT.RT
-knitr::opts_chunk$set(echo = FALSE)
-row.names(contrasts.PMT.RT)
 row.names(contrasts.PMT.RT) <- c("A-B","B-C","C-D")
-row.names(contrasts.PMT.RT) <- c("A-B","B-C","C-D")
-contrasts.PMT.RT
-PMT.Acc <- arr2df(tapply(PMT$C,
-list(s=PMT$s, cond=PMT$cond, S=PMT$S),mean))
-str(PMT.Acc)
-PMT.Acc.data <- arr2df(tapply(PMT$C,
-list(s=PMT$s),mean))
-str(PMT.Acc.data)
-hist(PMT.Acc.data$y)
-ggplot(PMT.Acc.data, aes(y)) +
-geom_histogram()
-ggplot(PMT.Acc.data, aes(y)) +
-geom_histogram(binwidth = 5)
-ggplot(PMT.Acc.data, aes(y)) +
-geom_histogram(bins = 50)
-ggplot(PMT.Acc.data, aes(y)) +
-geom_histogram(bins = 25)
-ggplot(PMT.Acc.data, aes(y)) +
-geom_histogram(bins = 20)
-ggplot(PMT.Acc.data, aes(y)) +
-geom_histogram(binwidth = 1)
-ggplot(PMT.Acc.data, aes(y)) +
-geom_histogram(binwidth = 0.05)
-ggplot(PMT.Acc.data, aes(y)) +
-geom_histogram(binwidth = 0.02)
-ggplot(PMT.Acc.data, aes(y)) +
-geom_histogram(binwidth = 0.05)
-ggplot(PMT.Acc.data, aes(y)) +
-geom_histogram(binwidth = 0.025)
-ggplot(PMT.Acc.data, aes(y)) +
-geom_histogram(binwidth = 0.05)
-ggplot(PMT.Acc.data, aes(y)) +
-geom_histogram(binwidth = 0.05) +
-ylab("Frequency") +
-xlab("PM Accuracy")
-ggplot(PMT.Acc.data, aes(y)) +
-geom_histogram(binwidth = 0.05) +
-ylab("Frequency") +
-xlab("PM Accuracy") +
-ggtitle("PM Accuracy Histogram")
-PMT.Acc.Hist.Data <- arr2df(tapply(PMT$C,
-list(s=PMT$s),mean))
-str(PMT.Acc.Hist.Data)
-hist(PMT.Acc.Hist.Data$y)
-ggplot(PMT.Acc.Hist.Data, aes(y)) +
-geom_histogram(binwidth = 0.05) +
-ylab("Frequency") +
-xlab("PM Accuracy") +
-ggtitle("PM Accuracy Histogram")
+
+# # # ANOVA analysis: Ongoing RT for PM versus non-PM Trials # # #
+#
+#
+# Ongoing Task RT Object
+# str(data.E1)
+# any((data.E1$block=="3" & data.E1$S=="pc" & data.E1$R=="C"))
+# any((data.E1$block=="3" & data.E1$S=="pn" & data.E1$R=="N"))
+
 CDT.Reactive <- data.E1[(data.E1$block=="3" & ((data.E1$S=="cc" & data.E1$R=="C") | (data.E1$S=="pc" & data.E1$R=="C") |
-(data.E1$S=="nn" & data.E1$R=="N") | (data.E1$S=="pn" & data.E1$R=="N"))),]
+                                                   (data.E1$S=="nn" & data.E1$R=="N") | (data.E1$S=="pn" & data.E1$R=="N"))),]
 CDT.Reactive$block <- factor(CDT.Reactive$block)
 CDT.Reactive$R <- factor(CDT.Reactive$R)
-CDT.Reactive <- arr2df(tapply(CDT$RT,
-list(s=CDT$s,
-cond=CDT$cond, S=CDT$S), mean))
-CDT.Reactive.lmer.E1 <- lmer(y ~ S*cond+(1|s), data=CDT.Reactive)
-save(CDT.Reactive.lmer.E1, file="CDT.Reactive.lmer.E1.RData")
-load("CDT.Reactive.lmer.E1.RData")
-CDT.Reactive.glm.E1 <- Anova(CDT.Reactive.lmer.E1,type="II")
-CDT.Reactive.glm.E1
-levels(CDT.Reactive$S) <- c("Conflict","Nonconflict","PM_Conflict","PM_Nonconflict")
-mneffects(CDT.Reactive,list("S","cond",c("S","cond"), digits=3))
-CDT.Reactive$S <- as.numeric(factor(CDT.Reactive$S))
-bonf.CDT.Reactive <- data.frame()
-bonf.CDT.Reactive <- tapply(CDT.Reactive$y,
-list(s=CDT.Reactive$s,
-S=factor(CDT.Reactive$S)), mean)
-bonf.CDT.Reactive
-str(CDT.Reactive)
-CDT.Reactive <- data.E1[(data.E1$block=="3" & ((data.E1$S=="cc" & data.E1$R=="C") | (data.E1$S=="pc" & data.E1$R=="C") |
-(data.E1$S=="nn" & data.E1$R=="N") | (data.E1$S=="pn" & data.E1$R=="N"))),]
-CDT.Reactive$block <- factor(CDT.Reactive$block)
-CDT.Reactive$R <- factor(CDT.Reactive$R)
-CDT.Reactive <- arr2df(tapply(CDT$RT,
-list(s=CDT$s,
-cond=CDT$cond, S=CDT$S), mean))
-str(CDT.Reactive)
-str(data.E1)
-any(data.E1$S=="pc" & data.E1$R=="C")
-any((data.E1$S=="pc" & data.E1$R=="C"))
-any((data.E1$S=="pn" & data.E1$R=="N"))
-any((data.E1$block=="3" & data.E1$S=="pc" & data.E1$R=="C"))
-any((data.E1$block=="3" & data.E1$S=="pn" & data.E1$R=="N"))
-CDT.Reactive <- data.E1[(data.E1$block=="3" & ((data.E1$S=="cc" & data.E1$R=="C") | (data.E1$S=="pc" & data.E1$R=="C") |
-(data.E1$S=="nn" & data.E1$R=="N") | (data.E1$S=="pn" & data.E1$R=="N"))),]
-any((CDT.Reactive$block=="3" & CDT.Reactive$S=="pc" & CDT.Reactive$R=="C"))
-any((CDT.Reactive$block=="3" & CDT.Reactive$S=="pn" & CDT.Reactive$R=="N"))
-CDT.Reactive$block <- factor(CDT.Reactive$block)
-CDT.Reactive$R <- factor(CDT.Reactive$R)
-str(CDT.Reactive)
-CDT.Reactive.lmer.E1 <- lmer(y ~ S*cond+(1|s), data=CDT.Reactive)
-mneffects(CDT.Reactive,list("S","cond",c("S","cond"), digits=3))
-str(CDT.Reactive)
-CDT.Reactive <- arr2df(tapply(CDT$RT,
-list(s=CDT$s,
-cond=CDT$cond, S=CDT$S), mean))
-str(CDT.Reactive)
-str(data.E1)
-any((data.E1$block=="3" & data.E1$S=="pc" & data.E1$R=="C"))
-any((data.E1$block=="3" & data.E1$S=="pn" & data.E1$R=="N"))
-CDT.Reactive <- data.E1[(data.E1$block=="3" & ((data.E1$S=="cc" & data.E1$R=="C") | (data.E1$S=="pc" & data.E1$R=="C") |
-(data.E1$S=="nn" & data.E1$R=="N") | (data.E1$S=="pn" & data.E1$R=="N"))),]
-any((CDT.Reactive$block=="3" & CDT.Reactive$S=="pc" & CDT.Reactive$R=="C"))
-any((CDT.Reactive$block=="3" & CDT.Reactive$S=="pn" & CDT.Reactive$R=="N"))
-CDT.Reactive$block <- factor(CDT.Reactive$block)
-CDT.Reactive$R <- factor(CDT.Reactive$R)
+# any((CDT.Reactive$block=="3" & CDT.Reactive$S=="pc" & CDT.Reactive$R=="C"))
+# any((CDT.Reactive$block=="3" & CDT.Reactive$S=="pn" & CDT.Reactive$R=="N"))
 # any(CDT.Reactive$R=="P")
 # any(CDT.Reactive$block=="2")
-str(CDT.Reactive)
-any(CDT.Reactive$R=="P")
-any(CDT.Reactive$S=="pc")
-str(CDT.Reactive)
-CDT.Reac <- arr2df(tapply(CDT$RT,
-list(s=CDT$s,
-cond=CDT$cond, S=CDT$S), mean))
-CDT.Reac
-tail(CDT.Reac)
-CDT.Reac <- arr2df(tapply(CDT.Reactive$RT,
-list(s=CDT.Reactive$s,
-cond=CDT.Reactive$cond, S=CDT.Reactive$S), mean))
-tail(CDT.Reac)
-CDT.Reactive <- arr2df(tapply(CDT.Reactive$RT,
-list(s=CDT.Reactive$s,
-cond=CDT.Reactive$cond, S=CDT.Reactive$S), mean))
-str(CDT.Reactive)
-CDT.Reactive.lmer.E1 <- lmer(y ~ S*cond+(1|s), data=CDT.Reactive)
-save(CDT.Reactive.lmer.E1, file="CDT.Reactive.lmer.E1.RData")
-load("CDT.Reactive.lmer.E1.RData")
-CDT.Reactive.glm.E1 <- Anova(CDT.Reactive.lmer.E1,type="II")
-CDT.Reactive.glm.E1
-levels(CDT.Reactive$S) <- c("Conflict","Nonconflict","PM_Conflict","PM_Nonconflict")
-mneffects(CDT.Reactive,list("S","cond",c("S","cond"), digits=3))
-round(se2(CDT.Reactive, facs=c("S")),3)
-round(se2(CDT.Reactive, facs=c("cond")),3)
-CDT.Reactive$S <- as.numeric(factor(CDT.Reactive$S))
-bonf.CDT.Reactive <- data.frame()
-bonf.CDT.Reactive <- tapply(CDT.Reactive$y,
-list(s=CDT.Reactive$s,
-S=factor(CDT.Reactive$S)), mean)
-bonf.CDT.Reactive
-t.test (bonf.CDT.Reactive[,1], bonf.CDT.Reactive[,3], paired=T)
-cohensD(x=bonf.CDT.Reactive[,1], y=bonf.CDT.Reactive[,3], method="paired")
-t.test (bonf.CDT.Reactive[,2], bonf.CDT.Reactive[,4], paired=T)
-cohensD(x=bonf.CDT.Reactive[,2], y=bonf.CDT.Reactive[,4], method="paired")
-tccpc <- t.test (bonf.CDT.Reactive[,1], bonf.CDT.Reactive[,3], paired=T)
-dccpc <- cohensD(x=bonf.CDT.Reactive[,1], y=bonf.CDT.Reactive[,3], method="paired")
-tnnpn <- t.test (bonf.CDT.Reactive[,2], bonf.CDT.Reactive[,4], paired=T)
-dnnpn <- cohensD(x=bonf.CDT.Reactive[,2], y=bonf.CDT.Reactive[,4], method="paired")
-contrasts.Reactive <- data.frame(cbind(rbind(tccpc, tnnpn),rbind(dccpc, dnnpn)))
-colnames(contrasts.Reactive) <- c("t","df","p","95% CI","Mean Diff","H0","H1","Method","Data","Cohen's d")
-contrasts.Reactive <- contrasts.Reactive[, c(1,2,3,5,10)]
-row.names(contrasts.Reactive) <- c("C minus C-to-PMC","N minus N-to-PMN")
-contrasts.Reactive
-row.names(contrasts.Reactive) <- c("C-to-C minus C-to-PMC","N-to-N minus N-to-PMN")
-contrasts.Reactive
-contrasts.Reactive <- data.frame(cbind(rbind(tccpc, tnnpn),rbind(dccpc, dnnpn)))
-colnames(contrasts.Reactive) <- c("t","df","p","95% CI","Mean Diff","H0","H1","Method","Data","Cohen's d")
-contrasts.Reactive <- contrasts.Reactive[, c(1,2,3,5,10)]
-row.names(contrasts.Reactive) <- c("CR minus CR-to-PMC","NR minus NR-to-PMN")
-contrasts.Reactive
-CDT.Reactive.Means <- mneffects(CDT.Reactive,list("S","cond",c("S","cond"), digits=3))
-CDT.Reactive.S <- data.frame(rbind(round(CDT.Reactive.Means$S,3), round(se2(CDT.Reactive, facs=c("S")),3)))
-rownames(CDT.Reactive.S)<- c("M","SE")
-CDT.Reactive.S
-CDT.Reactive.Cond <- data.frame(rbind(round(CDT.Reactive.Means$cond,3), round(se2(CDT.Reactive, facs=c("cond")),3)))
-rownames(CDT.Reactive.Cond)<- c("M","SE")
-CDT.Reactive.Cond
-levels(CDT.Reactive$S) <- c("Conflict","Nonconflict","PM_Conflict","PM_Nonconflict")
-CDT.Reactive.Means <- mneffects(CDT.Reactive,list("S","cond",c("S","cond"), digits=3))
-CDT.Reactive.S <- data.frame(rbind(round(CDT.Reactive.Means$S,3), round(se2(CDT.Reactive, facs=c("S")),3)))
-rownames(CDT.Reactive.S)<- c("M","SE")
-CDT.Reactive.S
-levels(CDT.Reactive.Means$S) <- c("Conflict","Nonconflict","PM_Conflict","PM_Nonconflict")
-CDT.Reactive.Means <- mneffects(CDT.Reactive,list("S","cond",c("S","cond"), digits=3))
-CDT.Reactive.S <- data.frame(rbind(round(CDT.Reactive.Means$S,3), round(se2(CDT.Reactive, facs=c("S")),3)))
-rownames(CDT.Reactive.S)<- c("M","SE")
-CDT.Reactive.S
-levels(CDT.Reactive$S) <- c("Conflict","Nonconflict","PM_Conflict","PM_Nonconflict")
-CDT.Reactive.Means <- mneffects(CDT.Reactive,list("S","cond",c("S","cond"), digits=3))
-levels(CDT.Reactive)
-levels(CDT.Reactive$S)
-CDT.Reactive.Means <- mneffects(CDT.Reactive,list("S","cond", digits=3))
-CDT.Reactive.S <- data.frame(rbind(round(CDT.Reactive.Means$S,3), round(se2(CDT.Reactive, facs=c("S")),3)))
-rownames(CDT.Reactive.S)<- c("M","SE")
-CDT.Reactive.S
-CDT.Reactive <- data.E1[(data.E1$block=="3" & ((data.E1$S=="cc" & data.E1$R=="C") | (data.E1$S=="pc" & data.E1$R=="C") |
-(data.E1$S=="nn" & data.E1$R=="N") | (data.E1$S=="pn" & data.E1$R=="N"))),]
-CDT.Reactive$block <- factor(CDT.Reactive$block)
-CDT.Reactive$R <- factor(CDT.Reactive$R)
+# any(CDT.Reactive$S=="pc")
+# str(CDT.Reactive)
+# levels(CDT.Reactive$cond) <- c("LL.LT","LL.HT","HL.LT","HL.HT")
 levels(CDT.Reactive$S) <- c("Conflict","Nonconflict","PM_Conflict","PM_Nonconflict")
 CDT.Reactive <- arr2df(tapply(CDT.Reactive$RT,
-list(s=CDT.Reactive$s,
-cond=CDT.Reactive$cond, S=CDT.Reactive$S), mean))
-str(CDT.Reactive)
-CDT.Reactive.lmer.E1 <- lmer(y ~ S*cond+(1|s), data=CDT.Reactive)
-save(CDT.Reactive.lmer.E1, file="CDT.Reactive.lmer.E1.RData")
+                        list(s=CDT.Reactive$s,
+                             cond=CDT.Reactive$cond, S=CDT.Reactive$S), mean))
+# str(CDT.Reactive)
+# CDT.Reactive.lmer.E1 <- lmer(y ~ S*cond+(1|s), data=CDT.Reactive)
+# save(CDT.Reactive.lmer.E1, file="CDT.Reactive.lmer.E1.RData")
 load("CDT.Reactive.lmer.E1.RData")
 CDT.Reactive.glm.E1 <- Anova(CDT.Reactive.lmer.E1,type="II")
-levels(CDT.Reactive$S)
-CDT.Reactive.Means <- mneffects(CDT.Reactive,list("S","cond", digits=3))
-CDT.Reactive.S <- data.frame(rbind(round(CDT.Reactive.Means$S,3), round(se2(CDT.Reactive, facs=c("S")),3)))
-rownames(CDT.Reactive.S)<- c("M","SE")
-CDT.Reactive.S
-CDT.Reactive.Cond <- data.frame(rbind(round(CDT.Reactive.Means$cond,3), round(se2(CDT.Reactive, facs=c("cond")),3)))
-rownames(CDT.Reactive.Cond)<- c("M","SE")
-CDT.Reactive.Cond
-# Split up data object for S comparisons
-CDT.Reactive$S <- as.numeric(factor(CDT.Reactive$S))
-bonf.CDT.Reactive <- data.frame()
-bonf.CDT.Reactive <- tapply(CDT.Reactive$y,
-list(s=CDT.Reactive$s,
-S=factor(CDT.Reactive$S)), mean)
-# bonf.CDT.Reactive
-tccpc <- t.test (bonf.CDT.Reactive[,1], bonf.CDT.Reactive[,3], paired=T)
-dccpc <- cohensD(x=bonf.CDT.Reactive[,1], y=bonf.CDT.Reactive[,3], method="paired")
-tnnpn <- t.test (bonf.CDT.Reactive[,2], bonf.CDT.Reactive[,4], paired=T)
-dnnpn <- cohensD(x=bonf.CDT.Reactive[,2], y=bonf.CDT.Reactive[,4], method="paired")
-contrasts.Reactive <- data.frame(cbind(rbind(tccpc, tnnpn),rbind(dccpc, dnnpn)))
-colnames(contrasts.Reactive) <- c("t","df","p","95% CI","Mean Diff","H0","H1","Method","Data","Cohen's d")
-contrasts.Reactive <- contrasts.Reactive[, c(1,2,3,5,10)]
-row.names(contrasts.Reactive) <- c("CR minus CR-to-PMC","NR minus NR-to-PMN")
-contrasts.Reactive
-load("CDT.Reactive.lmer.E1.RData")
-CDT.Reactive.glm.E1 <- Anova(CDT.Reactive.lmer.E1,type="II")
+# CDT.Reactive.glm.E1
 CDT.Reactive.TABLE.E1 <- data.frame(CDT.Reactive.glm.E1$Chisq, CDT.Reactive.glm.E1$Df, CDT.Reactive.glm.E1$Pr)
 CDT.Reactive.TABLE.E1$CDT.Reactive.glm.E1.Chisq <- round(CDT.Reactive.TABLE.E1$CDT.Reactive.glm.E1.Chisq, 2)
 CDT.Reactive.TABLE.E1$CDT.Reactive.glm.E1.Pr <- format.pval(CDT.Reactive.TABLE.E1$CDT.Reactive.glm.E1.Pr, digits=2, eps= 0.001)
 CDT.Reactive.TABLE.E1$CDT.Reactive.glm.E1.Pr <- gsub("0\\.", ".", CDT.Reactive.TABLE.E1$CDT.Reactive.glm.E1.Pr)
 rownames(CDT.Reactive.TABLE.E1) <- c("Stimulus","Time Pressure","Stimulus by Time Pressure")
 colnames(CDT.Reactive.TABLE.E1) <- c("Chi-square","df","p")
-CDT.Reactive.TABLE.E1
+# wsAnova(CDT.Reactive)
+CDT.Reactive.Means <- mneffects(CDT.Reactive,list("S","cond", digits=3))
+
+CDT.Reactive.S <- data.frame(rbind(round(CDT.Reactive.Means$S,3), round(se2(CDT.Reactive, facs=c("S")),3)))
+rownames(CDT.Reactive.S)<- c("M","SE")
+# CDT.Reactive.S
+
+CDT.Reactive.Cond <- data.frame(rbind(round(CDT.Reactive.Means$cond,3), round(se2(CDT.Reactive, facs=c("cond")),3)))
+rownames(CDT.Reactive.Cond)<- c("M","SE")
+# CDT.Reactive.Cond
+
+# Split up data object for S comparisons
+CDT.Reactive$S <- as.numeric(factor(CDT.Reactive$S))
+bonf.CDT.Reactive <- data.frame()
+bonf.CDT.Reactive <- tapply(CDT.Reactive$y,
+                      list(s=CDT.Reactive$s,
+                           S=factor(CDT.Reactive$S)), mean)
+# bonf.CDT.Reactive
+tccpc <- t.test (bonf.CDT.Reactive[,1], bonf.CDT.Reactive[,3], paired=T)
+dccpc <- cohensD(x=bonf.CDT.Reactive[,1], y=bonf.CDT.Reactive[,3], method="paired")
+tnnpn <- t.test (bonf.CDT.Reactive[,2], bonf.CDT.Reactive[,4], paired=T)
+dnnpn <- cohensD(x=bonf.CDT.Reactive[,2], y=bonf.CDT.Reactive[,4], method="paired")
+
+contrasts.Reactive <- data.frame(cbind(rbind(tccpc, tnnpn),rbind(dccpc, dnnpn)))
+colnames(contrasts.Reactive) <- c("t","df","p","95% CI","Mean Diff","H0","H1","Method","Data","Cohen's d")
+contrasts.Reactive <- contrasts.Reactive[, c(1,2,3,5,10)]
+row.names(contrasts.Reactive) <- c("CR minus CR-to-PMC","NR minus NR-to-PMN")
+# contrasts.Reactive
+
+setwd("C:/Users/Russell Boag/Documents/GitHub/DMCATC")
+
+```
+
+
+## Ongoing Task Accuracy GLMER
+
+```{r CDT Accuracy GLMER, echo=FALSE}
+
+panderOptions("digits", 4)
+
+lmer <- CDT.Acc.TABLE.E1
+means1 <- CDT.Acc.S
+means2 <- CDT.Acc.Block
+means3 <- CDT.Acc.Cond
+contrasts <- contrasts.CDT.Acc
+
+pander(lmer)
+pander(means1)
+pander(means2)
+pander(means3)
+pander(contrasts)
+xtable(lmer)
+
+write.csv(lmer, file="analysis/CDT.Acc.TABLE.E1.csv")
+write.csv(means1, file="analysis/CDT.Acc.S.E1.csv")
+write.csv(means2, file="analysis/CDT.Acc.Block.E1.csv")
+write.csv(means3, file="analysis/CDT.Acc.Cond.E1.csv")
+# write.csv(contrasts, file="analysis/CDT.Acc.Contrasts.E1.csv")
+
+```
+
+## Ongoing Task RT LMER
+
+```{r CDT RT LMER, echo=FALSE}
+
+panderOptions("digits", 4)
+
+lmer <- CDT.RT.TABLE.E1
+means1 <- CDT.RT.S
+means2 <- CDT.RT.Block
+means3 <- CDT.RT.Cond
+contrasts <- contrasts.CDT.RT
+
+pander(lmer)
+pander(means1)
+pander(means2)
+pander(means3)
+pander(contrasts)
+xtable(lmer)
+
+write.csv(lmer, file="analysis/CDT.RT.TABLE.E1.csv")
+write.csv(means1, file="analysis/CDT.RT.S.E1.csv")
+write.csv(means2, file="analysis/CDT.RT.Block.E1.csv")
+write.csv(means3, file="analysis/CDT.RT.Cond.E1.csv")
+# write.csv(contrasts, file="analysis/CDT.RT.Contrasts.E1.csv")
+
+```
+
+## PM Accuracy GLMER
+
+```{r PMT Accuracy GLMER, echo=FALSE}
+
+panderOptions("digits", 4)
+
+lmer <- PMT.Acc.TABLE.E1
+means1 <- PMT.Acc.S
+means2 <- PMT.Acc.Cond
+contrasts <- contrasts.PMT.Acc
+
+pander(lmer)
+pander(means1)
+pander(means2)
+pander(contrasts)
+xtable(lmer)
+
+write.csv(lmer, file="analysis/PMT.Acc.TABLE.E1.csv")
+write.csv(means1, file="analysis/PMT.Acc.S.E1.csv")
+write.csv(means2, file="analysis/PMT.Acc.Cond.E1.csv")
+# write.csv(contrasts, file="analysis/PMT.Acc.Contrasts.E1.csv")
+
+```
+
+## PM RT LMER
+
+```{r PMT RT LMER, echo=FALSE}
+
+panderOptions("digits", 4)
+
+lmer <- PMT.RT.TABLE.E1
+means1 <- PMT.RT.S
+means2 <- PMT.RT.Cond
+contrasts <- contrasts.PMT.RT
+
+pander(lmer)
+pander(means1)
+pander(means2)
+pander(contrasts)
+xtable(lmer)
+
+write.csv(lmer, file="analysis/PMT.RT.TABLE.E1.csv")
+write.csv(means1, file="analysis/PMT.RT.S.E1.csv")
+write.csv(means2, file="analysis/PMT.RT.Cond.E1.csv")
+# write.csv(contrasts, file="analysis/PMT.RT.Contrasts.E1.csv")
+
+```
+
+## Reactive Control RT Check LMER
+
+Check that congruent ongoing task responses to PM stimuli (i.e., conflict responses to PM conflicts) are faster than correct ongoing task responses to non-PM stimuli (although this will be partly due to statistical facilitation from the fast PM accumulator on PM trials filtering out ongoing task responses).
+
+```{r Reactive Control RT Check, echo=FALSE}
+
+panderOptions("digits", 4)
+
+lmer <- CDT.Reactive.TABLE.E1
+means1 <- CDT.Reactive.S
+contrasts <- contrasts.Reactive
+
+pander(lmer)
+pander(means1)
+pander(contrasts)
+xtable(lmer)
+
+write.csv(lmer, file="analysis/CDT.Reactive.TABLE.E1.csv")
+write.csv(means1, file="analysis/CDT.Reactive.S.E1.csv")
+# write.csv(contrasts, file="analysis/CDT.Reactive.Contrasts.E1.csv")
+
+```

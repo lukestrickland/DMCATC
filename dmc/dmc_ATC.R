@@ -972,7 +972,7 @@ finish.conddf.E1_A4 <- function(effects) {
   effects<- effects[grepl("Diff", rownames(effects)),]
   effects$contrast[grep ("A-B", rownames(effects))] <- "A-B"
   effects$contrast[grep ("B-C", rownames(effects))] <- "B-C"
-  
+  effects$contrast[grep ("C-D", rownames(effects))] <- "C-D"
   effects
 }
 

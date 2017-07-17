@@ -1,0 +1,4 @@
+"","Chi-square","df","p"
+"Stimulus",96.54,3,"<.001"
+"Time Pressure",600.93,3,"<.001"
+"Stimulus by Time Pressure",10.31,9,".33"
