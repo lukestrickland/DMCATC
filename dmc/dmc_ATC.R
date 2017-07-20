@@ -44,10 +44,12 @@ group.inference.dist <- function (hsamples, fun) {
 # This will allow subsequent functions both to truncate simulations that would 
 #be non-responses, and to calculate the non-response rate. 
 
-# samples=samples[[1]];n.post=100;probs=c(1:99)/100;random=TRUE
-# bw="nrd0";report=10;save.simulation=FALSE;factors=NA
-# save.simulation.as.attribute=FALSE;ignore.R2=FALSE
-# gglist=FALSE; probs.gglist=c(0.1, 0.5, 0.9);CI.gglist=c(0.025, 0.975)
+samples=samples.E1[[1]];n.post=100;probs=c(1:99)/100;random=TRUE
+bw="nrd0";report=10;save.simulation=FALSE;factors=NA
+save.simulation.as.attribute=FALSE;ignore.R2=FALSE
+gglist=FALSE; probs.gglist=c(0.1, 0.5, 0.9);CI.gglist=c(0.025, 0.975)
+#assumes samples have an attribute called NRdata. This attribute is the unfiltered data for each
+#sample i.e. before we removed non-responses, cleaned etc.
 post.predict.dmc.MATCHORDER <- function(samples,n.post=100,probs=c(1:99)/100,random=TRUE,
          bw="nrd0",report=10,save.simulation=FALSE,factors=NA,
          save.simulation.as.attribute=FALSE,ignore.R2=FALSE,
@@ -105,6 +107,7 @@ post.predict.dmc.MATCHORDER <- function(samples,n.post=100,probs=c(1:99)/100,ran
     if ( (i %% report) == 0) cat(".")
     ###Luke plug in order matching
     
+    #getting the factor structure of whatever design you feed in
     callargs.data <- list()
     callargs.sim <- list()
     for (p in 1:length(facs)) {callargs.data[[p]] <- data[,facs[p]]

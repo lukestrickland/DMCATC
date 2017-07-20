@@ -1,5 +1,6 @@
 rm(list=ls())
-setwd("C:/Users/Russell Boag/Documents/GitHub/DMCATC")
+# setwd("C:/Users/Russell Boag/Documents/GitHub/DMCATC")
+setwd("D:/Software/DMC_ATCPMDC")
 source("dmc/dmc.R")
 source("dmc/dmc_ATC.R")
 load_model ("LBA","lbaN_B.R")
@@ -103,7 +104,7 @@ Reactive.Table
 # # # Reactive Control - Inhibition of Correct minus Error Stimuli # # #
 #
 Reactive.AC <- function (thetas) (thetas[,"mean_v.ccA3C",, drop=F] - thetas[,"mean_v.pcA3C",, drop=F]) -
-    (thetas[,"mean_v.nnA3C",, drop=F] - thetas[,"mean_v.pnA3C",, drop=F])
+    (thetas[,"mean_v.ccA3N",, drop=F] - thetas[,"mean_v.pcA3N",, drop=F])
 Reactive.BC <- function (thetas) (thetas[,"mean_v.ccB3C",, drop=F] - thetas[,"mean_v.pcB3C",, drop=F]) -
     (thetas[,"mean_v.nnB3C",, drop=F] - thetas[,"mean_v.pnB3C",, drop=F])
 Reactive.CC <- function (thetas) (thetas[,"mean_v.ccC3C",, drop=F] - thetas[,"mean_v.pcC3C",, drop=F]) -
@@ -119,6 +120,27 @@ Reactive.CN <- function (thetas) (thetas[,"mean_v.nnC3N",, drop=F] - thetas[,"me
     (thetas[,"mean_v.ccC3N",, drop=F] - thetas[,"mean_v.pcC3N",, drop=F])
 Reactive.DN <- function (thetas) (thetas[,"mean_v.nnD3N",, drop=F] - thetas[,"mean_v.pnD3N",, drop=F]) -
     (thetas[,"mean_v.ccD3N",, drop=F] - thetas[,"mean_v.pcD3N",, drop=F])
+
+
+zandp ( samples.E1,
+function(thetas)( thetas[,"mean_v.ccA3C",, drop=F] - thetas[,"mean_v.pcA3C",, drop=F] ) -
+ ( thetas[,"mean_v.ccA3N",, drop=F] - thetas[,"mean_v.pcA3N",, drop=F])
+
+)
+
+zandp ( samples.E1,function(thetas)( thetas[,"mean_v.ccA3C",, drop=F] - thetas[,"mean_v.pcA3C",, drop=F] 
+))
+
+zandp ( samples.E1,
+        function(thetas) thetas[,"mean_v.ccA3N",, drop=F] - thetas[,"mean_v.pcA3N",, drop=F])
+
+
+##Luke demonstrating why we get a higher Z score for on ethan the other
+# when the differnece of differences is the opposite
+mean.sd(samples.E1, function(thetas) thetas[,"mean_v.ccA3C",, drop=F] - thetas[,"mean_v.pcA3C",, drop=F])
+mean.sd(samples.E1, function(thetas) thetas[,"mean_v.ccA3N",, drop=F] - thetas[,"mean_v.pcA3N",, drop=F])
+
+
 
 Reactive.Cor.minus.Err.Table <- data.frame(rbind(
     A.Cor.minus.Err=c(zandp(samples.E1, Reactive.AC),
