@@ -1,16 +1,4 @@
----
-title: "Parameter Plots and Tables for ATC Experiment E1"
-author: "Russell Boag"
-date: "12 July 2017"
-output: html_document
----
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-
-```{r load and prep data, echo=FALSE, include=FALSE}
 
 ###################### Russ data analysis template ###############################
 # Running this top to bottom should correspond to my data analysis from the
@@ -77,6 +65,14 @@ sim <- do.call(rbind, E1PP)
 data <- lapply(E1PP, function(x) attr(x, "data"))
 data <- do.call(rbind, data)
 
+#
+head(sim)
+head(data)
+
+sim2 <- sim
+data2 <- data
+
+sim2$TP <-
 
 # Levels for graphing
 lev.S <- c("Conflict", "Nonconflict", "PM (Conflict)", "PM (Nonconflict)")
@@ -96,6 +92,24 @@ GGLIST <- lapply(GGLIST, function(x)  x[is.finite(x$data),])
 # xaxis for cond)
 pp.obj <- GGLIST[[1]]
 pp.obj <- pp.obj[,c(1,3,2,4,5,6,7,8)]
+
+# Re-level pp.obj for plotting purposes (split cond into TP and load factors)
+pp.obj$TP <- NA; pp.obj$load <- NA
+pp.obj
+pp.obj$TP[grep ("A", pp.obj$cond)] <- "Low"
+pp.obj$TP[grep ("B", pp.obj$cond)] <- "High"
+pp.obj$TP[grep ("C", pp.obj$cond)] <- "Low"
+pp.obj$TP[grep ("D", pp.obj$cond)] <- "High"
+
+pp.obj$load[grep ("A", pp.obj$cond)] <- "2"
+pp.obj$load[grep ("B", pp.obj$cond)] <- "2"
+pp.obj$load[grep ("C", pp.obj$cond)] <- "5"
+pp.obj$load[grep ("D", pp.obj$cond)] <- "5"
+
+pp.obj$cond <- NULL
+pp.obj <- pp.obj[ , c(9,8,1,2,3,4,5,6,7)]
+pp.obj
+
 
 # Better factor names
 levels(pp.obj$S) <- lev.S
@@ -211,9 +225,6 @@ E1.RT.plots.PM <- PM.RTgraph
 # ggsave("E1.Fits.RT.PM.png", plot = PM.RTgraph, width = 9, height = 6)
 #
 
-```
-
-```{r compute nonresponse predictions, echo=FALSE, include=FALSE, eval=TRUE}
 
 # Do out of sample predictions of non-responses to see whether they are
 # consistent with the model.
@@ -260,9 +271,7 @@ NR.plot <- NR.plot + geom_point(size=3) + geom_errorbar(aes(ymax = upper, ymin =
 # ggsave(NR.plot, file="E1.NR.Prob.png", width = 9, height = 4.5)
 
 
-```
 
-```{r generate parameter plots, echo=FALSE, include=FALSE}
 # # # Parameter Plots # # #
 #
 #
@@ -483,65 +492,53 @@ V.plots <- grid.arrange(V.corr.graph, V.ongoing.FA.graph, V.reactive.graph, layo
 
 # ggsave("E1.Rates.png", plot = V.plots, width = 9, height = 12)
 
-```
+
 
 ## Model Fits to Response Accuracy
-
-```{r plot accuracy fits, echo=FALSE, fig.height=9, fig.width=7}
 
 plot <- E1.acc.plots
 ggsave("figures/E1/E1.Fits.Accuracy.png", plot = plot)
 plot(plot)
 
-```
+
 
 ## Model Fits to RT (Ongoing)
 
-```{r plot RT fits ongoing, echo=FALSE, fig.height=12, fig.width=7}
-
-plot <- E1.RT.plots.ongoing 
+plot <- E1.RT.plots.ongoing
 ggsave("figures/E1/E1.Fits.RT.Ongoing.png", plot = plot)
 plot(plot)
 
-```
+
 
 ## Model Fits to RT (PM)
-
-```{r plot RT fits PM, echo=FALSE, fig.height=4, fig.width=7}
 
 plot <- E1.RT.plots.PM
 ggsave("figures/E1/E1.Fits.RT.PM.png", plot = plot)
 plot(plot)
 
-```
 
 ## Out of Sample Predicted Nonresponse Proportions
-
-```{r plot nonresponse proportions, echo=FALSE, fig.height=4, fig.width=7}
 
 plot <- NR.plot
 ggsave("figures/E1/E1.Fits.NR.png", plot = plot)
 plot(plot)
 
-```
+
 
 ## Parameter Plots: Thresholds
 
-```{r plot thresholds, eval=FALSE, fig.height=4, fig.width=7}
 
 plot <- B.plot
 
 plot(plot)
 
-```
+
 
 ## Parameter Plots: Rates
-
-```{r plot rates, eval=FALSE, fig.height=12, fig.width=7}
 
 plot <- V.plots
 
 plot(plot)
 
-```
+
 

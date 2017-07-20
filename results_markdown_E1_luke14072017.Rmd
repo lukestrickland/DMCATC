@@ -380,23 +380,35 @@ function so you can tweak it as needed.
 
 - Figure below shows model fits to ongoing task and PM accuracy by time pressure and PM block
 
-```{r fits accuracy, echo=FALSE, out.width='80%'}
+```{r Fits: Accuracy Ongoing, echo=FALSE, out.width='80%'}
 
-knitr::include_graphics("figures/E1/E1.Fits.Accuracy.png")
+knitr::include_graphics("figures/E1/E1.Fits.Accuracy.Ongoing.png")
+
+```
+
+```{r Fits: Accuracy PM, echo=FALSE, out.width='80%'}
+
+knitr::include_graphics("figures/E1/E1.Fits.Accuracy.PM.png")
 
 ```
 
 - Figure below shows model fits to ongoing task correct and error RT by time pressure and PM block
 
-```{r fits RT ongoing, echo=FALSE, out.width='80%'}
+```{r Fits: RT Ongoing Low Load, echo=FALSE, out.width='80%'}
 
-knitr::include_graphics("figures/E1/E1.Fits.RT.Ongoing.png")
+knitr::include_graphics("figures/E1/E1.Fits.RT.Ongoing.2.png")
+
+```
+
+```{r Fits: RT Ongoing High Load, echo=FALSE, out.width='80%'}
+
+knitr::include_graphics("figures/E1/E1.Fits.RT.Ongoing.5.png")
 
 ```
 
 - Figure below shows model fits to PM RT by time pressure and PM block
 
-```{r fits RT PM, echo=FALSE, out.width='80%'}
+```{r Fits: RT PM, echo=FALSE, out.width='80%'}
 
 knitr::include_graphics("figures/E1/E1.Fits.RT.PM.png")
 

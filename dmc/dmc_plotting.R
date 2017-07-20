@@ -5,7 +5,7 @@
 
 plot.cell.density <- function(data.cell,C=NA,xlim=c(0,Inf),ymax=NA,
                               save.density=FALSE,digits=2,main="",show.mean=FALSE)
-  # If !is.na(C) plots density for correct and error responses for a data frame 
+  # If !is.na(C) plots density for correct and error responses for a data frame
   # with columns R (a factor) and RT, adding a boolean score column for R=C.
   # Otherwise plots each response. Can deal with NA in the RT column, in which
   # case it provides a summary of p(NA)
@@ -19,17 +19,17 @@ plot.cell.density <- function(data.cell,C=NA,xlim=c(0,Inf),ymax=NA,
   if ( !any(is.na(C)) ) {
     if ( is.logical(C) & length(C)==dim(data.cell)[1] )
       dat$C <- C[is.in] else dat$C <- dat$R==C[is.in]
-    if (length(dat$RT[dat$C])>2) 
+    if (length(dat$RT[dat$C])>2)
       dns.correct <- density(dat$RT[dat$C]) else dns.correct <- NULL
-    if (length(dat$RT[!dat$C])>2) 
+    if (length(dat$RT[!dat$C])>2)
       dns.error <- density(dat$RT[!dat$C]) else dns.error <- NULL
     if (is.null(dns.error) & is.null(dns.correct))
       stop("There are no densities to plot")
     acc <- mean(dat$C)
-    if (!is.null(dns.correct)) 
-      dns.correct$y <- dns.correct$y*acc*(1-p.na) 
-    if (!is.null(dns.error)) 
-      dns.error$y <- dns.error$y*(1-acc)*(1-p.na) 
+    if (!is.null(dns.correct))
+      dns.correct$y <- dns.correct$y*acc*(1-p.na)
+    if (!is.null(dns.error))
+      dns.error$y <- dns.error$y*(1-acc)*(1-p.na)
     if (is.na(ymax)) ymax <- max(c(dns.correct$y,dns.error$y))
     if (!is.null(dns.correct)) {
       plot(dns.correct,xlab="RT",ylab="density",ylim=c(0,ymax),main=main)
@@ -43,7 +43,7 @@ plot.cell.density <- function(data.cell,C=NA,xlim=c(0,Inf),ymax=NA,
     if (p.na!=0) {
       nams <- c(nams,"p(NA) =")
       ps <- c(ps,round(p.na,digits))
-    } 
+    }
     legend("topright",paste(nams,ps),bty="n")
     legend("topright",xjust=0, inset=c(0,0.1), c("correct","error"),bty="n", lty=c(1,1), col=c("black","red"))
     if ( save.density ) list(correct=dns.correct,error=dns.error)
@@ -61,7 +61,7 @@ plot.cell.density <- function(data.cell,C=NA,xlim=c(0,Inf),ymax=NA,
     }
     ymax <- suppressWarnings(max(unlist(lapply(dns,function(x){max(x$y)}))))
     no.dns <- unlist(lapply(dns,is.null))
-    if (all(no.dns)) 
+    if (all(no.dns))
       stop("There are no densities to plot!")
     dns1 <- dns[!no.dns]
     ltys <- c(1:length(dns1))
@@ -74,32 +74,32 @@ plot.cell.density <- function(data.cell,C=NA,xlim=c(0,Inf),ymax=NA,
       nams <- c(nams,"p(NA) =")
       ps <- c(ps,round(p.na,2))
       lty <- c(ltys,NA)
-    } 
-    legend("topright",paste(nams,ps),lty=ltys,bty="n")    
+    }
+    legend("topright",paste(nams,ps),lty=ltys,bty="n")
     if ( save.density ) dns
   }
 }
 
 
 profile.dmc <- function(p.name,min.p,max.p,p.vector,data,
-                        n.point=100,digits=2,ylim=NA) 
+                        n.point=100,digits=2,ylim=NA)
   # for parameter p.name in p.vector draws the profile likelihood for data and
-  # returns the maximum (on a grid of resolution n.point) 
+  # returns the maximum (on a grid of resolution n.point)
 {
   if (!(p.name %in% names(p.vector)))
     stop("p.name not in p.vector")
   p <- p.vector
   ps <- seq(min.p,max.p,length.out=n.point)
   ll <- numeric(n.point)
-  for (i in 1:n.point) 
+  for (i in 1:n.point)
   {
-    p[p.name] <- ps[i]  
+    p[p.name] <- ps[i]
     ll[i] <- sum(log(likelihood.dmc(p,data)))
   }
   names(ll) <- round(ps,digits)
   if (any(is.na(ylim)))
     plot(ps,ll,type="l",xlab=p.name,ylab="log-likelihood") else
-      plot(ps,ll,type="l",xlab=p.name,ylab="log-likelihood",ylim=ylim)   
+      plot(ps,ll,type="l",xlab=p.name,ylab="log-likelihood",ylim=ylim)
   ll[ll==max(ll)]
 }
 
@@ -107,13 +107,13 @@ profile.dmc <- function(p.name,min.p,max.p,p.vector,data,
 
 # xlim=NA;natural=TRUE;n.point=1e3;trans=NA;main=""; trans=NA
 plot.prior <- function(i,p.prior,xlim=NA,natural=TRUE,n.point=1e3,trans=NA,
-  main="",ylim=NA, line = FALSE, ...) 
+  main="",ylim=NA, line = FALSE, ...)
   # Plot the i'th member of list created by p.prior. If trans then plot
   # on natural scale using transform specified in attr(p.prior[[i]],"trans")
 {
   if ( attr(p.prior[[i]],"dist")!="constant" ) {
-    if ( any(is.na(trans)) ) 
-      if (natural) trans <- attr(p.prior[[i]],"untrans") else 
+    if ( any(is.na(trans)) )
+      if (natural) trans <- attr(p.prior[[i]],"untrans") else
         trans <- "identity"
     if ( is.numeric(i) ) i <- names(p.prior)[i]
     if ( !(i %in% names(p.prior)) ) stop("Parameter not in prior")
@@ -127,42 +127,42 @@ plot.prior <- function(i,p.prior,xlim=NA,natural=TRUE,n.point=1e3,trans=NA,
                      lnorm_l=c(p$lower,exp(p[[1]]+2*p[[2]]))
       )
     }
-      
+
     x <- seq(xlim[1], xlim[2], length.out = n.point)
-     
-    ### Code to calcualte Jacobian of transform by Quentin Gronau 
-    
+
+    ### Code to calcualte Jacobian of transform by Quentin Gronau
+
     # Tranform function
     eval(parse(text = paste0("f <- function(x)", trans, "(x)")))
     xx <- f(x) # Trasformed x
-      
+
     # Redefine x on finite support
     finite_index <- is.finite(xx)
     x_ok <- x[finite_index]
     x <- seq(x_ok[1], x_ok[length(x_ok)], length.out = n.point)
     xx <- f(x)
-    
+
     # Make p
     p$x <- x
     p$log <- FALSE
-      
+
     # Get derivative
-    fprime <- try(deriv(parse(text = paste0(trans, "(x)")), "x", func = TRUE), 
+    fprime <- try(deriv(parse(text = paste0(trans, "(x)")), "x", func = TRUE),
       silent = TRUE)
-    
+
     # Calcualte density including normalizing Jacobian if transformed.
     if ( class(fprime) == "try-error" )
-      y <- 1/abs( sapply(x, function(x) numDeriv::grad(f, x)) ) * 
-        do.call(paste("d",attr(p,"dist"),sep=""),p) else 
-      y <- 1/abs( attr(fprime(x), "gradient") ) * 
+      y <- 1/abs( sapply(x, function(x) numDeriv::grad(f, x)) ) *
+        do.call(paste("d",attr(p,"dist"),sep=""),p) else
+      y <- 1/abs( attr(fprime(x), "gradient") ) *
             do.call(paste("d",attr(p,"dist"),sep=""),p)
-    
+
     # Plot
     if (any(is.na(ylim))) ylim <- c(0,max(y))
-    
-    if (line) lines(xx,y,...) else 
-      plot(xx,y,type="l",xlab=i,ylab="density",main=main,ylim=ylim,...)  
-    
+
+    if (line) lines(xx,y,...) else
+      plot(xx,y,type="l",xlab=i,ylab="density",main=main,ylim=ylim,...)
+
     invisible(cbind(x=xx,y=y))
   }
 }
@@ -178,12 +178,12 @@ plot.dmc <- function(samples,hyper=FALSE,start=1,end=NA,thin=1,save.ll=FALSE,
                      only.prior=FALSE,only.like=FALSE,subject=1,layout=NA,
                      smooth=FALSE,density=FALSE,...)
   # If not hyper, by default changes samples$theta to a mcmc.list object and plots
-  # If pll.chain=TRUE changes samples$pll to an mcmc object and plots posterior 
+  # If pll.chain=TRUE changes samples$pll to an mcmc object and plots posterior
   # log-likelihood of chains. If pll.barplot=TRUE plots their means as a barplot.
   # only.prior and only.like pick out one or other component of pll.
   # If hyper same but at the the hyper  (phi) level.
 {
-  
+
   my.chain.plot <- function(chain.pll,thin=1,main.pll=NULL) {
     x <- 1:dim(chain.pll)[1]
     x <- x[x %% thin == 0]
@@ -191,18 +191,18 @@ plot.dmc <- function(samples,hyper=FALSE,start=1,end=NA,thin=1,save.ll=FALSE,
     plot(x,chain.pll[x,1],xlab="Iterations",ylab="",ylim=ylim,type="l",main=main.pll)
     for (i in 2:dim(chain.pll)[2]) lines(x,chain.pll[x,i],col=i,lty=i)
   }
-  
-  
+
+
   auto.layout <- any(is.na(layout))
   if ( hyper ) {
     hyper <- attr(samples,"hyper")
-    if (is.null(hyper)) 
+    if (is.null(hyper))
       stop("There are no hyper-parameters to plot.")
     if ( is.na(end) ) end <- hyper$nmc
     if ( end <= start )
       stop("End must be greater than start")
     if ( pll.chain | pll.barplot ) {
-      chain.pll <- hyper$h_summed_log_prior[start:end,] + 
+      chain.pll <- hyper$h_summed_log_prior[start:end,] +
                    hyper$h_log_likelihoods[start:end,]
       colnames(chain.pll) <- 1:dim(chain.pll)[2]
       if (pll.barplot) {
@@ -212,7 +212,7 @@ plot.dmc <- function(samples,hyper=FALSE,start=1,end=NA,thin=1,save.ll=FALSE,
         if (save.ll) mean.ll
       } else {
         if (!auto.layout) par(mfrow=layout)
-        if (!pll.together) 
+        if (!pll.together)
           plot(mcmc(chain.pll,thin=thin),auto.layout=auto.layout,
             density=density,smooth=smooth,...) else
             plot(mcmc.list(lapply(data.frame(chain.pll),function(x){
@@ -228,14 +228,14 @@ plot.dmc <- function(samples,hyper=FALSE,start=1,end=NA,thin=1,save.ll=FALSE,
     if (is.null(samples$theta)) samples <- samples[[subject]]
     if ( is.na(end) ) end <- samples$nmc
     if ( end <= start ) stop("End must be greater than start")
-    
+
     if ( pll.chain | pll.barplot ) {
       if ( only.prior ) chain.pll <- samples$summed_log_prior[start:end,] else
         if ( only.like ) chain.pll <- samples$log_likelihoods[start:end,] else
-          chain.pll <- samples$summed_log_prior[start:end,] + 
+          chain.pll <- samples$summed_log_prior[start:end,] +
                        samples$log_likelihoods[start:end,]
       colnames(chain.pll) <- 1:dim(chain.pll)[2]
-      
+
       if ( pll.barplot ) {
         mean.ll <- apply(chain.pll,2,mean)
         names(mean.ll) <- 1:length(mean.ll)
@@ -243,7 +243,7 @@ plot.dmc <- function(samples,hyper=FALSE,start=1,end=NA,thin=1,save.ll=FALSE,
         if (save.ll) mean.ll
       } else {
         if ( !auto.layout ) par(mfrow=layout)
-        if ( !pll.together ) 
+        if ( !pll.together )
           plot(mcmc(chain.pll,thin=thin),auto.layout=auto.layout,
             density=density,smooth=smooth,main.pll=main.pll) else {
             if (!density & !smooth) my.chain.plot(chain.pll,thin=thin,main.pll=main.pll,...) else
@@ -255,7 +255,7 @@ plot.dmc <- function(samples,hyper=FALSE,start=1,end=NA,thin=1,save.ll=FALSE,
     } else {
       if (!auto.layout) par(mfrow=layout)
       plot(window(theta.as.mcmc.list(samples,thin=thin),start=start,end=end),
-           auto.layout=auto.layout,density=density,smooth=smooth,...) 
+           auto.layout=auto.layout,density=density,smooth=smooth,...)
     }
   }
 }
@@ -263,14 +263,14 @@ plot.dmc <- function(samples,hyper=FALSE,start=1,end=NA,thin=1,save.ll=FALSE,
 
 
 ppl.barplots.dmc <- function(samples,start=1,end=NA,layout=c(5,2))
-  # Grid of barplots of pll for set of subjects  
+  # Grid of barplots of pll for set of subjects
 {
-  if (!is.null(samples$theta)) 
+  if (!is.null(samples$theta))
     stop("This function cannot be applied to a single subject.")
   par(mfrow=layout)
   for (i in 1:length(samples))
     plot.dmc(samples,subject=i,pll.barplot=TRUE,start=start,end=end,
-             main.pll=paste("Subject",i))  
+             main.pll=paste("Subject",i))
 }
 
 
@@ -286,19 +286,19 @@ plot.pp.dmc <- function(pp,style="pdf",layout=NULL,no.layout=FALSE,
                         show.response=NA,
                         ltys=NA,lwds=NA)
   # pdf or cdf of data and posterior predictive fits
-  # Show response is a vector of integers in 1:n.resp of which resposnes to show, 
-  # if NA shows all 
+  # Show response is a vector of integers in 1:n.resp of which resposnes to show,
+  # if NA shows all
 {
- 
+
   plot.one <- function(pp,style,data.style,pos,x.min.max=NA,ylim,
                        show.fits,dname,mname,model.legend,lgnd,
-                       n.resp,show.response,ltys,lwds) 
+                       n.resp,show.response,ltys,lwds)
   {
-    
+
     no.facs <- class(try(pp[[data.style]][1][[1]][[2]],silent=TRUE))=="try-error"
     if (no.facs) ni <- 1 else ni <- length(pp[[1]])
     for ( i in 1:ni ) if ( !all(unlist(lapply(pp[[1]][[i]],is.null))) ) {
-      if ( no.facs ) 
+      if ( no.facs )
         lgnd <- names(lapply(pp[[style]],function(x){out <- attr(x,"cell.name")})) else
         lgnd <- lapply(pp[[style]][[i]],function(x){out <- attr(x,"cell.name")})
       ok.n <- c(1:n.resp)[!unlist(lapply(pp[[1]][[i]],is.null))]
@@ -307,7 +307,7 @@ plot.pp.dmc <- function(pp,style="pdf",layout=NULL,no.layout=FALSE,
       is.in <- is.in & ((1:n.resp)==ok.n)
       inj <- c(1:n.resp)[is.in]
       if ( style=="pdf" ) {
-        if (is.null(pos)) pos <- "topright" 
+        if (is.null(pos)) pos <- "topright"
         if (any(is.na(ylim))) ylim <- c(0,max(
           c(unlist(lapply(pp[[style]][[i]],function(x){
               if (length(x$y)==0) NA else max(x$y)})),
@@ -315,7 +315,7 @@ plot.pp.dmc <- function(pp,style="pdf",layout=NULL,no.layout=FALSE,
               if (length(x$y)==0) NA else max(x$y)}))),na.rm=TRUE))
         xlim <- c(Inf,-Inf)
         for (j in 1:length(ok.n)) {
-          if (no.facs) 
+          if (no.facs)
             xij <- pp[[style]][[ok.n[j]]][[1]]$x else
             xij <- pp[[style]][i][[1]][[ok.n[j]]]$x
           xlim[1] <- ifelse(min(xij)<xlim[1],
@@ -335,7 +335,7 @@ plot.pp.dmc <- function(pp,style="pdf",layout=NULL,no.layout=FALSE,
             xy <- pp[[style]][i][[1]][[ok.n[j]]]
             xy.dat <- pp[[data.style]][i][[1]][[ok.n[j]]]
           }
-          if ( j == show.response[1] ) 
+          if ( j == show.response[1] )
             plot(xy,main="",ylim=ylim,xlim=xlim) else
               lines(xy,lty=ltys[j],lwd=lwds[j])
           lines(xy.dat,lty=ltys[j],lwd=lwds[j],col="red")
@@ -346,7 +346,7 @@ plot.pp.dmc <- function(pp,style="pdf",layout=NULL,no.layout=FALSE,
         # Get limits
         xlim <- c(Inf,-Inf)
         for ( j in inj ) {
-          if (no.facs) ppj <- pp[[data.style]][[ j ]][[1]] else 
+          if (no.facs) ppj <- pp[[data.style]][[ j ]][[1]] else
             ppj <- pp[[data.style]][i][[1]][[ j ]]
           xlim[1] <- ifelse(suppressWarnings(min(ppj))<xlim[1],min(ppj),xlim[1])
           xlim[2] <- ifelse(suppressWarnings(max(ppj))>xlim[2],max(ppj),xlim[2])
@@ -373,23 +373,23 @@ plot.pp.dmc <- function(pp,style="pdf",layout=NULL,no.layout=FALSE,
           if ( show.fits && !is.null(attr(pp,"dpqs")) ) for (k in 1:length(attr(pp,"dpqs"))) {
             ppk <- attr(pp,"dpqs")[[k]]
             if (no.facs) {
-              y <- as.numeric(names(ppk[[style]][[ j ]][[1]])) 
+              y <- as.numeric(names(ppk[[style]][[ j ]][[1]]))
               x <- ppk[[style]][[ j ]][[1]]
             } else {
               y <- as.numeric(names(ppk[[style]][i][[1]][[ j ]]))
               x <- ppk[[style]][i][[1]][[ j ]]
             }
-            lines(x,y,col="grey",lty=ltys[j]) 
+            lines(x,y,col="grey",lty=ltys[j])
           }
-          if (no.facs) ppj <- pp[[data.style]][[ j ]][[1]] else 
+          if (no.facs) ppj <- pp[[data.style]][[ j ]][[1]] else
             ppj <- pp[[data.style]][i][[1]][[ j ]]
-          lines(ppj,as.numeric(names(ppj)),col="red",lty=ltys[j],lwd=lwds[j]) 
-          if ( !any(is.na(percentiles)) & !is.null(ppj) )  
+          lines(ppj,as.numeric(names(ppj)),col="red",lty=ltys[j],lwd=lwds[j])
+          if ( !any(is.na(percentiles)) & !is.null(ppj) )
             points(ppj[percentiles],as.numeric(names(ppj))[percentiles],col="red",cex=1.25)
           if ( show.fit ) {
             if (no.facs) ppj <- pp[[style]][[ j ]][[1]] else
               ppj <- pp[[style]][i][[1]][[ j ]] # ok.n[j]
-            lines(ppj,as.numeric(names(ppj)),lty=ltys[j],lwd=lwds[j]) 
+            lines(ppj,as.numeric(names(ppj)),lty=ltys[j],lwd=lwds[j])
             if ( !any(is.na(percentiles)) & !is.null(ppj) )
               points(ppj[percentiles],as.numeric(names(ppj))[percentiles],pch=16,cex=.75)
           }
@@ -406,19 +406,19 @@ plot.pp.dmc <- function(pp,style="pdf",layout=NULL,no.layout=FALSE,
       }
     }
   }
-  
+
   if (!show.fit) {
     model.legend <- FALSE
     show.fits <- FALSE
   }
-  
+
   if ( !all(names(pp)[1:2]==c("pdf","cdf")) ) {
     style <- "cdf"
     dname <- paste("Average",dname)
     mname <- paste("Average",mname)
     pp <- attr(pp,"av")
   }
-  
+
   if (!any(style %in% c("pdf","cdf")))
     stop("style must be either \"pdf\" or \"cdf\"")
   facs <- dimnames(pp[[1]])
@@ -426,7 +426,7 @@ plot.pp.dmc <- function(pp,style="pdf",layout=NULL,no.layout=FALSE,
   resp <- names(pp[[1]][1][[1]])
   if (is.null(resp)) resp <- names(pp[[1]])
   n.resp <- length(resp)
-  n.levs <- lapply(facs,length) 
+  n.levs <- lapply(facs,length)
   if ( !no.layout ) {
     if ( is.null(layout) ) {
       if (class(try(pp[[data.style]][1][[1]][[2]],silent=TRUE))=="try-error")
@@ -434,7 +434,7 @@ plot.pp.dmc <- function(pp,style="pdf",layout=NULL,no.layout=FALSE,
     }
     if (length(layout)==1) layout <- c(1,layout) else
       layout <- layout[1:2]
-    par(mfrow=layout,mar=c(2,2,0,0)) 
+    par(mfrow=layout,mar=c(2,2,0,0))
   }
   lgnd <- NULL
   data.style <- paste("data",style,sep=".")
@@ -443,7 +443,7 @@ plot.pp.dmc <- function(pp,style="pdf",layout=NULL,no.layout=FALSE,
   if (any(is.na(lwds))) lwds <- rep(1,n.resp)
   if ( !(length(ltys)==n.resp) ) stop(paste("Must provide",n.resp,"ltys"))
   if (!(length(lwds)==n.resp)) stop(paste("Must provide",n.resp,"lwds"))
-  
+
   plot.one(pp,style,data.style,pos,x.min.max,ylim,show.fits,
                   dname,mname,model.legend,lgnd,n.resp,show.response,ltys,lwds)
 }
@@ -455,7 +455,7 @@ acf.dmc <- function(samples,par=NA,chain=1,lag.max=NULL,hyper=FALSE,plot=TRUE,..
 {
   if (hyper) {
     hyper <- attr(samples,"hyper")
-    if (is.na(par)) 
+    if (is.na(par))
       out <- acf(window(hyper$h_log_likelihoods[,chain],...),
         main=chain,lag.max=lag.max,plot=plot) else {
         phi <- phi.as.mcmc.list(hyper)
@@ -464,7 +464,7 @@ acf.dmc <- function(samples,par=NA,chain=1,lag.max=NULL,hyper=FALSE,plot=TRUE,..
         out <- acf(window(series,...),main=par,lag.max=lag.max,plot=plot)
       }
   } else {
-    if (is.na(par)) 
+    if (is.na(par))
       out <- acf(window(samples$log_likelihoods[,chain],...),
         main=chain,lag.max=lag.max,plot=plot) else {
         if (is.numeric(par)) par <- dimnames(samples$theta)[[2]][par]
@@ -480,10 +480,10 @@ acf.dmc <- function(samples,par=NA,chain=1,lag.max=NULL,hyper=FALSE,plot=TRUE,..
 # collapse.subjects=FALSE;scale.subjects=TRUE; do.plot=TRUE
 pairs.dmc <- function(samples,start=1,end=NA,hyper=FALSE,hyper1=TRUE,hyper2=TRUE,thin=NA,
   collapse.subjects=FALSE,scale.subjects=TRUE,
-  do.plot=TRUE,...) 
+  do.plot=TRUE,...)
   ## put histograms on the diagonal
 {
-  
+
   panel.hist <- function(x, ...)
   {
     usr <- par("usr"); on.exit(par(usr))
@@ -493,7 +493,7 @@ pairs.dmc <- function(samples,start=1,end=NA,hyper=FALSE,hyper1=TRUE,hyper2=TRUE
     y <- h$counts; y <- y/max(y)
     rect(breaks[-nB], 0, breaks[-1], y, col = "cyan", ...)
   }
-  
+
   ## put correlations on the upper panels,
   panel.cor <- function(x, y, digits = 2, prefix = "", ...)
   {
@@ -504,12 +504,12 @@ pairs.dmc <- function(samples,start=1,end=NA,hyper=FALSE,hyper1=TRUE,hyper2=TRUE
     txt <- paste0(prefix, txt)
     text(0.5, 0.5, txt, cex = 2)
   }
-  
+
   if (hyper) {
     hyper <- attr(samples,"hyper")
-    dim1 <- dim(hyper$phi[[1]]) 
+    dim1 <- dim(hyper$phi[[1]])
     dim2 <- dim(hyper$phi[[2]])
-    nam1 <- dimnames(hyper$phi[[1]])[[2]] 
+    nam1 <- dimnames(hyper$phi[[1]])[[2]]
     nam2 <- dimnames(hyper$phi[[2]])[[2]]
     if (hyper1 & hyper2) {
       samples$theta <- aperm(array(c(aperm(hyper$phi[[1]],c(1,3,2)),
@@ -534,7 +534,7 @@ pairs.dmc <- function(samples,start=1,end=NA,hyper=FALSE,hyper1=TRUE,hyper2=TRUE
     dimall[3] <- i*n
     theta <- array(dim=dimall,dimnames=dimnames(thetas[[1]]))
     for (j in 1:n) {
-      if ( scale.subjects ) for (k in 1:dim(thetas[[1]])[2] ) 
+      if ( scale.subjects ) for (k in 1:dim(thetas[[1]])[2] )
         thetas[[j]][,k,] <- (thetas[[j]][,k,]-mean(thetas[[j]][,k,]))/sd(thetas[[j]][,k,])
       theta[,,( 1+ (j-1)*i ):(j*i)] <- thetas[[j]]
     }
@@ -543,7 +543,7 @@ pairs.dmc <- function(samples,start=1,end=NA,hyper=FALSE,hyper1=TRUE,hyper2=TRUE
   if (is.na(end)) end <- dim(samples$theta)[3]
   theta <- aperm(samples$theta[,,start:end],c(1,3,2))
   if (!is.na(thin))
-    theta <- theta[,c(1:dim(theta)[2])[(c(1:dim(theta)[2]) %% thin) == 0],] 
+    theta <- theta[,c(1:dim(theta)[2])[(c(1:dim(theta)[2]) %% thin) == 0],]
   theta <- matrix(theta,ncol=dim(theta)[[3]],
                   dimnames=list(NULL,dimnames(theta)[[3]]))
   if (do.plot) pairs(theta,diag.panel = panel.hist,upper.panel = panel.cor,...)
@@ -555,8 +555,8 @@ plot.deviance.dmc <- function(ds=NULL,samples=NULL,digits=2,fast=TRUE,
                               main="",xlim=NA)
   # Posterior deviance histogram
 {
-  if (is.null(ds)) if (is.null(samples)) 
-    stop("Must supply samples or deviance statistics") else 
+  if (is.null(ds)) if (is.null(samples))
+    stop("Must supply samples or deviance statistics") else
       ds <- Dstats.dmc(samples,TRUE,fast)
     if (any(is.na(xlim)))
       hist(ds$D,breaks="fd",xlab="Posterior Deviance",main=main) else
@@ -585,12 +585,12 @@ plot.score.dmc <- function(data=NULL, rnd=2, xlim=c(0,5), ymax=NA, IQR=FALSE)
     stop(paste("S levels (",paste(slevs,collapse=","),
                 ") cant be matched with R levels (",paste(slevs,collapse=","),")"))
   correct <- tolower(data$S)==tolower(data$R)
-  print(round(mean(correct),rnd))                       
-  print(round(tapply(data$RT,list(correct),mean),rnd))   
+  print(round(mean(correct),rnd))
+  print(round(tapply(data$RT,list(correct),mean),rnd))
   plot.cell.density(data,C=correct,xlim=xlim)
-  
+
   if (IQR)
-    print(round(tapply(data$RT,list(correct),IQR),2)) # standard deviation   
+    print(round(tapply(data$RT,list(correct),IQR),2)) # standard deviation
 }
 
 
@@ -600,9 +600,9 @@ ppp.dmc <- function(samples,
                     fun=function(x){mean(x$RT)},n.post=500,
                     transformp=identity,verbose=TRUE,
                     plot.density=TRUE,main="",bw="nrd0",report=10,SSD=Inf,...)
-  # posterior predictive (pp) p value for function fun of data (p(observed)>pp) 
+  # posterior predictive (pp) p value for function fun of data (p(observed)>pp)
 {
-  
+
   model <- attributes(samples$data)$model
   facs <- names(attr(model,"factors"))
   resp <- names(attr(model,"responses"))
@@ -639,7 +639,7 @@ ppp.dmc <- function(samples,
 h.ppp.dmc <- function(hsamples,collapse="mean",
   fun=function(x){mean(x$RT)},transformp=identity,
   n.post=500,save.pps=FALSE,verbose=TRUE,
-  plot.density=TRUE,main="",bw="nrd0",report=10,SSD=Inf,...) 
+  plot.density=TRUE,main="",bw="nrd0",report=10,SSD=Inf,...)
   # ppp for average over subjects
 {
   pps <- lapply(hsamples,ppp.dmc,fun=fun,transformp=transformp,
@@ -653,15 +653,15 @@ h.ppp.dmc <- function(hsamples,collapse="mean",
   }
   print(ppp)
   attr(pp,"observed") <- obs
-  if (save.pps) attr(pp,"pps") <- pps 
+  if (save.pps) attr(pp,"pps") <- pps
   invisible(pp)
 }
 
 
 ### Fixed Effects
 
-plotSpar.dmc <- function(est,p.name,len=.05) 
-  # plots ordered cis for p.name, est produced by summary.dmc  
+plotSpar.dmc <- function(est,p.name,len=.05)
+  # plots ordered cis for p.name, est produced by summary.dmc
 {
   lo <- unlist(lapply(est,function(x){x$quantiles[p.name,c("2.5%")]}))
   med <- unlist(lapply(est,function(x){x$quantiles[p.name,c("50%")]}))
@@ -675,13 +675,13 @@ plotSpar.dmc <- function(est,p.name,len=.05)
 }
 
 
-### Hierachical 
+### Hierachical
 
 h.profile.dmc <- function(p.name,p.num,min.p,max.p,ps,p.prior,n.point=100,
-                          digits=3,ylim=NA) 
+                          digits=3,ylim=NA)
   # for parameter p.name at position p.num (1 or 2) in p.prior given subject
-  # parameters ps draws a likelihood profile and returns the maximum (on a grid 
-  # of resolution n.point) 
+  # parameters ps draws a likelihood profile and returns the maximum (on a grid
+  # of resolution n.point)
 {
   if (!(p.name %in% dimnames(ps)[[2]]))
     stop("p.name not in ps")
@@ -691,9 +691,9 @@ h.profile.dmc <- function(p.name,p.num,min.p,max.p,ps,p.prior,n.point=100,
   ll <- numeric(n.point)
   pop <- p.prior[[p.name]]
   pop$x <- ps[,p.name]
-  for (i in 1:n.point) 
-  {    
-    pop[[p.num]] <- pps[i]  
+  for (i in 1:n.point)
+  {
+    pop[[p.num]] <- pps[i]
     ll[i] <- sum(do.call(paste("d",attr(pop,"dist"),sep=""),pop))
   }
   names(ll) <- round(pps,digits)
@@ -702,7 +702,7 @@ h.profile.dmc <- function(p.name,p.num,min.p,max.p,ps,p.prior,n.point=100,
     plot(pps,ll,type="l",xlab=paste(p.name,p.num,sep="."),
          ylab="log-likelihood") else
            plot(pps,ll,type="l",xlab=paste(p.name,p.num,sep="."),
-                ylab="log-likelihood",ylim=ylim)  
+                ylab="log-likelihood",ylim=ylim)
   ll[ll==max(ll)]
 }
 
@@ -710,27 +710,27 @@ h.profile.dmc <- function(p.name,p.num,min.p,max.p,ps,p.prior,n.point=100,
 ############  LUKES GGPLOTs
 
 theme_simple <- function (base_size = 12, base_family = "") {
-  theme_grey(base_size = base_size, base_family = base_family) %+replace% 
+  theme_grey(base_size = base_size, base_family = base_family) %+replace%
     theme(
       panel.background = element_rect(fill="white"),
       panel.grid.minor.y = element_blank(),
       legend.key = element_rect(fill="white", colour= "white"),
-      strip.background = element_rect(fill="white"))   
+      strip.background = element_rect(fill="white"))
 }
 
 theme_set(theme_simple())
 
 # sim=sim; data=data; factors=NULL; CI= c(0.025, 0.975)
 # quantiles.to.get = c(0.1, 0.5, 0.9); noR = FALSE
-get.fitgglist.dmc <- function (sim, data, factors=NA, noR = FALSE,  
+get.fitgglist.dmc <- function (sim, data, factors=NA, noR = FALSE,
   quantiles.to.get = c(0.1, 0.5, 0.9), CI= c(0.025, 0.975),
   acc.fun=function(x){as.numeric(x$S)==as.numeric(x$R)},
-  correct.only=FALSE,error.only=FALSE)  
+  correct.only=FALSE,error.only=FALSE)
   # Extracts list of data frames, pps (response proabilities) and RTs
   # from the save.simulation output of post.predict
 {
 
-  arr2df=function(arr) 
+  arr2df=function(arr)
   {
     if (is.null(dim(arr))) out=data.frame(y=arr) else {
       dn=dimnames(arr)
@@ -754,21 +754,21 @@ get.fitgglist.dmc <- function (sim, data, factors=NA, noR = FALSE,
     out
   }
 
-  get.ps <- function (sim, factors,R) 
+  get.ps <- function (sim, factors,R)
   {
     n <- tapply(sim$RT,cbind.data.frame(sim[,factors],R=R),length)
     n[is.na(n)] <- 0 # In case some cells are empty
     nok <- tapply(sim$RT,cbind.data.frame(sim[,factors],R=R),function(x){sum(!is.na(x))})
     nok[is.na(nok)] <- 0 # In case some cells are empty
 
-    # In the case that there are no factors, the apply doesn't work, and in this 
+    # In the case that there are no factors, the apply doesn't work, and in this
     # case we can just sum all the Rs instead.
-    if(is.null(factors)) np <- sum(nok) else 
+    if(is.null(factors)) np <- sum(nok) else
       np <- rep(apply(n,1:length(factors),sum),times=length(levels(R)))
 
     nok/np
-  }  
-  
+  }
+
   get.stat <- function(fun,data,sim,tapplyvec) {
     mean.sim <- tapply(sim$RT,sim[ ,tapplyvec],fun,na.rm=TRUE)
     mean.df <- arr2df(apply(mean.sim,2:len,quantile,probs=.5, na.rm=TRUE))
@@ -778,20 +778,20 @@ get.fitgglist.dmc <- function (sim, data, factors=NA, noR = FALSE,
     names(mean.df)[names(mean.df)=="y"] <- "median"
     if (dim(mean.df)[2]==4) {
       mean.df <- cbind.data.frame(row.names(mean.df),mean.df)
-      names(mean.df)[1] <- tapplyvec[2]  
+      names(mean.df)[1] <- tapplyvec[2]
     }
     mean.df
   }
 
   if (correct.only & error.only)
     stop("Cant plot only correct and only error, set only one to true")
-  
+
   if (is.function(acc.fun)) {
     try(C.sim <- acc.fun(sim),silent=TRUE)
     try(C.data <- acc.fun(data),silent=TRUE)
     if (class(C.sim)=="try-error" | class(C.data)=="try-error")
     {
-      warning("Accuracy function could not score properly") 
+      warning("Accuracy function could not score properly")
       C.sim <- sim[,"R"]
       C.data <- data[,"R"]
       scored <- FALSE
@@ -806,17 +806,17 @@ get.fitgglist.dmc <- function (sim, data, factors=NA, noR = FALSE,
     scored <- FALSE
   }
 
-  
+
   if ( is.null(factors) & noR ) stop ("Cannot plot when no factors and noR TRUE")
-  if ( !is.null(factors) && is.na(factors[1]) ) 
-    factors <-  colnames(sim) [!colnames (sim) %in% c("reps", "R", "RT","R2")] 
+  if ( !is.null(factors) && is.na(factors[1]) )
+    factors <-  colnames(sim) [!colnames (sim) %in% c("reps", "R", "RT","R2")]
   if (!noR) {
     C.sim <- sim[,"R"]
     C.data <- data[,"R"]
-  } 
+  }
   ps <- get.ps(sim, factors=c("reps", factors),R=C.sim)
   ps[is.nan(ps)] <- 0
-  len <- length(factors) + 1   
+  len <- length(factors) + 1
   pp.df <- arr2df(apply(ps, 2:length(dim(ps)), quantile, probs = .5, na.rm=T))
   pp.df$lower <- as.vector(apply(ps, 2:length(dim(ps)), quantile, probs=CI[1], na.rm=TRUE))
   pp.df$upper <- as.vector(apply(ps, 2:length(dim(ps)), quantile, probs=CI[2], na.rm=TRUE))
@@ -827,13 +827,13 @@ get.fitgglist.dmc <- function (sim, data, factors=NA, noR = FALSE,
   if( is.null(factors) ) pp.df$R <- rownames(pp.df)
 
   # Drop the response factor from RT calculations if noR == T
-  if (noR == FALSE) { 
-    len <- length(factors) +2 
-    tapplyvec <- c("reps", factors,"R") 
-  } else { 
-    if (noR == TRUE) { 
+  if (noR == FALSE) {
+    len <- length(factors) +2
+    tapplyvec <- c("reps", factors,"R")
+  } else {
+    if (noR == TRUE) {
       len <- length(factors) +1
-      tapplyvec <- c("reps", factors)  
+      tapplyvec <- c("reps", factors)
     }
   }
 
@@ -847,37 +847,37 @@ get.fitgglist.dmc <- function (sim, data, factors=NA, noR = FALSE,
       data <- data[C.data!="TRUE",]
     }
   }
-  
+
   # First calc all quantiles of the RT distribution for each rep
   all.quants <- tapply(sim$RT,sim[ ,tapplyvec],quantile, prob=quantiles.to.get,na.rm=TRUE)
   DIM <- dim(all.quants)
-  DIMnames <- dimnames(all.quants)  
+  DIMnames <- dimnames(all.quants)
   all.quants <- lapply(all.quants, function(x) as.numeric(as.character(x)))
-     
-  # then Loop through specified quantiles of the RT distribution, for each 
-  # calculating posterior mean + CI then bind to data frame. 
+
+  # then Loop through specified quantiles of the RT distribution, for each
+  # calculating posterior mean + CI then bind to data frame.
   for (i in 1:length(quantiles.to.get)) {
     quant.array <- unlist(lapply(all.quants, function(x) x[i]))
     dim(quant.array) <-  DIM
-    dimnames(quant.array) <- DIMnames 
+    dimnames(quant.array) <- DIMnames
     quant.df <- arr2df(apply(quant.array, 2:len, quantile, probs = 0.5, na.rm=TRUE))
     quant.df$lower <- as.vector(apply(quant.array, 2:len, quantile, prob=CI[1], na.rm=TRUE))
     quant.df$upper <- as.vector(apply(quant.array, 2:len, quantile, prob=CI[2], na.rm=TRUE))
-    quant.df$data <- as.vector(tapply(data$RT, data[, c(tapplyvec[tapplyvec!="reps"])], 
+    quant.df$data <- as.vector(tapply(data$RT, data[, c(tapplyvec[tapplyvec!="reps"])],
       quantile, prob=quantiles.to.get[i],na.rm=TRUE))
     quant.df$quantile <- as.character(quantiles.to.get[i])
-  
+
     ### This bit is to deal with cases where there is only one factor (or just R is requested)
     ### the structure about will coerce the one factor or R into rownames, so this puts it back as a column
     if ( length(colnames(quant.df) [
-      !colnames (quant.df) %in% c("median", "lower", "upper", "data", "quantile", "y")])==0) 
+      !colnames (quant.df) %in% c("median", "lower", "upper", "data", "quantile", "y")])==0)
     {
       quant.df <- cbind(quant.df, rownames(quant.df))
       names(quant.df)[length(quant.df)] <- tapplyvec[tapplyvec!="reps"]
     }
-  
-    if (i==1) RT.df <- quant.df  else  RT.df <- rbind(RT.df, quant.df) 
-   
+
+    if (i==1) RT.df <- quant.df  else  RT.df <- rbind(RT.df, quant.df)
+
   }
   names(RT.df)[names(RT.df)=="y"] <- "median"
 
@@ -888,114 +888,114 @@ get.fitgglist.dmc <- function (sim, data, factors=NA, noR = FALSE,
 }
 
 
-ggplot.RP.dmc <- function (df, xaxis = 'R', panels.ppage=4, nrow=NULL, ncol=NULL) 
-  # xaxis is the name of the factor to put on the X axis  
+ggplot.RP.dmc <- function (df, xaxis = 'R', panels.ppage=4, nrow=NULL, ncol=NULL)
+  # xaxis is the name of the factor to put on the X axis
 {
-  
+
   if (!is.null(attr(df, "gglist"))) {
-    cat ("Treating as a pp object for a single participant") 
+    cat ("Treating as a pp object for a single participant")
     df <- attr(df, "gglist")[[1]]
   }
-  
+
   if (!is.null(attr(attr(df, "av"), "gglist"))) {
-    cat ("Treating as a pp object for a group of participants") 
+    cat ("Treating as a pp object for a group of participants")
     df <- attr(attr(df, "av"), "gglist")[[1]]
   }
-  
-  #remove cases where the combination of factors was not present in design  
+
+  #remove cases where the combination of factors was not present in design
   df <- df[!is.nan(df$data),]
-  
+
   grid <- colnames(df) [!colnames (df) %in% c(xaxis, "median", "lower", "upper", "data")]
-  
+
   if (length(grid)==0) {
-    n.plots <-1 
-    plot.ind <- rep(1, length(df$data)) 
+    n.plots <-1
+    plot.ind <- rep(1, length(df$data))
   } else {
-    n.plots <- sum (!is.na((tapply(df$data, df[,c(grid)], function (x) 1)))) 
+    n.plots <- sum (!is.na((tapply(df$data, df[,c(grid)], function (x) 1))))
     plot.ind <- as.numeric(factor(with(df, interaction(df[,grid]))))
   }
-  
+
   plot.pages <- ceiling(n.plots/panels.ppage)
-  
+
   grid_labels <- labeller(label_value, .multi_line=F)
-  
+
   plots <- list()
   for (j in 1:plot.pages) {
-    
+
     active.df <- df[plot.ind %in% ((j-1)*panels.ppage+1):(j* panels.ppage),]
-    
-    plot <- ggplot(active.df, aes_string(x = xaxis, y= 'median')) + 
+
+    plot <- ggplot(active.df, aes_string(x = xaxis, y= 'median')) +
       geom_point(size=3) + geom_errorbar(aes(ymax = upper, ymin = lower), width= 0.2) +
-      geom_point(aes_string(x = xaxis, y= 'data'), pch=21, size=4, colour="black") +
+      geom_point(aes_string(x = xaxis, y= 'data'), pch=21, size=3, colour="black") +
       geom_line(aes(group = 1, y=data), linetype=2) + ylab("Response Proportion")
-    
-    if (length(grid)!=0) 
-      plot <- plot + facet_wrap(grid, labeller = grid_labels, scales = 'free_x', 
+
+    if (length(grid)!=0)
+      plot <- plot + facet_wrap(grid, labeller = grid_labels, scales = 'free_x',
                                 nrow=nrow, ncol=ncol)
     plots[[j]] <- plot
   }
-  
+
   if (length(plots)==1) plots[[1]] else plots
 }
 
 ggplot.RA.dmc <- function(df, xaxis = 'R', panels.ppage=4,ylim=NA,df.type="pps",
-                          nrow=NULL, ncol=NULL) 
+                          nrow=NULL, ncol=NULL)
   # Plots accuracy and returns df with only correct response rows, dropping
   # R column.
-{ 
-  if (!is.null(attr(df, "gglist"))) {    
-    cat ("Treating as a pp object for a single participant\n")     
-    df <- attr(df, "gglist")[[df.type]]   
+{
+  if (!is.null(attr(df, "gglist"))) {
+    cat ("Treating as a pp object for a single participant\n")
+    df <- attr(df, "gglist")[[df.type]]
   }
-  
-  if (!is.null(attr(attr(df, "av"), "gglist"))) {  
-    cat ("Treating as a pp object for a group of participants\n")     
-    df <- attr(attr(df, "av"), "gglist")[[df.type]]   
+
+  if (!is.null(attr(attr(df, "av"), "gglist"))) {
+    cat ("Treating as a pp object for a group of participants\n")
+    df <- attr(attr(df, "av"), "gglist")[[df.type]]
   }
   acc.df <- df[df$R=="TRUE",names(df)[names(df)!="R"]]
   if (xaxis=='R') xaxis <- names(acc.df)[1]
-  if ( any(is.na(ylim)) ) 
-    ylim <- c(min(c(acc.df$lower,acc.df$data)),max(c(acc.df$upper,acc.df$data))) 
+  if ( any(is.na(ylim)) )
+    ylim <- c(min(c(acc.df$lower,acc.df$data)),max(c(acc.df$upper,acc.df$data)))
   out <-  ggplot.RP.dmc(acc.df, xaxis=xaxis,panels.ppage=panels.ppage,
-                        nrow=nrow, ncol=ncol) 
-  #If else to account for single page (single ggplot)  
+                        nrow=nrow, ncol=ncol)
+  #If else to account for single page (single ggplot)
   # vs multipage (list of ggplots)
-  if (is.null(names(out))) {  
-    out <- lapply (out, function(x) x + ylab("accuracy") + ylim(ylim)  ) } else {      
-    out <- out+ ylab("accuracy") + ylim(ylim)       
+  if (is.null(names(out))) {
+    out <- lapply (out, function(x) x + ylab("accuracy") + ylim(ylim)  ) } else {
+    out <- out+ ylab("accuracy") + ylim(ylim)
   }
   out
 }
 
 # df<-reduced.df;xaxis='S'
 ggplot.RT.dmc <- function (df, xaxis = 'R', panels.ppage=4, do.quantiles=TRUE,
-                           nrow=NULL, ncol=NULL) 
-  # xaxis is the name of the factor to put on the X axis  
+                           nrow=NULL, ncol=NULL)
+  # xaxis is the name of the factor to put on the X axis
 {
-  
+
   if (!is.null(attr(df, "gglist"))) {
-    cat ("Treating as a pp object for a single participant") 
+    cat ("Treating as a pp object for a single participant")
     df <- attr(df, "gglist")[[2]]
   }
-  
+
   if (!is.null(attr(attr(df, "av"), "gglist"))) {
-    cat ("Treating as a pp object for a group of participants") 
+    cat ("Treating as a pp object for a group of participants")
     df <- attr(attr(df, "av"), "gglist")[[2]]
-  }  
-  
+  }
+
   df <- df[!is.nan(df$median),]
 
   # get factors (other than the xaxis factor) for the grid
-  if (do.quantiles) grid <- colnames(df) [!colnames (df) %in% 
+  if (do.quantiles) grid <- colnames(df) [!colnames (df) %in%
       c(xaxis, "median", "lower", "upper", "data", "quantile")] else
-    grid <- colnames(df) [!colnames (df) %in% 
-      c(xaxis, "median", "lower", "upper", "data")]     
+    grid <- colnames(df) [!colnames (df) %in%
+      c(xaxis, "median", "lower", "upper", "data")]
 
   if (length(grid)==0) {
-    n.plots <-1 
-    plot.ind <- rep(1, length(df$data)) 
+    n.plots <-1
+    plot.ind <- rep(1, length(df$data))
   } else {
-    n.plots <- sum (!is.na((tapply(df$data, df[,c(grid)], function (x) 1)))) 
+    n.plots <- sum (!is.na((tapply(df$data, df[,c(grid)], function (x) 1))))
     plot.ind <- as.numeric(factor(with(df, interaction(df[,grid]))))
   }
 
@@ -1004,18 +1004,18 @@ ggplot.RT.dmc <- function (df, xaxis = 'R', panels.ppage=4, do.quantiles=TRUE,
   # each step of the loop grabs enough data to create number of plots p page
   plots <- list()
   for (j in 1:plot.pages) {
- 
+
     active.df <- df[plot.ind %in% ((j-1)*panels.ppage+1):(j* panels.ppage),]
 
-    plot <- ggplot(active.df, aes_string(x = xaxis, y= 'median')) + geom_point(size=3) + 
+    plot <- ggplot(active.df, aes_string(x = xaxis, y= 'median')) + geom_point(size=3) +
         geom_errorbar(aes(ymax = upper, ymin = lower), width= 0.2) +
-        geom_point(aes_string(x = xaxis, y= 'data'), pch=21, size=4, colour="black") +
+        geom_point(aes_string(x = xaxis, y= 'data'), pch=21, size=3, colour="black") +
         ylab("RT")
-    if (do.quantiles) 
+    if (do.quantiles)
       plot <- plot + geom_line(aes(group = quantile, y=data), linetype=2) else
       plot <- plot + geom_line(aes(group=1,y=data), linetype=2)
 
-    if(length(grid)!=0) plot <- plot + 
+    if(length(grid)!=0) plot <- plot +
       facet_wrap(grid, labeller = labeller(label_value, .multi_line=F), scales = 'free',
                  nrow=nrow, ncol=ncol)
 
@@ -1040,39 +1040,39 @@ plot_SS_srrt.dmc <- function(data,sim=NULL,minN=1,ci=.99,sim.line=FALSE,
   do.correct=FALSE,Cfun=function(x){as.numeric(x$S)==(as.numeric(x$R)-1)},
   plot.it=TRUE,violin=0.05,ylab="Median SRRT (s)",ylim=NA,only.ssrt=TRUE,
   probs=NA,n.intervals=5,low.interval=NA,percentile.av=FALSE,cut.on.data=TRUE,xlabels=NULL)
-  # Plots median signal-respond RT function, optionally with violin plots and  
-  # invisibly returns a data frame with number of observations and Gelman p  
-  # values for each SSD. sim is save from post.predict.dmc. Like data, must have 
+  # Plots median signal-respond RT function, optionally with violin plots and
+  # invisibly returns a data frame with number of observations and Gelman p
+  # values for each SSD. sim is save from post.predict.dmc. Like data, must have
   # an SSD and RT column. Recommend at least 500 reps in sim object.
   # NB1: p for n=1 is meaningless, so p=NA in such cases.
   # NB2: n.sim is number of simulated experiments where the median was defined,
   #      be cautious about p value and violins for SSDs where it is small,
-  # NB3: Does not plot violins if violin=0 or FALSE, otherwise absolute value  
+  # NB3: Does not plot violins if violin=0 or FALSE, otherwise absolute value
   #      of violin gives "wex", width of density plot.
   # NB4: sim.line joins violin medians with dotted line.
-  # NB5: If probs=NA then n.intervals is used to create this number of evenly 
+  # NB5: If probs=NA then n.intervals is used to create this number of evenly
   #      spaced SSD intervals when doing an average plot. low.interval specifies
   #      a SSD = 0-low.inteval ranges to be removed first.
   # NB6: percentile.av calculates intervals for each subject based on simulation (data
   #      to unstable) then averages. Otherwise does absolute SSD based on all
   #      data (so can do for sim=NULL case). In either case can base on data SSDs
   #      (cut.on.data=TRUE, maybe unstable for percentile.av) or simulation (FALSE)
-  
+
 {
   fit <- !is.null(sim)
   if (is.na(xlab)) xlab <- ifelse(is.data.frame(data),"SSD (s)","SSD")
   if ( !is.data.frame(data) ) { # average over subjects
     av.plot <- TRUE
     snames <- names(data)
-    if ( fit && !is.list(sim) ) 
-      stop("If sim is for multiple subjects data must be a samples object") else 
+    if ( fit && !is.list(sim) )
+      stop("If sim is for multiple subjects data must be a samples object") else
     {
       # Make sure breaks are unique
       data <- lapply(data,function(x) {
         if (only.ssrt) out <- x$data[!is.na(x$data$RT),] else out <- x$data
         if (!is.na(low.interval)) ok <- out$SSD>low.interval else
           ok <- rep(TRUE,dim(out)[1])
-        out$SSD[ok] <- out$SSD[ok] + (runif(length(out$SSD[ok]))-.5)/1e6 
+        out$SSD[ok] <- out$SSD[ok] + (runif(length(out$SSD[ok]))-.5)/1e6
         out
       })
       sim <- lapply(sim,function(x) {
@@ -1083,13 +1083,13 @@ plot_SS_srrt.dmc <- function(data,sim=NULL,minN=1,ci=.99,sim.line=FALSE,
          x
       })
     }
-    if ( do.correct ) { 
+    if ( do.correct ) {
       data <- lapply(data,function(x){x[Cfun(x) | x$R=="NR",]})
       if (fit) sim <- lapply(sim,function(x){x[Cfun(x) | x$R=="NR",]})
     }
     if ( !fit & cut.on.data==FALSE )
         stop("sim must be supplied if cut.on.data=FALSE")
-    if ( any(is.na(probs)) )  
+    if ( any(is.na(probs)) )
       probs <- seq(0,1,1/n.intervals)[-c(1,n.intervals+1)]
 
     if ( percentile.av ) {
@@ -1117,7 +1117,7 @@ plot_SS_srrt.dmc <- function(data,sim=NULL,minN=1,ci=.99,sim.line=FALSE,
       SSDnames <- paste("(",
         paste(SSDnames[-length(SSDnames)],SSDnames[-1],sep=","),
       "%]",sep="")
-      if ( !is.na(low.interval) ) SSDnames <- 
+      if ( !is.na(low.interval) ) SSDnames <-
         c(paste(paste("[0",low.interval,sep=","),"]",sep=""),SSDnames)
       data$SSD <- factor(data$SSD,labels=SSDnames)
       if (fit) sim$SSD <- factor(sim$SSD,labels=SSDnames)
@@ -1158,21 +1158,21 @@ plot_SS_srrt.dmc <- function(data,sim=NULL,minN=1,ci=.99,sim.line=FALSE,
     }
     if (do.correct) data <- data[Cfun(data) | data$R=="NR",]
   }
-  
+
   # Prepare SSDs
   nrt <- tapply(!is.na(data$RT),data[,c("SS","SSD")],sum)[2,]
   SSDs <- names(nrt[nrt>=minN])
-  
+
   # Remove small SSD
   tmp <- factor(data$SSD)
   levels(tmp)[!(levels(tmp) %in% SSDs)] <- NA
   data <- data[!is.na(tmp),]
   nrt <- nrt[nrt>=minN]
-    
+
   # Calculate data summaries
   mrt <- tapply(data$RT,data$SSD,median,na.rm=TRUE)
   ok <- !is.na(mrt)
-  
+
   # Get graph x axis
   if ( av.plot ) {
     if (is.null(xlabels)) xlabs <- levels(data$SSD) else
@@ -1187,7 +1187,7 @@ plot_SS_srrt.dmc <- function(data,sim=NULL,minN=1,ci=.99,sim.line=FALSE,
     if (is.null(xlabels)) xlabs <- SSD else
       if (length(xlabels) == length(SSD)) xlabs <- xlabels else
         stop(paste("xlabels not the right length (",length(SSD),")"))
-  } 
+  }
 
   if ( plot.it & !fit ) { # Signal respond plot
     if (any(is.na(ylim))) ylim <- c(min(mrt[ok])-0.01,max(mrt[ok])+0.01)
@@ -1196,26 +1196,26 @@ plot_SS_srrt.dmc <- function(data,sim=NULL,minN=1,ci=.99,sim.line=FALSE,
     points(xvals[ok],mrt[ok],pch=16)
     lines(xvals[ok],mrt[ok],lwd=2)
   }
-  
+
   if ( fit ) {
 
     tmp <- factor(sim$SSD);levels(tmp)[!(levels(tmp) %in% SSDs)] <- NA
     sim <- sim[!is.na(tmp),]
-    
+
     # Calcualte simulation summaries
     mrt.sim <- tapply(sim$RT,sim[,c("reps","SSD")],median,na.rm=TRUE)
-    
+
     # Simulation ci
     mrt.lo <- apply(mrt.sim,2,quantile,probs=(1-ci)/2,na.rm=TRUE)
     mrt.hi <- apply(mrt.sim,2,quantile,probs=1-(1-ci)/2,na.rm=TRUE)
-    
+
     if ( plot.it ) { # Signal respond plot
       if (any(is.na(ylim)) & fit) ylim <- c(min(c(mrt.lo,mrt[ok]),na.rm=TRUE),
-        max(c(mrt.hi,mrt[ok]),na.rm=TRUE)) 
-      
+        max(c(mrt.hi,mrt[ok]),na.rm=TRUE))
+
       plot(xvals[ok],mrt[ok],ylim=ylim,pch=16,xlab=xlab,ylab=ylab,main=main,xaxt="n")
       axis(1,xvals[ok],xlabs[ok])
-      
+
       if ( as.logical(abs(violin)) ) for (i in SSDs[ok]) {
         vioplot(mrt.sim[!is.na(mrt.sim[,i]),i],at=xvals[i],add=TRUE,
                 col="lightgrey",wex=abs(violin))
@@ -1224,7 +1224,7 @@ plot_SS_srrt.dmc <- function(data,sim=NULL,minN=1,ci=.99,sim.line=FALSE,
     }
     points(xvals[ok],mrt[ok],pch=16,cex=1.5,col="red")
     lines(xvals[ok],mrt[ok],lwd=2)
-    
+
     # Gelman p values
     p <- round(apply((mrt.sim-rep(mrt,each=dim(mrt.sim)[1]))>=0,2,mean,na.rm=TRUE),3)
     n.sim <- apply(mrt.sim,2,function(x){sum(!is.na(x))})
@@ -1244,12 +1244,12 @@ plot_SS_srrt.dmc <- function(data,sim=NULL,minN=1,ci=.99,sim.line=FALSE,
 plot_SS_if.dmc <- function(data,sim=NULL,minN=1,plot.it=TRUE,violin=.05,
   ylab="p(Respond)",xlab=NA,ylim=NA,sim.line=FALSE,main="Inhibition function",
   probs=NA,n.intervals=5,low.interval=NA,percentile.av=TRUE,cut.on.data=TRUE,xlabels=NULL)
-  # Plots inhibiiton function, optionally wit violin plots and invisibly 
-  # returns a data frame with number of observaitons and Gelman p values for 
-  # each SSD. sim is save from post.predict.dmc. Like data, must have an SSD and 
+  # Plots inhibiiton function, optionally wit violin plots and invisibly
+  # returns a data frame with number of observaitons and Gelman p values for
+  # each SSD. sim is save from post.predict.dmc. Like data, must have an SSD and
   # RT column. Recommend at east 500 reps in sim object.
   # NB1: p for n=1 is meaningless, so p=NA in such cases)
-  # NB2: Does not plot violins if violin=0 or FALSE, otherwise absolute value  
+  # NB2: Does not plot violins if violin=0 or FALSE, otherwise absolute value
   #      of violin gives "wex", width of density plot.)
   # NB3: sim.line joins violin medians with dotted line.
   # NB4: Other options similar to SSRT plot
@@ -1259,14 +1259,14 @@ plot_SS_if.dmc <- function(data,sim=NULL,minN=1,plot.it=TRUE,violin=.05,
   if ( !is.data.frame(data) ) { # average over subjects
     av.plot <- TRUE
     snames <- names(data)
-    if ( fit && !is.list(sim) ) 
+    if ( fit && !is.list(sim) )
       stop("If sim is for multiple subjects data must be a samples object") else {
       # Make sure breaks are unique
       data <- lapply(data,function(x) {
         out <- x$data
         if (!is.na(low.interval)) ok <- out$SSD>low.interval else
           ok <- rep(TRUE,dim(out)[1])
-        out$SSD[ok] <- out$SSD[ok] + (runif(length(out$SSD[ok]))-.5)/1e6 
+        out$SSD[ok] <- out$SSD[ok] + (runif(length(out$SSD[ok]))-.5)/1e6
         out
       })
       sim <- lapply(sim,function(x) {
@@ -1278,9 +1278,9 @@ plot_SS_if.dmc <- function(data,sim=NULL,minN=1,plot.it=TRUE,violin=.05,
     }
     if ( !fit & cut.on.data==FALSE )
         stop("sim must be supplied if cut.on.data=FALSE")
-    if ( any(is.na(probs)) )  
+    if ( any(is.na(probs)) )
       probs <- seq(0,1,1/n.intervals)[-c(1,n.intervals+1)]
-      
+
     if ( percentile.av ) {
       absSSD <- unlist(lapply(data,function(x){x$SSD[is.finite(x$SSD)]}))
       for ( i in snames ) {
@@ -1305,7 +1305,7 @@ plot_SS_if.dmc <- function(data,sim=NULL,minN=1,plot.it=TRUE,violin=.05,
       SSDnames <- paste("(",
         paste(SSDnames[-length(SSDnames)],SSDnames[-1],sep=","),
       "%]",sep="")
-      if ( !is.na(low.interval) ) SSDnames <- 
+      if ( !is.na(low.interval) ) SSDnames <-
         c(paste(paste("[0",low.interval,sep=","),"]",sep=""),SSDnames)
       data$SSD <- factor(data$SSD,labels=SSDnames)
       if (fit) sim$SSD <- factor(sim$SSD,labels=SSDnames)
@@ -1349,10 +1349,10 @@ plot_SS_if.dmc <- function(data,sim=NULL,minN=1,plot.it=TRUE,violin=.05,
   levels(tmp)[!(levels(tmp) %in% SSDs)] <- NA
   data <- data[!is.na(tmp),]
   n <- n[n>=minN]
-  
+
   # Calculate data summaries
   pR <- tapply(!is.na(data$RT),data$SSD,mean) # probability of responding
-  
+
   # Get graph x axis
   if ( av.plot ) {
     if (is.null(xlabels)) xlabs <- levels(data$SSD) else
@@ -1367,7 +1367,7 @@ plot_SS_if.dmc <- function(data,sim=NULL,minN=1,plot.it=TRUE,violin=.05,
     if (is.null(xlabels)) xlabs <- SSD else
       if (length(xlabels) == length(SSD)) xlabs=xlabels else
         stop(paste("xlabels not the right length (",length(SSD),")"))
-  } 
+  }
 
   if ( !fit & plot.it ) { # Inhibition Function
     if (any(is.na(ylim))) ylim <- c(0,1)
@@ -1376,14 +1376,14 @@ plot_SS_if.dmc <- function(data,sim=NULL,minN=1,plot.it=TRUE,violin=.05,
     points(xvals,pR,pch=16)
     lines(xvals,pR)
   }
-  
+
   if ( fit ) {
     tmp <- factor(sim$SSD)
     levels(tmp)[!(levels(tmp) %in% SSDs)] <- NA
     sim <- sim[!is.na(tmp),]
     # Calcualte simulation summaries
     pR.sim <- tapply(!is.na(sim$RT),sim[,c("reps","SSD")],mean)
-    
+
     if ( plot.it ) { # Inhibition Function
       if (any(is.na(ylim))) ylim <- c(0,1)
       plot(xvals,pR,ylim=ylim,pch=16,xlab=xlab,ylab=ylab,main=main,xaxt="n")
@@ -1395,7 +1395,7 @@ plot_SS_if.dmc <- function(data,sim=NULL,minN=1,plot.it=TRUE,violin=.05,
     }
     points(xvals,pR,pch=16,cex=1.5,col="red")
     lines(xvals,pR)
-    
+
     # Gelman p values
     p <- round(apply((pR.sim-rep(pR,each=dim(pR.sim)[1]))>=0,2,mean,na.rm=TRUE),3)
     out <- cbind.data.frame(SSD=xlabs,n=n,p=p)
