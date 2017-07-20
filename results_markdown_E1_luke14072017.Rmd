@@ -3,8 +3,8 @@ title: "Results and Modelling for ATC Experiment E1"
 author: "Russell Boag"
 date: "12 July 2017"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -499,13 +499,13 @@ pander(DIC)
 
 panderOptions('table.alignment.default', function(df) ifelse(sapply(df, is.numeric), 'center', 'left'))
 
-t0.table <- read.csv("analysis/t0.E1.csv")
+t0.table <- read.csv("analysis/mean.t0.E1.csv")
 t0.table <- data.frame(t0.table)
 colnames(t0.table) <- c("Parameter", "Mean", "SD")
 
 pander(t0.table)
 
-A.table <- read.csv("analysis/A.E1.csv")
+A.table <- read.csv("analysis/mean.A.E1.csv")
 A.table <- data.frame(A.table)
 colnames(A.table) <- c("Parameter", "Mean", "SD")
 
@@ -519,7 +519,7 @@ pander(A.table)
 
 panderOptions('table.alignment.default', function(df) ifelse(sapply(df, is.numeric), 'center', 'left'))
 
-sdv.table <- read.csv("analysis/sdvs.E1.csv")
+sdv.table <- read.csv("analysis/mean.sdvs.E1.csv")
 sdv.table <- data.frame(sdv.table)
 colnames(sdv.table) <- c("Parameter", "Mean", "SD")
 
@@ -572,6 +572,11 @@ arousal/task engagement during PM blocks, which may be because the ongoing task
 becomes subjectively more difficult and/or engaging with the addition of the 
 concurrent PM task relative to control blocks.
 
+```{r Plot: Capacity PM, echo=FALSE, out.width='80%'}
+
+knitr::include_graphics("figures/E1/E1.Effort.Arousal.PM.png")
+
+```
 
 ### Proactive Control (Thresholds)
 
@@ -595,6 +600,11 @@ pander(Z.pro.pm.table)
 
 - As Figure XX shows, ongoing task thresholds where much higher in PM than control blocks for both conflict and nonconflict responses. This is consistent with strategic delay theories of PM costs whereby responses to the ongoing task are deliberately delayed in order to avoid preempting PM targets.
 
+```{r Plot: Proactive Control PM, echo=FALSE, out.width='80%'}
+
+knitr::include_graphics("figures/E1/E1.Proactive.Control.PM.png")
+
+```
 
 #### Proactive Control under Time Pressure
 
@@ -621,9 +631,9 @@ speed at expense of accuracy
 
 - Taken together, and considering the very large magnitude of the effects, these threshold shifts in response to changes in both PM demand and time pressure provide convincing evidence that proactive control via strategic threshold adjustment is the most important driver of observed PM cost and speed-accuracy trade-off effects. 
 
-```{r Plot: Proactive Control, echo=FALSE, out.width='80%'}
+```{r Plot: Proactive Control TP, echo=FALSE, out.width='80%'}
 
-knitr::include_graphics("figures/E1/E1.Proactive.Control.png")
+knitr::include_graphics("figures/E1/E1.Proactive.Control.TP.png")
 
 ```
 
@@ -711,7 +721,7 @@ Still I recall there was even more to this arousal thing across A1-A4?
 
 ```{r Plot: Effort/Arousal, echo=FALSE, out.width='80%'}
 
-knitr::include_graphics("figures/E1/E1.Effort.Arousal.png")
+knitr::include_graphics("figures/E1/E1.Effort.Arousal.TP.png")
 
 ```
 
@@ -731,8 +741,20 @@ time pressure levels (e.g., replacing control and PM ongoing task thresholds wit
 the average of the two). We can then examine the associated mis-fit of the model 
 with the removed effect relative to the full model with the effect included.
 
-- Compare fits to accuracy and RT for a model with thresholds averaged over 
-control and PM blocks and a model with rates averaged over control and PM blocks.
+- We generated posterior predictions for all of the PM and time pressure effects for the selected model, and then separately for models with two different sets of parameters averaged over either PM or time pressure blocks: ongoing accumulation rates, and ongoing thresholds. 
+
+- In the supplementary materials, we include fit graphs comparing the full model to the two versions with proactive (threshold) and reactive (rate) mechanisms systematically turned off. 
+
+- Here we focus our discussion to PM cost and time pressure effects and the contribution of each cognitive mechanism toward explaining the effects. First, we assess how much of the PM accuracy and RT effects were accounted for by the different models, and whether each model adequately fit these effects. Second, we assess how much of the time pressure accuracy and RT effects were accounted for by the different models, and whether each model adequately fit these effects. Finally, we examine the penalty associated with selectively turning off proactive control mechanisms, reactive inhibition mechanisms, or both in terms of fit to overall accuracy and RT.
+
+### PM Cost Effects
+
+- The full (selected) model accounted for the accuracy and RT costs associated with PM demand fairly well (XX% of the PM cost to conflict accuracy, XX% of the PM cost to nonconflict accuracy, and closely fit the cost to both correct and error RT for both ongoing task responses). 
+
+- Averaging the ongoing task thresholds between control and PM blocks (i.e., turning off proactive control) made the model underpredict the cost to ongoing task accuracy, more so for conflicts than nonconflicts, and dramatically underpredict the cost to both correct and error ongoing task RT (so much so that the model in fact predicted a PM advantage to ongoing task RT rather than a cost). This further indicates that proactive control of thresholds is an important mechanism in explaining PM costs effects, in particular costs to ongoing task RT. 
+
+- In contrast, averaging the ongoing task accumulation rates between control and PM blocks (i.e., turning off reactive inhibition) caused the model to overpredict costs to ongoing task accuracy (predicting an accuracy advantage for conflicts) and overpredict costs to both correct and error ongoing task RT. This suggests that reactive control of accumulation rates is also an important mechanism in explaining PM cost effects.
+
 
 ```{r Plot: Model Exploration PM Contrasts, echo=FALSE, out.width='80%'}
 
@@ -740,8 +762,18 @@ knitr::include_graphics("figures/E1/E1.ModelExpPMContrasts.png")
 
 ```
 
+### Time Pressure Effects
 
-- Compare fits to accuracy and RT for a model with thesholds averaged over time pressure and a model with accumulation rates averaged over time pressure.
+- In terms of time pressure effects, the full model provided a very close account of accuracy differences between low and high time pressure blocks under both low and high trial load conditions. The full model also closely fit to RT differences between time pressure blocks for both correct and error ongoing task responses as well as PM responses.
+
+- Averaging the ongoing task thresholds (i.e., turning off proactive control) made the model overpredict the cost to ongoing task accuracy under increased time pressure for conflcits, that is, it predicted lower conflict accuracy in the high time pressure blocks than was observed. Conversely, the model underpredicted the cost to ongoing task accuracy under increased time pressure for nonconflcits, that is, it predicted higher nonconflict accuracy in the high time pressure blocks than was observed. 
+
+- Similarly, the averaged-threshold model underpredicted RT differences between high and low time pressure blocks for both correct and error conflict and nonconflict responses (i.e., it predicted less of a speed-up from low to high time pressure than was observed). This provides further evidence that proactive control mechanisms are critical for explaining empirical speed-accuracy trade-off effects under different levels of time pressure. 
+
+- Averaging the ongoing task accumulation rates resulted in a model that underpredicts the cost to ongoing task accuracy under increased time pressure (actually predicting an accuracy advantage for conflicts under high time pressure instead of the observed cost). Likewise, the averaged-rates model underpredicts RT differences between high and low time pressure blocks for both correct and error conflict and nonconflict responses, predicteding less of a speed-up from low to high time pressure than was observed. 
+
+- In terms of PM responses, the averaged-threshold model maintained close fits to PM accuracy, but severely underpredicted RT differences between high and low time pressure blocks. In contrast, the averaged-rates model maintained close fits with PM RT, but underpredicted accuracy differences between high and low time pressure blocks (i.e., predicted higher PM accuracy under high time pressure than was observed). Taken together, both proactive and reactive control mechanisms appear necessary to account for the full range of RT and accuracy differences under different levels of time pressure. 
+
 
 ```{r Plot: Model Exploration TP Contrasts, echo=FALSE, out.width='80%'}
 
@@ -749,8 +781,17 @@ knitr::include_graphics("figures/E1/E1.ModelExpTPContrastsOngoing.png")
 
 ```
 
+- Finally, we examine the overall importance of proactive and reactive inhibition mechanisms in terms of how well the model fits observed accuracy and RT. 
 
-- Compare fits to overall RT and accuracy for a model which only includes reactive control mechanisms, a model which only includes proactive control mechanisms, and a model with neither control mechanism.
+- As shown in Figure XX, the full model (which includes both proactive and reactive control mechanisms) provided an almost exact fit to accuracy, while slightly overpredicting overall RT (RT was overpredicted by XX%).
+
+- In contrast, when proactive control is removed and the model only allows for reactive control, we get severe mis-fit to both overall accuracy and RT, the model underpredicting both by a large margin (accuracy underpredicted by XX%, RT underpredicted by XX%).
+
+- Similarly, when reactive control is removed from the model and only proactive control included, we get less severe but still substantial underprediction of both accuracy and RT (accuracy underpredicted by XX%, RT underpredicted by XX%).
+
+- Lastly, when both proactive and reactive control mechanisms are turned off (i.e., the model includes neither mechanism), the model produces the worst overall fit to accuracy and RT, underpredicting both by a larger margin than either the proactive-only or reactive-only models (accuracy underpredicted by XX%, RT underpredicted by XX%).
+
+- This provides convincing evidence that both proactive and reactive control mechanisms play critical and complimentary roles in accounting for ongoing task costs associated with different PM and time pressure demands. 
 
 ```{r Plot: Model Exploration TP Contrasts PM & Control Mechanisms, echo=FALSE, out.width='80%'}
 

@@ -1,6 +1,6 @@
 rm(list=ls())
-# setwd("C:/Users/Russell Boag/Documents/GitHub/DMCATC")
-setwd("D:/Software/DMC_ATCPMDC")
+setwd("C:/Users/Russell Boag/Documents/GitHub/DMCATC")
+# setwd("D:/Software/DMC_ATCPMDC")
 source("dmc/dmc.R")
 source("dmc/dmc_ATC.R")
 load_model ("LBA","lbaN_B.R")
@@ -62,39 +62,39 @@ Reactive.nnBN <- function (thetas) thetas[,"mean_v.nnB3N",, drop=F] - thetas[,"m
 Reactive.nnCN <- function (thetas) thetas[,"mean_v.nnC3N",, drop=F] - thetas[,"mean_v.pnC3N",, drop=F]
 Reactive.nnDN <- function (thetas) thetas[,"mean_v.nnD3N",, drop=F] - thetas[,"mean_v.pnD3N",, drop=F]
 
-Reactive.nnAC <- function (thetas) thetas[,"mean_v.nnA3C",, drop=F] - thetas[,"mean_v.pnA3C",, drop=F]
-Reactive.nnBC <- function (thetas) thetas[,"mean_v.nnB3C",, drop=F] - thetas[,"mean_v.pnB3C",, drop=F]
-Reactive.nnCC <- function (thetas) thetas[,"mean_v.nnC3C",, drop=F] - thetas[,"mean_v.pnC3C",, drop=F]
-Reactive.nnDC <- function (thetas) thetas[,"mean_v.nnD3C",, drop=F] - thetas[,"mean_v.pnD3C",, drop=F]
-
 Reactive.ccAN <- function (thetas) thetas[,"mean_v.ccA3N",, drop=F] - thetas[,"mean_v.pcA3N",, drop=F]
 Reactive.ccBN <- function (thetas) thetas[,"mean_v.ccB3N",, drop=F] - thetas[,"mean_v.pcB3N",, drop=F]
 Reactive.ccCN <- function (thetas) thetas[,"mean_v.ccC3N",, drop=F] - thetas[,"mean_v.pcC3N",, drop=F]
 Reactive.ccDN <- function (thetas) thetas[,"mean_v.ccD3N",, drop=F] - thetas[,"mean_v.pcD3N",, drop=F]
 
+Reactive.nnAC <- function (thetas) thetas[,"mean_v.nnA3C",, drop=F] - thetas[,"mean_v.pnA3C",, drop=F]
+Reactive.nnBC <- function (thetas) thetas[,"mean_v.nnB3C",, drop=F] - thetas[,"mean_v.pnB3C",, drop=F]
+Reactive.nnCC <- function (thetas) thetas[,"mean_v.nnC3C",, drop=F] - thetas[,"mean_v.pnC3C",, drop=F]
+Reactive.nnDC <- function (thetas) thetas[,"mean_v.nnD3C",, drop=F] - thetas[,"mean_v.pnD3C",, drop=F]
+
 Reactive.Table <- data.frame(rbind(
     A.NonPM.minus.PM=c(zandp(samples.E1, Reactive.ccAC),
                        zandp(samples.E1, Reactive.nnAN),
-                       zandp(samples.E1, Reactive.nnAC),
-                       zandp(samples.E1, Reactive.ccAN)
+                       zandp(samples.E1, Reactive.ccAN),
+                       zandp(samples.E1, Reactive.nnAC)
     ),
 
     B.NonPM.minus.PM=c(zandp(samples.E1, Reactive.ccBC),
                        zandp(samples.E1, Reactive.nnBN),
-                       zandp(samples.E1, Reactive.nnBC),
-                       zandp(samples.E1, Reactive.ccBN)
+                       zandp(samples.E1, Reactive.ccBN),
+                       zandp(samples.E1, Reactive.nnBC)
     ),
 
     C.NonPM.minus.PM=c(zandp(samples.E1, Reactive.ccCC),
                        zandp(samples.E1, Reactive.nnCN),
-                       zandp(samples.E1, Reactive.nnCC),
-                       zandp(samples.E1, Reactive.ccCN)
+                       zandp(samples.E1, Reactive.ccCN),
+                       zandp(samples.E1, Reactive.nnCC)
     ),
 
     D.NonPM.minus.PM=c(zandp(samples.E1, Reactive.ccDC),
                        zandp(samples.E1, Reactive.nnDN),
-                       zandp(samples.E1, Reactive.nnDC),
-                       zandp(samples.E1, Reactive.ccDN)
+                       zandp(samples.E1, Reactive.ccDN),
+                       zandp(samples.E1, Reactive.nnDC)
     )
 ))
 colnames(Reactive.Table) <- c("Conflict","Nonconflict","Conflict (Error)","Nonconflict (Error)")
@@ -106,41 +106,20 @@ Reactive.Table
 Reactive.AC <- function (thetas) (thetas[,"mean_v.ccA3C",, drop=F] - thetas[,"mean_v.pcA3C",, drop=F]) -
     (thetas[,"mean_v.ccA3N",, drop=F] - thetas[,"mean_v.pcA3N",, drop=F])
 Reactive.BC <- function (thetas) (thetas[,"mean_v.ccB3C",, drop=F] - thetas[,"mean_v.pcB3C",, drop=F]) -
-    (thetas[,"mean_v.nnB3C",, drop=F] - thetas[,"mean_v.pnB3C",, drop=F])
-Reactive.CC <- function (thetas) (thetas[,"mean_v.ccC3C",, drop=F] - thetas[,"mean_v.pcC3C",, drop=F]) -
-    (thetas[,"mean_v.nnC3C",, drop=F] - thetas[,"mean_v.pnC3C",, drop=F])
-Reactive.DC <- function (thetas) (thetas[,"mean_v.ccD3C",, drop=F] - thetas[,"mean_v.pcD3C",, drop=F]) -
-    (thetas[,"mean_v.nnD3C",, drop=F] - thetas[,"mean_v.pnD3C",, drop=F])
-
-Reactive.AN <- function (thetas) (thetas[,"mean_v.nnA3N",, drop=F] - thetas[,"mean_v.pnA3N",, drop=F]) -
-    (thetas[,"mean_v.ccA3N",, drop=F] - thetas[,"mean_v.pcA3N",, drop=F])
-Reactive.BN <- function (thetas) (thetas[,"mean_v.nnB3N",, drop=F] - thetas[,"mean_v.pnB3N",, drop=F]) -
     (thetas[,"mean_v.ccB3N",, drop=F] - thetas[,"mean_v.pcB3N",, drop=F])
-Reactive.CN <- function (thetas) (thetas[,"mean_v.nnC3N",, drop=F] - thetas[,"mean_v.pnC3N",, drop=F]) -
+Reactive.CC <- function (thetas) (thetas[,"mean_v.ccC3C",, drop=F] - thetas[,"mean_v.pcC3C",, drop=F]) -
     (thetas[,"mean_v.ccC3N",, drop=F] - thetas[,"mean_v.pcC3N",, drop=F])
-Reactive.DN <- function (thetas) (thetas[,"mean_v.nnD3N",, drop=F] - thetas[,"mean_v.pnD3N",, drop=F]) -
+Reactive.DC <- function (thetas) (thetas[,"mean_v.ccD3C",, drop=F] - thetas[,"mean_v.pcD3C",, drop=F]) -
     (thetas[,"mean_v.ccD3N",, drop=F] - thetas[,"mean_v.pcD3N",, drop=F])
 
-
-zandp ( samples.E1,
-function(thetas)( thetas[,"mean_v.ccA3C",, drop=F] - thetas[,"mean_v.pcA3C",, drop=F] ) -
- ( thetas[,"mean_v.ccA3N",, drop=F] - thetas[,"mean_v.pcA3N",, drop=F])
-
-)
-
-zandp ( samples.E1,function(thetas)( thetas[,"mean_v.ccA3C",, drop=F] - thetas[,"mean_v.pcA3C",, drop=F] 
-))
-
-zandp ( samples.E1,
-        function(thetas) thetas[,"mean_v.ccA3N",, drop=F] - thetas[,"mean_v.pcA3N",, drop=F])
-
-
-##Luke demonstrating why we get a higher Z score for on ethan the other
-# when the differnece of differences is the opposite
-mean.sd(samples.E1, function(thetas) thetas[,"mean_v.ccA3C",, drop=F] - thetas[,"mean_v.pcA3C",, drop=F])
-mean.sd(samples.E1, function(thetas) thetas[,"mean_v.ccA3N",, drop=F] - thetas[,"mean_v.pcA3N",, drop=F])
-
-
+Reactive.AN <- function (thetas) (thetas[,"mean_v.nnA3N",, drop=F] - thetas[,"mean_v.pnA3N",, drop=F]) -
+    (thetas[,"mean_v.nnA3C",, drop=F] - thetas[,"mean_v.pnA3C",, drop=F])
+Reactive.BN <- function (thetas) (thetas[,"mean_v.nnB3N",, drop=F] - thetas[,"mean_v.pnB3N",, drop=F]) -
+    (thetas[,"mean_v.nnB3C",, drop=F] - thetas[,"mean_v.pnB3C",, drop=F])
+Reactive.CN <- function (thetas) (thetas[,"mean_v.nnC3N",, drop=F] - thetas[,"mean_v.pnC3N",, drop=F]) -
+    (thetas[,"mean_v.nnC3C",, drop=F] - thetas[,"mean_v.pnC3C",, drop=F])
+Reactive.DN <- function (thetas) (thetas[,"mean_v.nnD3N",, drop=F] - thetas[,"mean_v.pnD3N",, drop=F]) -
+    (thetas[,"mean_v.nnD3C",, drop=F] - thetas[,"mean_v.pnD3C",, drop=F])
 
 Reactive.Cor.minus.Err.Table <- data.frame(rbind(
     A.Cor.minus.Err=c(zandp(samples.E1, Reactive.AC),
@@ -161,3 +140,9 @@ Reactive.Cor.minus.Err.Table <- data.frame(rbind(
 ))
 colnames(Reactive.Cor.minus.Err.Table) <- c("Conflict Correct-Error Diff","Nonconflict Correct-Error Diff")
 Reactive.Cor.minus.Err.Table
+
+# ## Luke demonstrating why we get a higher Z score for one than the other
+# # when the differnece of differences is the opposite
+# mean.sd(samples.E1, function(thetas) thetas[,"mean_v.ccA3C",, drop=F] - thetas[,"mean_v.pcA3C",, drop=F])
+# mean.sd(samples.E1, function(thetas) thetas[,"mean_v.ccA3N",, drop=F] - thetas[,"mean_v.pcA3N",, drop=F])
+#
