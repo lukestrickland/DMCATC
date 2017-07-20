@@ -658,6 +658,7 @@ colnames(Effort.TP.Table.Wide) <- c("A-B (Control)","B-C (Control)","C-D (Contro
 
 # # # Tables # # #
 t0.Table
+A.Table
 sdv.Table
 av.Bs.PM.Table
 av.Bs.TP.Table
@@ -859,6 +860,21 @@ write.csv(table, file = "analysis/t0.E1.csv")
 
 ```
 
+## A
+
+### Parameter Table: A
+
+```{r A, echo=FALSE}
+
+panderOptions("digits", 3)
+
+table <- A.Table
+
+pander(table)
+
+write.csv(table, file = "analysis/A.E1.csv")
+
+```
 
 ## SDV
 
