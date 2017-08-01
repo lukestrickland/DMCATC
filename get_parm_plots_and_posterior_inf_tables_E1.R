@@ -100,6 +100,63 @@ Reactive.Table <- data.frame(rbind(
 colnames(Reactive.Table) <- c("Conflict","Nonconflict","Conflict (Error)","Nonconflict (Error)")
 Reactive.Table
 
+# # # Reactive Control (Averaged over Time Pressure) # # #
+#
+Reactive.ccC <- function (thetas) ((thetas[,"mean_v.ccA3C",, drop=F] + thetas[,"mean_v.ccB3C",, drop=F] +
+                                        thetas[,"mean_v.ccC3C",, drop=F] + thetas[,"mean_v.ccD3C",, drop=F]) -
+                                       (thetas[,"mean_v.pcA3C",, drop=F] + thetas[,"mean_v.pcB3C",, drop=F] +
+                                            thetas[,"mean_v.pcC3C",, drop=F] + thetas[,"mean_v.pcD3C",, drop=F]))
+
+Reactive.nnN <- function (thetas) ((thetas[,"mean_v.nnA3N",, drop=F] + thetas[,"mean_v.nnB3N",, drop=F] +
+                                        thetas[,"mean_v.nnC3N",, drop=F] + thetas[,"mean_v.nnD3N",, drop=F]) -
+                                       (thetas[,"mean_v.pnA3N",, drop=F] + thetas[,"mean_v.pnB3N",, drop=F] +
+                                            thetas[,"mean_v.pnC3N",, drop=F] + thetas[,"mean_v.pnD3N",, drop=F]))
+
+Reactive.ccN <- function (thetas) ((thetas[,"mean_v.ccA3N",, drop=F] + thetas[,"mean_v.ccB3N",, drop=F] +
+                                        thetas[,"mean_v.ccC3N",, drop=F] + thetas[,"mean_v.ccD3N",, drop=F]) -
+                                       (thetas[,"mean_v.pcA3N",, drop=F] + thetas[,"mean_v.pcB3N",, drop=F] +
+                                            thetas[,"mean_v.pcC3N",, drop=F] + thetas[,"mean_v.pcD3N",, drop=F]))
+
+Reactive.nnC <- function (thetas) ((thetas[,"mean_v.nnA3C",, drop=F] + thetas[,"mean_v.nnB3C",, drop=F] +
+                                        thetas[,"mean_v.nnC3C",, drop=F] + thetas[,"mean_v.nnD3C",, drop=F]) -
+                                       (thetas[,"mean_v.pnA3C",, drop=F] + thetas[,"mean_v.pnB3C",, drop=F] +
+                                            thetas[,"mean_v.pnC3C",, drop=F] + thetas[,"mean_v.pnD3C",, drop=F]))
+
+Reactive.Table.Collapsed <- data.frame(rbind(
+    NonPM.minus.PM=c(zandp(samples.E1, Reactive.ccC),
+                     zandp(samples.E1, Reactive.nnN),
+                     zandp(samples.E1, Reactive.ccN),
+                     zandp(samples.E1, Reactive.nnC))))
+colnames(Reactive.Table.Collapsed) <- c("Conflict","Nonconflict","Conflict (Error)","Nonconflict (Error)")
+Reactive.Table.Collapsed
+
+# # # Reactive Control (Averaged over Time Pressure and Stimulus Type) # # #
+#
+Reactive.cor <- function (thetas) ((thetas[,"mean_v.ccA3C",, drop=F] + thetas[,"mean_v.ccB3C",, drop=F] +
+                                        thetas[,"mean_v.ccC3C",, drop=F] + thetas[,"mean_v.ccD3C",, drop=F] +
+                                        thetas[,"mean_v.nnA3N",, drop=F] + thetas[,"mean_v.nnB3N",, drop=F] +
+                                        thetas[,"mean_v.nnC3N",, drop=F] + thetas[,"mean_v.nnD3N",, drop=F]) -
+
+                                       (thetas[,"mean_v.pcA3C",, drop=F] + thetas[,"mean_v.pcB3C",, drop=F] +
+                                            thetas[,"mean_v.pcC3C",, drop=F] + thetas[,"mean_v.pcD3C",, drop=F] +
+                                            thetas[,"mean_v.pnA3N",, drop=F] + thetas[,"mean_v.pnB3N",, drop=F] +
+                                            thetas[,"mean_v.pnC3N",, drop=F] + thetas[,"mean_v.pnD3N",, drop=F]))
+
+Reactive.err <- function (thetas) ((thetas[,"mean_v.ccA3N",, drop=F] + thetas[,"mean_v.ccB3N",, drop=F] +
+                                        thetas[,"mean_v.ccC3N",, drop=F] + thetas[,"mean_v.ccD3N",, drop=F] +
+                                        thetas[,"mean_v.nnA3C",, drop=F] + thetas[,"mean_v.nnB3C",, drop=F] +
+                                        thetas[,"mean_v.nnC3C",, drop=F] + thetas[,"mean_v.nnD3C",, drop=F]) -
+
+                                       (thetas[,"mean_v.pcA3N",, drop=F] + thetas[,"mean_v.pcB3N",, drop=F] +
+                                            thetas[,"mean_v.pcC3N",, drop=F] + thetas[,"mean_v.pcD3N",, drop=F] +
+                                            thetas[,"mean_v.pnA3C",, drop=F] + thetas[,"mean_v.pnB3C",, drop=F] +
+                                            thetas[,"mean_v.pnC3C",, drop=F] + thetas[,"mean_v.pnD3C",, drop=F]))
+
+Reactive.Table.Cor.Err <- data.frame(rbind(
+    NonPM.minus.PM=c(zandp(samples.E1, Reactive.cor),
+                     zandp(samples.E1, Reactive.err))))
+colnames(Reactive.Table.Cor.Err) <- c("Correct","Error")
+Reactive.Table.Cor.Err
 
 # # # Reactive Control - Inhibition of Correct minus Error Stimuli # # #
 #
@@ -177,24 +234,42 @@ Proactive.PM.Table <- data.frame(rbind(
     )
 ))
 colnames(Proactive.PM.Table) <- c("Conflict","Nonconflict")
-Proactive.Table
+Proactive.PM.Table
 
-
-# # # Proactive Control (PM Cost) by Time Pressure # # #
+# # # Proactive Control (Averaged over Time Pressure) # # #
 #
-ProactiveTP.ABC <- function (thetas) (thetas[,"B.A3C",, drop=F] - thetas[,"B.A2C",, drop=F]) -
-    (thetas[,"B.B3C",, drop=F] - thetas[,"B.B2C",, drop=F])
-ProactiveTP.BCC <- function (thetas) (thetas[,"B.B3C",, drop=F] - thetas[,"B.B2C",, drop=F]) -
-    (thetas[,"B.C3C",, drop=F] - thetas[,"B.C2C",, drop=F])
-ProactiveTP.CDC <- function (thetas) (thetas[,"B.C3C",, drop=F] - thetas[,"B.C2C",, drop=F]) -
-    (thetas[,"B.D3C",, drop=F] - thetas[,"B.D2C",, drop=F])
+Proactive.C <- function (thetas) ((thetas[,"B.A3C",, drop=F] + thetas[,"B.B3C",, drop=F] +
+                                       thetas[,"B.C3C",, drop=F] + thetas[,"B.D3C",, drop=F]) -
+                                      (thetas[,"B.A2C",, drop=F] + thetas[,"B.B2C",, drop=F] +
+                                           thetas[,"B.C2C",, drop=F] + thetas[,"B.D2C",, drop=F]))
 
-ProactiveTP.ABN <- function (thetas) (thetas[,"B.A3N",, drop=F] - thetas[,"B.A2N",, drop=F]) -
-    (thetas[,"B.B3N",, drop=F] - thetas[,"B.B2N",, drop=F])
-ProactiveTP.BCN <- function (thetas) (thetas[,"B.B3N",, drop=F] - thetas[,"B.B2N",, drop=F]) -
-    (thetas[,"B.C3N",, drop=F] - thetas[,"B.C2N",, drop=F])
-ProactiveTP.CDN <- function (thetas) (thetas[,"B.C3N",, drop=F] - thetas[,"B.C2N",, drop=F]) -
-    (thetas[,"B.D3N",, drop=F] - thetas[,"B.D2N",, drop=F])
+Proactive.N <- function (thetas) ((thetas[,"B.A3N",, drop=F] + thetas[,"B.B3N",, drop=F] +
+                                       thetas[,"B.C3N",, drop=F] + thetas[,"B.D3N",, drop=F]) -
+                                      (thetas[,"B.A2N",, drop=F] + thetas[,"B.B2N",, drop=F] +
+                                           thetas[,"B.C2N",, drop=F] + thetas[,"B.D2N",, drop=F]))
+
+Proactive.PM.Table.Collapsed <- data.frame(rbind(
+    PM.minus.Control=c(zandp(samples.E1, Proactive.C),
+                       zandp(samples.E1, Proactive.N))))
+colnames(Proactive.PM.Table.Collapsed) <- c("Conflict","Nonconflict")
+Proactive.PM.Table.Collapsed
+
+
+# # # DIFFERENCE in Proactive Control (PM Cost) by Time Pressure # # #
+#
+ProactiveTP.ABC <- function (thetas) ((thetas[,"B.A3C",, drop=F] - thetas[,"B.A2C",, drop=F]) -
+                                          (thetas[,"B.B3C",, drop=F] - thetas[,"B.B2C",, drop=F]))
+ProactiveTP.BCC <- function (thetas) ((thetas[,"B.B3C",, drop=F] - thetas[,"B.B2C",, drop=F]) -
+                                          (thetas[,"B.C3C",, drop=F] - thetas[,"B.C2C",, drop=F]))
+ProactiveTP.CDC <- function (thetas) ((thetas[,"B.C3C",, drop=F] - thetas[,"B.C2C",, drop=F]) -
+                                          (thetas[,"B.D3C",, drop=F] - thetas[,"B.D2C",, drop=F]))
+
+ProactiveTP.ABN <- function (thetas) ((thetas[,"B.A3N",, drop=F] - thetas[,"B.A2N",, drop=F]) -
+                                          (thetas[,"B.B3N",, drop=F] - thetas[,"B.B2N",, drop=F]))
+ProactiveTP.BCN <- function (thetas) ((thetas[,"B.B3N",, drop=F] - thetas[,"B.B2N",, drop=F]) -
+                                          (thetas[,"B.C3N",, drop=F] - thetas[,"B.C2N",, drop=F]))
+ProactiveTP.CDN <- function (thetas) ((thetas[,"B.C3N",, drop=F] - thetas[,"B.C2N",, drop=F]) -
+                                          (thetas[,"B.D3N",, drop=F] - thetas[,"B.D2N",, drop=F]))
 
 Proactive.TP.Table <- data.frame(rbind(
     PM.Cost.A.minus.B=c(zandp(samples.E1, ProactiveTP.ABC),zandp(samples.E1, ProactiveTP.ABN)
@@ -207,8 +282,119 @@ Proactive.TP.Table <- data.frame(rbind(
     )
 ))
 colnames(Proactive.TP.Table) <- c("Conflict","Nonconflict")
-ProactiveTP.Table
+Proactive.TP.Table
 
+
+# # # DIFFERENCE in Proactive Control (PM Cost) by Time Pressure (Averaged over Stimulus Type) # # #
+#
+ProactiveTP.AB <- function (thetas) (((thetas[,"B.A3C",, drop=F] + thetas[,"B.A3N",, drop=F]) -
+                                          (thetas[,"B.A2C",, drop=F] + thetas[,"B.A2N",, drop=F])) -
+                                         ((thetas[,"B.B3C",, drop=F] + thetas[,"B.B3N",, drop=F]) -
+                                              (thetas[,"B.B2C",, drop=F] + thetas[,"B.B2N",, drop=F])))
+
+ProactiveTP.BC <- function (thetas) (((thetas[,"B.B3C",, drop=F] + thetas[,"B.B3N",, drop=F]) -
+                                          (thetas[,"B.B2C",, drop=F] + thetas[,"B.B2N",, drop=F])) -
+                                         ((thetas[,"B.C3C",, drop=F] + thetas[,"B.C3N",, drop=F]) -
+                                              (thetas[,"B.C2C",, drop=F] + thetas[,"B.C2N",, drop=F])))
+
+ProactiveTP.CD <- function (thetas) (((thetas[,"B.C3C",, drop=F] + thetas[,"B.C3N",, drop=F]) -
+                                          (thetas[,"B.C2C",, drop=F] + thetas[,"B.C2N",, drop=F])) -
+                                         ((thetas[,"B.D3C",, drop=F] + thetas[,"B.D3N",, drop=F]) -
+                                              (thetas[,"B.D2C",, drop=F] + thetas[,"B.D2N",, drop=F])))
+
+Proactive.TP.Table.Collapsed <- data.frame(rbind(
+    PM.Cost.A.minus.B=zandp(samples.E1, ProactiveTP.AB),
+
+    PM.Cost.B.minus.C=zandp(samples.E1, ProactiveTP.BC),
+
+    PM.Cost.C.minus.D=zandp(samples.E1, ProactiveTP.CD)
+))
+colnames(Proactive.TP.Table.Collapsed) <- c("Z")
+Proactive.TP.Table.Collapsed
+
+
+# # # Thresholds by Time Pressure # # #
+#
+ThresholdsTP.ABC.PM <- function (thetas) (thetas[,"B.A3C",, drop=F] - thetas[,"B.B3C",, drop=F])
+ThresholdsTP.BCC.PM <- function (thetas) (thetas[,"B.B3C",, drop=F] - thetas[,"B.C3C",, drop=F])
+ThresholdsTP.CDC.PM <- function (thetas) (thetas[,"B.C3C",, drop=F] - thetas[,"B.D3C",, drop=F])
+
+ThresholdsTP.ABC.Control <- function (thetas) (thetas[,"B.A2C",, drop=F] - thetas[,"B.B2C",, drop=F])
+ThresholdsTP.BCC.Control <- function (thetas) (thetas[,"B.B2C",, drop=F] - thetas[,"B.C2C",, drop=F])
+ThresholdsTP.CDC.Control <- function (thetas) (thetas[,"B.C2C",, drop=F] - thetas[,"B.D2C",, drop=F])
+
+ThresholdsTP.ABN.PM <- function (thetas) (thetas[,"B.A3N",, drop=F] - thetas[,"B.B3N",, drop=F])
+ThresholdsTP.BCN.PM <- function (thetas) (thetas[,"B.B3N",, drop=F] - thetas[,"B.C3N",, drop=F])
+ThresholdsTP.CDN.PM <- function (thetas) (thetas[,"B.C3N",, drop=F] - thetas[,"B.D3N",, drop=F])
+
+ThresholdsTP.ABN.Control <- function (thetas) (thetas[,"B.A2N",, drop=F] - thetas[,"B.B2N",, drop=F])
+ThresholdsTP.BCN.Control <- function (thetas) (thetas[,"B.B2N",, drop=F] - thetas[,"B.C2N",, drop=F])
+ThresholdsTP.CDN.Control <- function (thetas) (thetas[,"B.C2N",, drop=F] - thetas[,"B.D2N",, drop=F])
+
+ThresholdsTP.ABP.PM <- function (thetas) (thetas[,"B.A3P",, drop=F] - thetas[,"B.B3P",, drop=F])
+ThresholdsTP.BCP.PM <- function (thetas) (thetas[,"B.B3P",, drop=F] - thetas[,"B.C3P",, drop=F])
+ThresholdsTP.CDP.PM <- function (thetas) (thetas[,"B.C3P",, drop=F] - thetas[,"B.D3P",, drop=F])
+
+Thresholds.TP.Table <- data.frame(rbind(
+    CR.Thresh.A.minus.B=c(zandp(samples.E1, ThresholdsTP.ABC.Control),zandp(samples.E1, ThresholdsTP.ABC.PM)
+    ),
+
+    CR.Thresh.B.minus.C=c(zandp(samples.E1, ThresholdsTP.BCC.Control),zandp(samples.E1, ThresholdsTP.BCC.PM)
+    ),
+
+    CR.Thresh.C.minus.D=c(zandp(samples.E1, ThresholdsTP.CDC.Control),zandp(samples.E1, ThresholdsTP.CDC.PM)
+    ),
+
+    NR.Thresh.A.minus.B=c(zandp(samples.E1, ThresholdsTP.ABN.Control),zandp(samples.E1, ThresholdsTP.ABN.PM)
+    ),
+
+    NR.Thresh.B.minus.C=c(zandp(samples.E1, ThresholdsTP.BCN.Control),zandp(samples.E1, ThresholdsTP.BCN.PM)
+    ),
+
+    NR.Thresh.C.minus.D=c(zandp(samples.E1, ThresholdsTP.CDN.Control),zandp(samples.E1, ThresholdsTP.CDN.PM)
+    ),
+
+    PR.Thresh.A.minus.B=c("-",zandp(samples.E1, ThresholdsTP.ABP.PM)
+    ),
+
+    PR.Thresh.B.minus.C=c("-",zandp(samples.E1, ThresholdsTP.BCP.PM)
+    ),
+
+    PR.Thresh.C.minus.D=c("-",zandp(samples.E1, ThresholdsTP.CDP.PM)
+    )
+))
+colnames(Thresholds.TP.Table) <- c("Control","PM")
+Thresholds.TP.Table
+
+
+# # # Thresholds by Time Pressure (Averaged over Stimulus Type) # # #
+#
+ThresholdsTP.AB.PM <- function (thetas) ((thetas[,"B.A3C",, drop=F] + thetas[,"B.A3N",, drop=F]) -
+                                            (thetas[,"B.B3C",, drop=F] + thetas[,"B.B3N",, drop=F]))
+ThresholdsTP.BC.PM <- function (thetas) ((thetas[,"B.B3C",, drop=F] + thetas[,"B.B3N",, drop=F]) -
+                                            (thetas[,"B.C3C",, drop=F] + thetas[,"B.C3N",, drop=F]))
+ThresholdsTP.CD.PM <- function (thetas) ((thetas[,"B.C3C",, drop=F] + thetas[,"B.C3N",, drop=F]) -
+                                            (thetas[,"B.D3C",, drop=F] + thetas[,"B.D3N",, drop=F]))
+
+ThresholdsTP.AB.Control <- function (thetas) ((thetas[,"B.A2C",, drop=F] + thetas[,"B.A2N",, drop=F]) -
+                                            (thetas[,"B.B2C",, drop=F] + thetas[,"B.B2N",, drop=F]))
+ThresholdsTP.BC.Control <- function (thetas) ((thetas[,"B.B2C",, drop=F] + thetas[,"B.B2N",, drop=F]) -
+                                            (thetas[,"B.C2C",, drop=F] + thetas[,"B.C2N",, drop=F]))
+ThresholdsTP.CD.Control <- function (thetas) ((thetas[,"B.C2C",, drop=F] + thetas[,"B.C2N",, drop=F]) -
+                                            (thetas[,"B.D2C",, drop=F] + thetas[,"B.D2N",, drop=F]))
+
+Thresholds.TP.Table.Collapsed <- data.frame(rbind(
+    Thresh.A.minus.B=c(zandp(samples.E1, ThresholdsTP.AB.Control),zandp(samples.E1, ThresholdsTP.AB.PM)
+    ),
+
+    Thresh.B.minus.C=c(zandp(samples.E1, ThresholdsTP.BC.Control),zandp(samples.E1, ThresholdsTP.BC.PM)
+    ),
+
+    Thresh.C.minus.D=c(zandp(samples.E1, ThresholdsTP.CD.Control),zandp(samples.E1, ThresholdsTP.CD.PM)
+    )
+))
+colnames(Thresholds.TP.Table.Collapsed) <- c("Control","PM")
+Thresholds.TP.Table.Collapsed
 
 # # # Capacity (Difference in Drift between Control and PM blocks) # # #
 #
@@ -259,6 +445,37 @@ Capacity.Table <- data.frame(rbind(
 ))
 colnames(Capacity.Table) <- c("Conflict","Nonconflict","Conflict (Error)","Nonconflict (Error)")
 Capacity.Table
+
+
+# # # Capacity (Averaged over Time Pressure) # # #
+#
+Capacity.ccC <- function (thetas) ((thetas[,"mean_v.ccA3C",, drop=F] + thetas[,"mean_v.ccB3C",, drop=F] +
+                                        thetas[,"mean_v.ccC3C",, drop=F] + thetas[,"mean_v.ccD3C",, drop=F]) -
+                                       (thetas[,"mean_v.ccA2C",, drop=F] + thetas[,"mean_v.ccB2C",, drop=F] +
+                                            thetas[,"mean_v.ccC2C",, drop=F] + thetas[,"mean_v.ccD2C",, drop=F]))
+
+Capacity.nnN <- function (thetas) ((thetas[,"mean_v.nnA3N",, drop=F] + thetas[,"mean_v.nnB3N",, drop=F] +
+                                        thetas[,"mean_v.nnC3N",, drop=F] + thetas[,"mean_v.nnD3N",, drop=F]) -
+                                       (thetas[,"mean_v.nnA2N",, drop=F] + thetas[,"mean_v.nnB2N",, drop=F] +
+                                            thetas[,"mean_v.nnC2N",, drop=F] + thetas[,"mean_v.nnD2N",, drop=F]))
+
+Capacity.ccN <- function (thetas) ((thetas[,"mean_v.ccA3N",, drop=F] + thetas[,"mean_v.ccB3N",, drop=F] +
+                                        thetas[,"mean_v.ccC3N",, drop=F] + thetas[,"mean_v.ccD3N",, drop=F]) -
+                                       (thetas[,"mean_v.ccA2N",, drop=F] + thetas[,"mean_v.ccB2N",, drop=F] +
+                                            thetas[,"mean_v.ccC2N",, drop=F] + thetas[,"mean_v.ccD2N",, drop=F]))
+
+Capacity.nnC <- function (thetas) ((thetas[,"mean_v.nnA3C",, drop=F] + thetas[,"mean_v.nnB3C",, drop=F] +
+                                        thetas[,"mean_v.nnC3C",, drop=F] + thetas[,"mean_v.nnD3C",, drop=F]) -
+                                       (thetas[,"mean_v.nnA2C",, drop=F] + thetas[,"mean_v.nnB2C",, drop=F] +
+                                            thetas[,"mean_v.nnC2C",, drop=F] + thetas[,"mean_v.nnD2C",, drop=F]))
+
+Capacity.Table.Collapsed <- data.frame(rbind(
+    PM.minus.Control=c(zandp(samples.E1, Capacity.ccC),
+                       zandp(samples.E1, Capacity.nnN),
+                       zandp(samples.E1, Capacity.ccN),
+                       zandp(samples.E1, Capacity.nnC))))
+colnames(Capacity.Table.Collapsed) <- c("Conflict","Nonconflict","Conflict (Error)","Nonconflict (Error)")
+Capacity.Table.Collapsed
 
 
 # # # Effort/Arousal by Time Pressure # # #
@@ -386,6 +603,119 @@ Effort.TP.Table.Wide <- data.frame(rbind(
 colnames(Effort.TP.Table.Wide) <- c("A-B (Control)","B-C (Control)","C-D (Control)","A-B (PM)","B-C (PM)","C-D (PM)")
 Effort.TP.Table.Wide
 
+
+# # # Effort/Arousal by Time Pressure (Averaged over Stimulus Type) # # #
+#
+Effort.TPcor2AB <- function (thetas) ((thetas[,"mean_v.ccA2C",, drop=F] + thetas[,"mean_v.nnA2N",, drop=F]) -
+                                          (thetas[,"mean_v.ccB2C",, drop=F] + thetas[,"mean_v.nnB2N",, drop=F]))
+Effort.TPcor2BC <- function (thetas) ((thetas[,"mean_v.ccB2C",, drop=F] + thetas[,"mean_v.nnB2N",, drop=F]) -
+                                          (thetas[,"mean_v.ccC2C",, drop=F] + thetas[,"mean_v.nnC2N",, drop=F]))
+Effort.TPcor2CD <- function (thetas) ((thetas[,"mean_v.ccC2C",, drop=F] + thetas[,"mean_v.nnC2N",, drop=F]) -
+                                          (thetas[,"mean_v.ccD2C",, drop=F] + thetas[,"mean_v.nnD2N",, drop=F]))
+
+Effort.TPcor3AB <- function (thetas) ((thetas[,"mean_v.ccA3C",, drop=F] + thetas[,"mean_v.nnA3N",, drop=F]) -
+                                          (thetas[,"mean_v.ccB3C",, drop=F] + thetas[,"mean_v.nnB3N",, drop=F]))
+Effort.TPcor3BC <- function (thetas) ((thetas[,"mean_v.ccB3C",, drop=F] + thetas[,"mean_v.nnB3N",, drop=F]) -
+                                          (thetas[,"mean_v.ccC3C",, drop=F] + thetas[,"mean_v.nnC3N",, drop=F]))
+Effort.TPcor3CD <- function (thetas) ((thetas[,"mean_v.ccC3C",, drop=F] + thetas[,"mean_v.nnC3N",, drop=F]) -
+                                          (thetas[,"mean_v.ccD3C",, drop=F] + thetas[,"mean_v.nnD3N",, drop=F]))
+
+Effort.TPcor3ABP <- function (thetas) thetas[,"mean_v.ppA3P",, drop=F] - thetas[,"mean_v.ppB3P",, drop=F]
+Effort.TPcor3BCP <- function (thetas) thetas[,"mean_v.ppB3P",, drop=F] - thetas[,"mean_v.ppC3P",, drop=F]
+Effort.TPcor3CDP <- function (thetas) thetas[,"mean_v.ppC3P",, drop=F] - thetas[,"mean_v.ppD3P",, drop=F]
+
+
+Effort.TPerr2AB <- function (thetas) ((thetas[,"mean_v.ccA2N",, drop=F] + thetas[,"mean_v.nnA2C",, drop=F]) -
+                                          (thetas[,"mean_v.ccB2N",, drop=F] + thetas[,"mean_v.nnB2C",, drop=F]))
+Effort.TPerr2BC <- function (thetas) ((thetas[,"mean_v.ccB2N",, drop=F] + thetas[,"mean_v.nnB2C",, drop=F]) -
+                                          (thetas[,"mean_v.ccC2N",, drop=F] + thetas[,"mean_v.nnC2C",, drop=F]))
+Effort.TPerr2CD <- function (thetas) ((thetas[,"mean_v.ccC2N",, drop=F] + thetas[,"mean_v.nnC2C",, drop=F]) -
+                                          (thetas[,"mean_v.ccD2N",, drop=F] + thetas[,"mean_v.nnD2C",, drop=F]))
+
+Effort.TPerr3AB <- function (thetas) ((thetas[,"mean_v.ccA3N",, drop=F] + thetas[,"mean_v.nnA3C",, drop=F]) -
+                                           (thetas[,"mean_v.ccB3N",, drop=F] + thetas[,"mean_v.nnB3C",, drop=F]))
+Effort.TPerr3BC <- function (thetas) ((thetas[,"mean_v.ccB3N",, drop=F] + thetas[,"mean_v.nnB3C",, drop=F]) -
+                                           (thetas[,"mean_v.ccC3N",, drop=F] + thetas[,"mean_v.nnC3C",, drop=F]))
+Effort.TPerr3CD <- function (thetas) ((thetas[,"mean_v.ccC3N",, drop=F] + thetas[,"mean_v.nnC3C",, drop=F]) -
+                                           (thetas[,"mean_v.ccD3N",, drop=F] + thetas[,"mean_v.nnD3C",, drop=F]))
+
+Effort.TPerr3ABP <- function (thetas) ((thetas[,"mean_v.pcA3C",, drop=F] + thetas[,"mean_v.pnA3C",, drop=F] +
+                                            thetas[,"mean_v.pcA3N",, drop=F] + thetas[,"mean_v.pnA3N",, drop=F]) -
+                                           (thetas[,"mean_v.pcB3C",, drop=F] + thetas[,"mean_v.pnB3C",, drop=F] +
+                                                thetas[,"mean_v.pcB3N",, drop=F] + thetas[,"mean_v.pnB3N",, drop=F]))
+
+Effort.TPerr3BCP <- function (thetas) ((thetas[,"mean_v.pcB3C",, drop=F] + thetas[,"mean_v.pnB3C",, drop=F] +
+                                            thetas[,"mean_v.pcB3N",, drop=F] + thetas[,"mean_v.pnB3N",, drop=F]) -
+                                           (thetas[,"mean_v.pcC3C",, drop=F] + thetas[,"mean_v.pnC3C",, drop=F] +
+                                                thetas[,"mean_v.pcC3N",, drop=F] + thetas[,"mean_v.pnC3N",, drop=F]))
+
+Effort.TPerr3CDP <- function (thetas) ((thetas[,"mean_v.pcC3C",, drop=F] + thetas[,"mean_v.pnC3C",, drop=F] +
+                                            thetas[,"mean_v.pcC3N",, drop=F] + thetas[,"mean_v.pnC3N",, drop=F]) -
+                                           (thetas[,"mean_v.pcD3C",, drop=F] + thetas[,"mean_v.pnD3C",, drop=F] +
+                                                thetas[,"mean_v.pcD3N",, drop=F] + thetas[,"mean_v.pnD3N",, drop=F]))
+
+Effort.TP.Table <- data.frame(rbind(
+    Correct.2=c(zandp(samples.E1, Effort.TPcor2AB),
+                zandp(samples.E1, Effort.TPcor2BC),
+                zandp(samples.E1, Effort.TPcor2CD)
+    ),
+
+    Error.2=c(zandp(samples.E1, Effort.TPerr2AB),
+              zandp(samples.E1, Effort.TPerr2BC),
+              zandp(samples.E1, Effort.TPerr2CD)
+    ),
+
+    Correct.3=c(zandp(samples.E1, Effort.TPcor3AB),
+                zandp(samples.E1, Effort.TPcor3BC),
+                zandp(samples.E1, Effort.TPcor3CD)
+    ),
+
+    Error.3=c(zandp(samples.E1, Effort.TPerr3AB),
+              zandp(samples.E1, Effort.TPerr3BC),
+              zandp(samples.E1, Effort.TPerr3CD)
+    )
+))
+colnames(Effort.TP.Table) <- c("A-B","B-C","C-D")
+Effort.TP.Table
+
+# # # Effort/Arousal by Time Pressure (Averaged over PM Block and Stimulus Type) # # #
+#
+Effort.TPcorAB <- function (thetas) ((thetas[,"mean_v.ccA2C",, drop=F] + thetas[,"mean_v.nnA2N",, drop=F] +
+                                          thetas[,"mean_v.ccA3C",, drop=F] + thetas[,"mean_v.nnA3N",, drop=F]) -
+                                          (thetas[,"mean_v.ccB2C",, drop=F] + thetas[,"mean_v.nnB2N",, drop=F] +
+                                               thetas[,"mean_v.ccB3C",, drop=F] + thetas[,"mean_v.nnB3N",, drop=F]))
+
+Effort.TPcorBC <- function (thetas) ((thetas[,"mean_v.ccB2C",, drop=F] + thetas[,"mean_v.nnB2N",, drop=F] +
+                                          thetas[,"mean_v.ccB3C",, drop=F] + thetas[,"mean_v.nnB3N",, drop=F]) -
+                                          (thetas[,"mean_v.ccC2C",, drop=F] + thetas[,"mean_v.nnC2N",, drop=F] +
+                                               thetas[,"mean_v.ccC3C",, drop=F] + thetas[,"mean_v.nnC3N",, drop=F]))
+
+Effort.TPcorCD <- function (thetas) ((thetas[,"mean_v.ccC2C",, drop=F] + thetas[,"mean_v.nnC2N",, drop=F] +
+                                          thetas[,"mean_v.ccC3C",, drop=F] + thetas[,"mean_v.nnC3N",, drop=F]) -
+                                          (thetas[,"mean_v.ccD2C",, drop=F] + thetas[,"mean_v.nnD2N",, drop=F] +
+                                               thetas[,"mean_v.ccD3C",, drop=F] + thetas[,"mean_v.nnD3N",, drop=F]))
+
+Effort.TPerrAB <- function (thetas) ((thetas[,"mean_v.ccA2N",, drop=F] + thetas[,"mean_v.nnA2C",, drop=F] +
+                                           thetas[,"mean_v.ccA3N",, drop=F] + thetas[,"mean_v.nnA3C",, drop=F]) -
+                                          (thetas[,"mean_v.ccB2N",, drop=F] + thetas[,"mean_v.nnB2C",, drop=F] +
+                                               thetas[,"mean_v.ccB3N",, drop=F] + thetas[,"mean_v.nnB3C",, drop=F]))
+
+Effort.TPerrBC <- function (thetas) ((thetas[,"mean_v.ccB2N",, drop=F] + thetas[,"mean_v.nnB2C",, drop=F] +
+                                          thetas[,"mean_v.ccB3N",, drop=F] + thetas[,"mean_v.nnB3C",, drop=F]) -
+                                          (thetas[,"mean_v.ccC2N",, drop=F] + thetas[,"mean_v.nnC2C",, drop=F] +
+                                               thetas[,"mean_v.ccC3N",, drop=F] + thetas[,"mean_v.nnC3C",, drop=F]))
+
+Effort.TPerrCD <- function (thetas) ((thetas[,"mean_v.ccC2N",, drop=F] + thetas[,"mean_v.nnC2C",, drop=F] +
+                                          thetas[,"mean_v.ccC3N",, drop=F] + thetas[,"mean_v.nnC3C",, drop=F]) -
+                                          (thetas[,"mean_v.ccD2N",, drop=F] + thetas[,"mean_v.nnD2C",, drop=F] +
+                                               thetas[,"mean_v.ccD3N",, drop=F] + thetas[,"mean_v.nnD3C",, drop=F]))
+
+Effort.TP.Table.Collapsed <- data.frame(rbind(
+    A.minus.B=c(zandp(samples.E1, Effort.TPcorAB),zandp(samples.E1, Effort.TPerrAB)),
+    B.minus.C=c(zandp(samples.E1, Effort.TPcorBC),zandp(samples.E1, Effort.TPerrBC)),
+    C.minus.D=c(zandp(samples.E1, Effort.TPcorCD),zandp(samples.E1, Effort.TPerrCD))))
+colnames(Effort.TP.Table.Collapsed) <- c("Correct","Error")
+Effort.TP.Table.Collapsed
 
 # # # t0 # # #
 
@@ -912,6 +1242,10 @@ table <- Capacity.Table
 pander(table)
 write.csv(table, file = "analysis/Z.Capacity.E1.csv")
 
+table <- Capacity.Table.Collapsed
+pander(table)
+write.csv(table, file = "analysis/Z.Capacity.Collapsed.E1.csv")
+
 
 ### Parameter Table: Drift Rates by PM Block
 table <- av.Vs.PM.Table
@@ -921,22 +1255,26 @@ write.csv(table, file = "analysis/mean_vs.PM.E1.csv")
 
 ## Proactive Control
 plot <- Proactive.Plots
-ggsave("figures/E1/E1.Proactive.Control.png", plot = plot, height = 10.5, width = 7)
-plot(plot)
+ggsave("figures/E1/E1.Proactive.Control.png", plot = plot, height = 13, width = 9)
+# plot(plot)
 
 plot <- Proactive.PM.Plot
-ggsave("figures/E1/E1.Proactive.Control.PM.png", plot = plot, height = 5, width = 7)
-plot(plot)
+ggsave("figures/E1/E1.Proactive.Control.PM.png", plot = plot, height = 4, width = 9)
+# plot(plot)
 
 plot <- Proactive.TP.Plot
-ggsave("figures/E1/E1.Proactive.Control.TP.png", plot = plot, height = 5, width = 7)
-plot(plot)
+ggsave("figures/E1/E1.Proactive.Control.TP.png", plot = plot, height = 6.5, width = 9)
+# plot(plot)
 
 
 ### Posterior Inference Z Table: Proactive Control
 table <- Proactive.PM.Table
 pander(table)
 write.csv(table, file = "analysis/Z.Proactive.PM.E1.csv")
+
+table <- Proactive.PM.Table.Collapsed
+pander(table)
+write.csv(table, file = "analysis/Z.Proactive.PM.Collapsed.E1.csv")
 
 
 
@@ -948,8 +1286,8 @@ write.csv(table, file = "analysis/mean_Bs.PM.E1.csv")
 
 ## Reactive Control
 plot <- Reactive.Plot
-ggsave("figures/E1/E1.Reactive.Inhibition.png", plot = plot, height = 5, width = 7)
-plot(plot)
+ggsave("figures/E1/E1.Reactive.Inhibition.png", plot = plot, height = 4, width = 9)
+# plot(plot)
 
 
 ### Posterior Inference Z Table: Reactive Inhibition
@@ -957,11 +1295,31 @@ table <- Reactive.Table
 pander(table)
 write.csv(table, file = "analysis/Z.Reactive.E1.csv")
 
+table <- Reactive.Table.Collapsed
+pander(table)
+write.csv(table, file = "analysis/Z.Reactive.Collapsed.E1.csv")
+
+table <- Reactive.Table.Cor.Err
+pander(table)
+write.csv(table, file = "analysis/Z.Reactive.Cor.Err.E1.csv")
+
 
 ### Posterior Inference Z Table: Proactive Control by Time Pressure
 table <- Proactive.TP.Table
 pander(table)
 write.csv(table, file = "analysis/Z.Proactive.TP.E1.csv")
+
+table <- Proactive.TP.Table.Collapsed
+pander(table)
+write.csv(table, file = "analysis/Z.Proactive.TP.Collapsed.E1.csv")
+
+table <- Thresholds.TP.Table
+pander(table)
+write.csv(table, file = "analysis/Z.Thresholds.TP.E1.csv")
+
+table <- Thresholds.TP.Table.Collapsed
+pander(table)
+write.csv(table, file = "analysis/Z.Thresholds.TP.Collapsed.E1.csv")
 
 
 ### Parameter Table: Thresholds by Time Pressure
@@ -972,22 +1330,30 @@ write.csv(table, file = "analysis/mean_Bs.TP.E1.csv")
 
 ## Effort/Arousal by Time Pressure
 plot <- Effort.Plots
-ggsave("figures/E1/E1.Effort.Arousal.png", plot = plot, height = 6, width = 7)
-plot(plot)
+ggsave("figures/E1/E1.Effort.Arousal.png", plot = plot, height = 9, width = 9)
+# plot(plot)
 
 plot <- Effort.PM.Plot
-ggsave("figures/E1/E1.Effort.Arousal.PM.png", plot = plot, height = 5, width = 7)
-plot(plot)
+ggsave("figures/E1/E1.Effort.Arousal.PM.png", plot = plot, height = 4, width = 9)
+# plot(plot)
 
 plot <- Effort.TP.Plot
-ggsave("figures/E1/E1.Effort.Arousal.TP.png", plot = plot, height = 5, width = 7)
-plot(plot)
+ggsave("figures/E1/E1.Effort.Arousal.TP.png", plot = plot, height = 4, width = 9)
+# plot(plot)
 
 
 ### Posterior Inference Z Table: Effort/Arousal by Time Pressure
 table <- Effort.TP.Table.Wide
 pander(table)
+write.csv(table, file = "analysis/Z.Effort.TP.Wide.E1.csv")
+
+table <- Effort.TP.Table
+pander(table)
 write.csv(table, file = "analysis/Z.Effort.TP.E1.csv")
+
+table <- Effort.TP.Table.Collapsed
+pander(table)
+write.csv(table, file = "analysis/Z.Effort.TP.Collapsed.E1.csv")
 
 
 ### Parameter Table: Drift Rates by Time Pressure

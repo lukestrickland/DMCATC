@@ -24,46 +24,55 @@ E1.PMV <- h.IC.dmc(E1.block.B.V_cond.B.V.PMV.samples,DIC=TRUE)
 E1.PMV.npars <- E1.block.B.V_cond.B.V.PMV.samples$p1$n.pars
 rm(E1.block.B.V_cond.B.V.PMV.samples)
 
-load("data/samples/E1.blockBonly.samples.RData")
-E1.blockBonly <- h.IC.dmc(E1.blockBonly.samples,DIC=TRUE)
-E1.blockBonly.npars <- E1.blockBonly.samples$p1$n.pars
-rm(E1.blockBonly.samples)
-
 load("data/samples/E1.blockVonly.samples.RData")
 E1.blockVonly <- h.IC.dmc(E1.blockVonly.samples,DIC=TRUE)
 E1.blockVonly.npars <- E1.blockVonly.samples$p1$n.pars
 rm(E1.blockVonly.samples)
 
-load("data/samples/E1.condBonly.samples.RData")
-E1.condBonly <- h.IC.dmc(E1.condBonly.samples,DIC=TRUE)
-E1.condBonly.npars <- E1.condBonly.samples$p1$n.pars
-rm(E1.condBonly.samples)
+load("data/samples/E1.blockBonly.samples.RData")
+E1.blockBonly <- h.IC.dmc(E1.blockBonly.samples,DIC=TRUE)
+E1.blockBonly.npars <- E1.blockBonly.samples$p1$n.pars
+rm(E1.blockBonly.samples)
 
 load("data/samples/E1.condVonly.samples.RData")
 E1.condVonly <- h.IC.dmc(E1.condVonly.samples,DIC=TRUE)
 E1.condVonly.npars <- E1.condVonly.samples$p1$n.pars
 rm(E1.condVonly.samples)
 
-sum(E1.blockBonly)
-sum(E1.blockVonly)
-sum(E1.condBonly)
-sum(E1.condVonly)
-sum(E1.PMV)
-sum(E1.PMFA)
+load("data/samples/E1.condBonly.samples.RData")
+E1.condBonly <- h.IC.dmc(E1.condBonly.samples,DIC=TRUE)
+E1.condBonly.npars <- E1.condBonly.samples$p1$n.pars
+rm(E1.condBonly.samples)
 
-DIC.TABLE.E1 <- data.frame(cbind(Model=c("Top Model","Selected Model","Selected Model with B fixed over Time Pressure","Selected Model with V fixed over Time Pressure","Selected Model with B fixed over PM Block","Selected Model with V fixed over PM Block"),
+
+
+sum(E1.PMFA)
+sum(E1.PMV)
+sum(E1.blockVonly)
+sum(E1.blockBonly)
+sum(E1.condVonly)
+sum(E1.condBonly)
+
+DIC.TABLE.E1 <- data.frame(cbind(Model=c("Top Model","Selected Model",
+                                         "Selected Model with B fixed over PM Block",
+                                         "Selected Model with V fixed over PM Block",
+                                         "Selected Model with B fixed over Time Pressure",
+                                         "Selected Model with V fixed over Time Pressure"
+                                         ),
                                  n.pars=c(E1.PMFA.npars,
                                           E1.PMV.npars,
-                                          E1.blockBonly.npars,
                                           E1.blockVonly.npars,
-                                          E1.condBonly.npars,
-                                          E1.condVonly.npars),
+                                          E1.blockBonly.npars,
+                                          E1.condVonly.npars,
+                                          E1.condBonly.npars
+                                          ),
                                  DIC=round(c(sum(E1.PMFA),
                                              sum(E1.PMV),
-                                             sum(E1.blockBonly),
                                              sum(E1.blockVonly),
-                                             sum(E1.condBonly),
-                                             sum(E1.condVonly)),digits = 3)))
+                                             sum(E1.blockBonly),
+                                             sum(E1.condVonly),
+                                             sum(E1.condBonly)
+                                             ),digits = 3)))
 colnames(DIC.TABLE.E1) <- c("Model","Number of Parameters","DIC")
 DIC.TABLE.E1
 write.csv(DIC.TABLE.E1, file="analysis/DIC.TABLE.E1.csv")

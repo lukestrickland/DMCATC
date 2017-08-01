@@ -1,11 +1,13 @@
 ---
 title: "Results and Modelling for ATC Experiment E1"
 author: "R. Boag"
-date: ""
-output: pdf_document
-fig_caption: yes
-fontsize: 11pt
+date: ''
+output:
+  pdf_document: default
+  html_document: default
 geometry: margin=1in
+fontsize: 11pt
+fig_caption: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -13,7 +15,10 @@ geometry: margin=1in
 knitr::opts_chunk$set(echo = FALSE)
 setwd("C:/Users/Russell Boag/Documents/GitHub/DMCATC")
 # setwd("~/Software/DMCATC")
-pkgs <- c("plyr", "dplyr", "tidyr", "broom", "pander", "xtable", "citr")
+source("dmc/dmc.R")
+source("dmc/dmc_ATC.R")
+source("LSAnova.R")
+pkgs <- c("plyr", "dplyr", "tidyr", "broom", "pander", "xtable", "citr", "bookdown")
 # install.packages(pkgs) #install
 sapply(pkgs, require, character.only = T) #load
 
@@ -173,12 +178,14 @@ CDT.RT.Block <- read.csv("analysis/CDT.RT.Block.E1.csv")
 CDT.RT.Cond <- read.csv("analysis/CDT.RT.Cond.E1.csv")
 T.Contrasts.CDT.RT <- read.csv("analysis/T.Contrasts.CDT.RT.E1.csv")
 
+# pander(T.Contrasts.CDT.Acc)
+# pander(T.Contrasts.CDT.RT)
+
 ```
 
-Accuracy was lower for conflicts (`r options(digits = 2); CDT.Acc.S$Conflict[1]*100`%) compared to nonconflicts (`r options(digits = 2); CDT.Acc.S$Nonconflict[1]*100`%) and slightly lower under PM load compared to control (Control: _M_ = `r options(digits = 2); CDT.Acc.Block$Control[1]*100`%, _SE_ = `r options(digits = 2); CDT.Acc.Block$Control[2]*100`%; PM: _M_ = `r options(digits = 2); CDT.Acc.Block$PM[1]*100`%, _SE_ = `r options(digits = 2); CDT.Acc.Block$PM[2]*100`%). Planned comparisons revealed that accuracy decreased with higher levels of time pressure during both low trial load (Low TP: _M_ = `r options(digits = 2); CDT.Acc.Cond$A[1]*100`%, _SE_ = `r options(digits = 2); CDT.Acc.Cond$A[2]*100`%; High TP: _M_ = `r options(digits = 2); CDT.Acc.Cond$B[1]*100`%, _SE_ = `r options(digits = 2); CDT.Acc.Cond$B[2]*100`%) _t_ = `r options(digits = 2); T.Contrasts.CDT.Acc$t[1]`, _df_ = `r options(digits = 2); T.Contrasts.CDT.Acc$df[1]`, _p_ = `r options(digits = 2); T.Contrasts.CDT.Acc$p[1]`, _Cohen's d_ = `r options(digits = 2); T.Contrasts.CDT.Acc$d[1]`, and high trial load conditions (Low TP: _M_ = `r options(digits = 2); CDT.Acc.Cond$C[1]*100`%, _SE_ = `r options(digits = 2); CDT.Acc.Cond$C[2]*100`%; High TP: _M_ = `r options(digits = 2); CDT.Acc.Cond$D[1]*100`%, _SE_ = `r options(digits = 2); CDT.Acc.Cond$D[2]*100`%) _t_ = `r options(digits = 2); T.Contrasts.CDT.Acc$t[3]`, _df_ = `r options(digits = 2); T.Contrasts.CDT.Acc$df[3]`, _p_ = `r options(digits = 2); T.Contrasts.CDT.Acc$p[3]`, _Cohen's d_ = `r options(digits = 2); T.Contrasts.CDT.Acc$d[3]`. 
+Accuracy was lower for conflicts (`r options(digits = 2); CDT.Acc.S$Conflict[1]*100`%) compared to nonconflicts (`r options(digits = 2); CDT.Acc.S$Nonconflict[1]*100`%) and slightly lower under PM load compared to control (Control: _M_ = `r options(digits = 2); CDT.Acc.Block$Control[1]*100`%, _SE_ = `r options(digits = 2); CDT.Acc.Block$Control[2]*100`%; PM: _M_ = `r options(digits = 2); CDT.Acc.Block$PM[1]*100`%, _SE_ = `r options(digits = 2); CDT.Acc.Block$PM[2]*100`%). Planned comparisons revealed that accuracy decreased with higher levels of time pressure during both low trial load (Low TP: _M_ = `r options(digits = 2); CDT.Acc.Cond$A[1]*100`%, _SE_ = `r options(digits = 2); CDT.Acc.Cond$A[2]*100`%; High TP: _M_ = `r options(digits = 2); CDT.Acc.Cond$B[1]*100`%, _SE_ = `r options(digits = 2); CDT.Acc.Cond$B[2]*100`%) _t_ = `r options(digits = 2); T.Contrasts.CDT.Acc$t[1]`, _df_ = `r options(digits = 2); T.Contrasts.CDT.Acc$df[1]`, _p_ = `r options(digits = 2); T.Contrasts.CDT.Acc$p[1]`, _Cohen's d_ = `r options(digits = 2); T.Contrasts.CDT.Acc$d[1]`, and high trial load conditions (Low TP: _M_ = `r options(digits = 2); CDT.Acc.Cond$C[1]*100`%, _SE_ = `r options(digits = 2); CDT.Acc.Cond$C[2]*100`%; High TP: _M_ = `r options(digits = 2); CDT.Acc.Cond$D[1]*100`%, _SE_ = `r options(digits = 2); CDT.Acc.Cond$D[2]*100`%) _t_ = `r options(digits = 2); T.Contrasts.CDT.Acc$t[3]`, _df_ = `r options(digits = 2); T.Contrasts.CDT.Acc$df[3]`, _p_ = `r options(digits = 2); T.Contrasts.CDT.Acc$p[3]`, _Cohen's d_ = `r options(digits = 2); T.Contrasts.CDT.Acc$d[3]`. Accuracy did not differ by trial load. 
 
-Mean RT was slower for conflicts (`r options(digits = 2); CDT.RT.S$Conflict[1]`s) compared to nonconflicts (`r options(digits = 2); CDT.RT.S$Nonconflict[1]`s), and slower during PM blocks than control blocks (Control: _M_ = `r options(digits = 2); CDT.RT.Block$Control[1]`s, _SE_ = `r options(digits = 2); CDT.RT.Block$Control[2]`s; PM: _M_ = `r options(digits = 2); CDT.RT.Block$PM[1]`s, _SE_ = `r options(digits = 2); CDT.RT.Block$PM[2]`s). Planned comparisons indicated RT was significantly faster under high time pressure for both low trial load (Low TP: _M_ = `r options(digits = 2); CDT.RT.Cond$A[1]`s, _SE_ = `r options(digits = 2); CDT.RT.Cond$A[2]`s; High TP: _M_ = `r options(digits = 2); CDT.RT.Cond$B[1]`s, _SE_ = `r options(digits = 2); CDT.RT.Cond$B[2]`s) _t_ = `r options(digits = 2); T.Contrasts.CDT.RT$t[1]`, _df_ = `r options(digits = 2); T.Contrasts.CDT.RT$df[1]`, _p_ = `r options(digits = 2); T.Contrasts.CDT.RT$p[1]`, _Cohen's d_ = `r options(digits = 2); T.Contrasts.CDT.RT$d[1]`, and high trial load conditions (Low TP: _M_ = `r options(digits = 2); CDT.RT.Cond$C[1]`s, _SE_ = `r options(digits = 2); CDT.RT.Cond$C[2]`s; High TP: _M_ = `r options(digits = 2); CDT.RT.Cond$D[1]`s, _SE_ = `r options(digits = 2); CDT.RT.Cond$D[2]`s) _t_ = `r options(digits = 2); T.Contrasts.CDT.RT$t[3]`, _df_ = `r options(digits = 2); T.Contrasts.CDT.RT$df[3]`, _p_ = `r options(digits = 2); T.Contrasts.CDT.RT$p[3]`, _Cohen's d_ = `r options(digits = 2); T.Contrasts.CDT.RT$d[3]`. To summarise, the addition of PM load resulted in slower (_Mean Difference_ = `r options(digits = 2); CDT.RT.Block$PM[1] - CDT.RT.Block$Control[1]`s) and slightly 
-less accurate (_Mean Difference_ = `r options(digits = 2); CDT.Acc.Block$Control[1]*100 - CDT.Acc.Block$PM[1]*100`%) ongoing task performance, while increased time pressure led to faster but less accurate ongoing task performance. 
+Mean RT was slower for conflicts (`r options(digits = 2); CDT.RT.S$Conflict[1]`s) compared to nonconflicts (`r options(digits = 2); CDT.RT.S$Nonconflict[1]`s), and slower during PM blocks than control blocks (Control: _M_ = `r options(digits = 2); CDT.RT.Block$Control[1]`s, _SE_ = `r options(digits = 2); CDT.RT.Block$Control[2]`s; PM: _M_ = `r options(digits = 2); CDT.RT.Block$PM[1]`s, _SE_ = `r options(digits = 2); CDT.RT.Block$PM[2]`s). Planned comparisons indicated RT was significantly faster under high time pressure for both low trial load (Low TP: _M_ = `r options(digits = 2); CDT.RT.Cond$A[1]`s, _SE_ = `r options(digits = 2); CDT.RT.Cond$A[2]`s; High TP: _M_ = `r options(digits = 2); CDT.RT.Cond$B[1]`s, _SE_ = `r options(digits = 2); CDT.RT.Cond$B[2]`s) _t_ = `r options(digits = 2); T.Contrasts.CDT.RT$t[1]`, _df_ = `r options(digits = 2); T.Contrasts.CDT.RT$df[1]`, _p_ = `r options(digits = 2); T.Contrasts.CDT.RT$p[1]`, _Cohen's d_ = `r options(digits = 2); T.Contrasts.CDT.RT$d[1]`, and high trial load conditions (Low TP: _M_ = `r options(digits = 2); CDT.RT.Cond$C[1]`s, _SE_ = `r options(digits = 2); CDT.RT.Cond$C[2]`s; High TP: _M_ = `r options(digits = 2); CDT.RT.Cond$D[1]`s, _SE_ = `r options(digits = 2); CDT.RT.Cond$D[2]`s) _t_ = `r options(digits = 2); T.Contrasts.CDT.RT$t[3]`, _df_ = `r options(digits = 2); T.Contrasts.CDT.RT$df[3]`, _p_ = `r options(digits = 2); T.Contrasts.CDT.RT$p[3]`, _Cohen's d_ = `r options(digits = 2); T.Contrasts.CDT.RT$d[3]`. RTs were marginally longer under high trial load compared to low trial load, _t_ = `r options(digits = 2); T.Contrasts.CDT.RT$t[2]`, _df_ = `r options(digits = 2); T.Contrasts.CDT.RT$df[2]`, _p_ = `r options(digits = 2); T.Contrasts.CDT.RT$p[2]`, _Cohen's d_ = `r options(digits = 2); T.Contrasts.CDT.RT$d[2]`, although this effect was small. To summarise, the addition of PM load resulted in slower (_Mean Difference_ = `r options(digits = 2); CDT.RT.Block$PM[1] - CDT.RT.Block$Control[1]`s) and slightly less accurate (_Mean Difference_ = `r options(digits = 2); CDT.Acc.Block$Control[1]*100 - CDT.Acc.Block$PM[1]*100`%) ongoing task performance, while increased time pressure led to faster but less accurate ongoing task performance. 
 
 
 ## PM Trials
@@ -197,17 +204,19 @@ PMT.RT.S <- read.csv("analysis/PMT.RT.S.E1.csv")
 PMT.RT.Cond <- read.csv("analysis/PMT.RT.Cond.E1.csv")
 T.Contrasts.PMT.RT <- read.csv("analysis/T.Contrasts.PMT.RT.E1.csv")
 
-pander(T.Contrasts.PMT.RT)
+# pander(T.Contrasts.PMT.Acc)
+# pander(T.Contrasts.PMT.RT)
+# pander(PMT.Acc.S)
 
 ```
 
 PM responses were scored correct if the participant pressed the PM response key 
 instead of an ongoing task (Conflict/Nonconflict) response key on PM target 
 trials. PM accuracy decreased across different levels of time pressure during both low 
-trial load (Low TP: _M_ = `r options(digits = 2); PMT.Acc.Cond$A[1]*100`%, _SE_ = `r options(digits = 2); PMT.Acc.Cond$A[2]*100`%; High TP: _M_ = `r options(digits = 2); PMT.Acc.Cond$B[1]*100`%, _SE_ = `r options(digits = 2); PMT.Acc.Cond$B[2]*100`%) _t_ = `r options(digits = 2); T.Contrasts.PMT.Acc$t[1]`, _df_ = `r options(digits = 2); T.Contrasts.PMT.Acc$df[1]`, _p_ = `r options(digits = 2); T.Contrasts.PMT.Acc$p[1]`, _Cohen's d_ = `r options(digits = 2); T.Contrasts.PMT.Acc$d[1]`, and high trial load conditions (Low TP: _M_ = `r options(digits = 2); PMT.Acc.Cond$C[1]*100`%, _SE_ = `r options(digits = 2); PMT.Acc.Cond$C[2]*100`%; High TP: _M_ = `r options(digits = 2); PMT.Acc.Cond$D[1]*100`%, _SE_ = `r options(digits = 2); PMT.Acc.Cond$D[2]*100`%) _t_ = `r options(digits = 2); T.Contrasts.PMT.Acc$t[3]`, _df_ = `r options(digits = 2); T.Contrasts.PMT.Acc$df[3]`, _p_ = `r options(digits = 2); T.Contrasts.PMT.Acc$p[3]`, _Cohen's d_ = `r options(digits = 2); T.Contrasts.PMT.Acc$d[3]`.
+trial load (Low TP: _M_ = `r options(digits = 2); PMT.Acc.Cond$A[1]*100`%, _SE_ = `r options(digits = 2); PMT.Acc.Cond$A[2]*100`%; High TP: _M_ = `r options(digits = 2); PMT.Acc.Cond$B[1]*100`%, _SE_ = `r options(digits = 2); PMT.Acc.Cond$B[2]*100`%) _t_ = `r options(digits = 2); T.Contrasts.PMT.Acc$t[1]`, _df_ = `r options(digits = 2); T.Contrasts.PMT.Acc$df[1]`, _p_ = `r options(digits = 2); T.Contrasts.PMT.Acc$p[1]`, _Cohen's d_ = `r options(digits = 2); T.Contrasts.PMT.Acc$d[1]`, and high trial load conditions (Low TP: _M_ = `r options(digits = 2); PMT.Acc.Cond$C[1]*100`%, _SE_ = `r options(digits = 2); PMT.Acc.Cond$C[2]*100`%; High TP: _M_ = `r options(digits = 2); PMT.Acc.Cond$D[1]*100`%, _SE_ = `r options(digits = 2); PMT.Acc.Cond$D[2]*100`%) _t_ = `r options(digits = 2); T.Contrasts.PMT.Acc$t[3]`, _df_ = `r options(digits = 2); T.Contrasts.PMT.Acc$df[3]`, _p_ = `r options(digits = 2); T.Contrasts.PMT.Acc$p[3]`, _Cohen's d_ = `r options(digits = 2); T.Contrasts.PMT.Acc$d[3]`. PM accuracy did not differ by trial load.
 
 Mean RT for PM responses was significantly faster at higher levels of time pressure
-during both low trial load (Low TP: _M_ = `r options(digits = 2); PMT.RT.Cond$A[1]`s, _SE_ = `r options(digits = 2); PMT.RT.Cond$A[2]`s; High TP: _M_ = `r options(digits = 2); PMT.RT.Cond$B[1]`s, _SE_ = `r options(digits = 2); PMT.RT.Cond$B[2]`s) _t_ = `r options(digits = 2); T.Contrasts.PMT.RT$t[1]`, _df_ = `r options(digits = 2); T.Contrasts.PMT.RT$df[1]`, _p_ = `r options(digits = 2); T.Contrasts.PMT.RT$p[1]`, _Cohen's d_ = `r options(digits = 2); T.Contrasts.PMT.RT$d[1]`, and high trial load conditions (Low TP: _M_ = `r options(digits = 2); PMT.RT.Cond$C[1]`s, _SE_ = `r options(digits = 2); PMT.RT.Cond$C[2]`s; High TP: _M_ = `r options(digits = 2); PMT.RT.Cond$D[1]`s, _SE_ = `r options(digits = 2); PMT.RT.Cond$D[2]`s) _t_ = `r options(digits = 2); T.Contrasts.PMT.RT$t[3]`, _df_ = `r options(digits = 2); T.Contrasts.PMT.RT$df[3]`, _p_ = `r options(digits = 2); T.Contrasts.PMT.RT$p[3]`, _Cohen's d_ = `r options(digits = 2); T.Contrasts.PMT.RT$d[3]`. 
+during both low trial load (Low TP: _M_ = `r options(digits = 2); PMT.RT.Cond$A[1]`s, _SE_ = `r options(digits = 2); PMT.RT.Cond$A[2]`s; High TP: _M_ = `r options(digits = 2); PMT.RT.Cond$B[1]`s, _SE_ = `r options(digits = 2); PMT.RT.Cond$B[2]`s) _t_ = `r options(digits = 2); T.Contrasts.PMT.RT$t[1]`, _df_ = `r options(digits = 2); T.Contrasts.PMT.RT$df[1]`, _p_ = `r options(digits = 2); T.Contrasts.PMT.RT$p[1]`, _Cohen's d_ = `r options(digits = 2); T.Contrasts.PMT.RT$d[1]`, and high trial load conditions (Low TP: _M_ = `r options(digits = 2); PMT.RT.Cond$C[1]`s, _SE_ = `r options(digits = 2); PMT.RT.Cond$C[2]`s; High TP: _M_ = `r options(digits = 2); PMT.RT.Cond$D[1]`s, _SE_ = `r options(digits = 2); PMT.RT.Cond$D[2]`s) _t_ = `r options(digits = 2); T.Contrasts.PMT.RT$t[3]`, _df_ = `r options(digits = 2); T.Contrasts.PMT.RT$df[3]`, _p_ = `r options(digits = 2); T.Contrasts.PMT.RT$p[3]`, _Cohen's d_ = `r options(digits = 2); T.Contrasts.PMT.RT$d[3]`. PM RTs were marginally slower under high trial load compared to low trial load,  _t_ = `r options(digits = 2); T.Contrasts.PMT.RT$t[2]`, _df_ = `r options(digits = 2); T.Contrasts.PMT.RT$df[2]`, _p_ = `r options(digits = 2); T.Contrasts.PMT.RT$p[2]`, _Cohen's d_ = `r options(digits = 2); T.Contrasts.PMT.RT$d[2]`, although again this was a relatively small effect.
 
 There were no significant differences in accuracy or RT between conflict PM targets
 and nonconflict PM target. This is expected since the PM cue (i.e., particular letters in an aircraft callsign) was completely non-focal, meaning the evidence 
@@ -669,6 +678,53 @@ being invested in completing the task. One possible explanation is that the task
 
 Alternatively, rather than increasing effort in response to greater difficulty, participants could be 'satisficing', or decreasing effort when the task is perceived as easy. For example, in the relatively easy control and low time pressure conditions participants may believe that they can disengage from the task somewhat, expending fewer cognitive resources while still maintaining a satisfactory level of task performance.
 
+Several additional lines of evidence support this effort/task engagement hypothesis. First, both PM block and time pressure were highly significant predictors of self-reported effort ratings on the NASA-TLX (see Table XX in the supplementary materials); participants reported expending more effort under PM load compared to control as well as expending more effort during higher time pressure blocks. Second, ongoing task accumulation rates were significant predictors of self-reported effort ratings (see Table XX in the supplementary materials). Specifically, rates for both conflict and nonconflict error accumulators were positive predictors of effort, whereas correct accumulation rates were not. 
+
+As such, it seems as though subjects can choose to deploy more cognitive resources into the task when changes in environmental conditions such as PM load and time pressure suggest it may be advantageous to do so. Crucially, such resources need not be diverted from the ongoing task, contrary to the claims of capacity-sharing explanations. However, it is interesting to note that error accumulation rates for the ongoing task were more related to effort ratings than were correct accumulation rates. This suggests that although subjects can increase their arousal or exert more effort, that extra effort or arousal may not necessarily translate into higher quality information processing. 
+
+```{r TLX Effort Ratings by Block and Time Pressure, echo=FALSE, include=FALSE}
+
+tlx <- read.csv("data/E1_TLX.csv", header = TRUE)
+tlx$s <- factor(tlx$s)
+
+TLX.lmer.E1 <- lmer(effort ~ block*cond+(1|s), data=tlx)
+TLX.lm.E1 <- Anova(TLX.lmer.E1,type="II")
+TLX.lm.TABLE.E1 <- data.frame(TLX.lm.E1$Chisq, TLX.lm.E1$Df, TLX.lm.E1$Pr)
+
+TLX.lm.TABLE.E1$TLX.lm.E1.Chisq <- round(TLX.lm.TABLE.E1$TLX.lm.E1.Chisq, 2)
+TLX.lm.TABLE.E1$TLX.lm.E1.Pr <- format.pval(TLX.lm.TABLE.E1$TLX.lm.E1.Pr, digits=2, eps= 0.001)
+TLX.lm.TABLE.E1$TLX.lm.E1.Pr <- gsub("0\\.", ".", TLX.lm.TABLE.E1$TLX.lm.E1.Pr)
+rownames(TLX.lm.TABLE.E1) <- c("PM Block","Time Pressure",
+                                "PM Block by Time Pressure")
+colnames(TLX.lm.TABLE.E1) <- c("Chi-square","df","p")
+
+set.caption("General Linear Mixed Effects Model: PM Block and Time Pressure as Predictors of Self-Reported Task Effort")
+pander(TLX.lm.TABLE.E1)
+
+```
+
+
+```{r TLX Effort Ratings by Rates, echo=FALSE, include=FALSE}
+
+tlx <- read.csv("data/E1_TLX.csv", header = TRUE)
+tlx$s <- factor(tlx$s)
+
+TLX.lmer.E1 <- lmer(effort ~ mean_v.C+mean_v.N+mean_v.Cerr+mean_v.Nerr+(1|s), data=tlx)
+TLX.lm.E1 <- Anova(TLX.lmer.E1,type="II")
+TLX.lm.TABLE.E1 <- data.frame(TLX.lm.E1$Chisq, TLX.lm.E1$Df, TLX.lm.E1$Pr)
+
+TLX.lm.TABLE.E1$TLX.lm.E1.Chisq <- round(TLX.lm.TABLE.E1$TLX.lm.E1.Chisq, 2)
+TLX.lm.TABLE.E1$TLX.lm.E1.Pr <- format.pval(TLX.lm.TABLE.E1$TLX.lm.E1.Pr, digits=2, eps= 0.001)
+TLX.lm.TABLE.E1$TLX.lm.E1.Pr <- gsub("0\\.", ".", TLX.lm.TABLE.E1$TLX.lm.E1.Pr)
+rownames(TLX.lm.TABLE.E1) <- c("Conflict","Nonconflict",
+                                "Conflict (Error)", "Nonconflict (Error)")
+colnames(TLX.lm.TABLE.E1) <- c("Chi-square","df","p")
+
+set.caption("General Linear Mixed Effects Model: Accumulation Rates as Predictors of Self-Reported Task Effort")
+pander(TLX.lm.TABLE.E1)
+
+```
+
 ```{r echo=FALSE, eval=FALSE}
 
 Ok good points. There is a paper from Rummel on more on-task focus with PM as well.
@@ -722,7 +778,7 @@ As shown in Figure \ref{fig:PM.Control.Contrast.Plots}, the full (selected) mode
 
 Averaging the ongoing task thresholds between control and PM blocks made the model overpredict the cost to ongoing task accuracy, more so for conflicts than nonconflicts, and dramatically underpredict the cost to both correct and error ongoing task RT (so much so that the model in fact predicted a PM advantage to ongoing task RT rather than a cost). This further indicates that proactive control of thresholds is an important mechanism in explaining PM costs effects, in particular costs to ongoing task RT. 
 
-In contrast, averaging the ongoing task accumulation rates between control and PM blocks caused the model to underpredict costs to ongoing task accuracy (predicting an accuracy advantage for conflicts) and overpredict costs to both correct and error ongoing task RT. This suggests that reactive control of accumulation rates is also an important mechanism in explaining PM cost effects.
+In contrast, averaging the ongoing task accumulation rates between control and PM blocks caused the model to underpredict costs to ongoing task accuracy (predicting an accuracy advantage for conflicts) and overpredict costs to both correct and error ongoing task RT. This suggests that reactive inhibition of accumulation rates is also an important mechanism in explaining the differences in ongoing task accuracy and RT that occur under PM demand.
 
 
 ### Time Pressure Effects

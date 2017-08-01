@@ -52,13 +52,19 @@ samples <- samples[names(samples) != "p17"]  # Exclude p17 E1 due to no PM respo
 # plot.dmc(samples[[1]], p.prior= samples[[1]]$p.prior)
 
 #
-# E1PP <- h.post.predict.dmc(samples, save.simulation=
-#                              TRUE)
+# E1PP <- h.post.predict.dmc(samples, save.simulation=TRUE, n.post = 100)
 # save(E1PP, file="data/after_sampling/E1PP.RData")
-# # <<<<<<< HEAD
+
 load("data/after_sampling/E1PP.RData")
-# =======
-# >>>>>>> df826efb76acd8ad0e1cb10663f8f981493a9556
+
+# E1PP <- h.post.predict.dmc(samples, save.simulation=TRUE, n.post = 250)
+# save(E1PP, file="data/after_sampling/E1PP.250.RData")
+#
+# load("data/after_sampling/E1PP.250.RData")
+
+
+# rm(samples)
+
 
 sim <- do.call(rbind, E1PP)
 # Do the same for the data
@@ -305,7 +311,8 @@ E1.RT.plots.PM <- PM.RT.plots
 # ggsave("E1.Fits.RT.PM.png", plot = PM.RTgraph, width = 9, height = 6)
 #
 
-
+# # # Nonresponse Predictions # # #
+#
 # Do out of sample predictions of non-responses to see whether they are
 # consistent with the model.
 load("data/exp_data/okdats.E1.NR.RData")
@@ -381,32 +388,32 @@ NR.plot
 
 ## Model Fits to Response Accuracy
 plot <- E1.acc.plots.Ongoing
-ggsave("figures/E1/E1.Fits.Accuracy.Ongoing.png", plot = plot, height = 10.5, width = 7)
+ggsave("figures/E1/E1.Fits.Accuracy.Ongoing.png", plot = plot, height = 13, width = 9)
 # plot(plot)
 
 plot <- E1.acc.plots.PM
-ggsave("figures/E1/E1.Fits.Accuracy.PM.png", plot = plot, height = 5, width = 7)
+ggsave("figures/E1/E1.Fits.Accuracy.PM.png", plot = plot, height = 6.5, width = 9)
 # plot(plot)
 
 
 ## Model Fits to RT (Ongoing)
 plot <- E1.RT.plots.Ongoing.2
-ggsave("figures/E1/E1.Fits.RT.Ongoing.2.png", plot = plot, height = 10.5, width = 7)
+ggsave("figures/E1/E1.Fits.RT.Ongoing.2.png", plot = plot, height = 13, width = 9)
 # plot(plot)
 
 plot <- E1.RT.plots.Ongoing.5
-ggsave("figures/E1/E1.Fits.RT.Ongoing.5.png", plot = plot, height = 10.5, width = 7)
+ggsave("figures/E1/E1.Fits.RT.Ongoing.5.png", plot = plot, height = 13, width = 9)
 # plot(plot)
 
 
 ## Model Fits to RT (PM)
 plot <- E1.RT.plots.PM
-ggsave("figures/E1/E1.Fits.RT.PM.png", plot = plot, height = 5, width = 7)
+ggsave("figures/E1/E1.Fits.RT.PM.png", plot = plot, height = 6.5, width = 9)
 # plot(plot)
 
 ## Out of Sample Predicted Nonresponse Proportions
 plot <- NR.plot
-ggsave("figures/E1/E1.Fits.NR.png", plot = plot, height = 5, width = 7)
+ggsave("figures/E1/E1.Fits.NR.png", plot = plot, height = 4, width = 9)
 # plot(plot)
 
 

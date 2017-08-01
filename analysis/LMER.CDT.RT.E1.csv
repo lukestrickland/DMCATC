@@ -1,0 +1,8 @@
+"","Chi-square","df","p"
+"Stimulus",99.83,1,"<.001"
+"PM Block",144.52,1,"<.001"
+"Time Pressure",796.91,3,"<.001"
+"Stimulus by PM Block",0.36,1,".546"
+"Stimulus by Time Pressure",10.57,3,".014"
+"PM Block by Time Pressure",5.13,3,".162"
+"Stimulus by PM Block by Time Pressure",0.98,3,".806"

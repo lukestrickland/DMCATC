@@ -7,6 +7,8 @@ rm(list=ls())
 setwd("C:/Users/Russell Boag/Documents/GitHub/DMCATC")
 source("dmc/dmc.R")
 source("dmc/dmc_ATC.R")
+load_model ("LBA","lbaN_B.R")
+source("LSAnova.R")
 
 
 load("data/samples/E1.block.B.V_cond.B.V.PMV.samples.RData")
@@ -14,6 +16,126 @@ samples <- E1.block.B.V_cond.B.V.PMV.samples
 rm(E1.block.B.V_cond.B.V.PMV.samples)
 
 samples <- samples[names(samples) != "p17"]  # Exclude p17 E1 due to no PM responses
+
+# # # Get data from samples object # # #
+#
+get.hdata.dmc <- function(hsamples){
+    list.wind<-lapply(seq_along(hsamples), function(samples, n, i) cbind(n[[i]], samples[[i]]$data),
+                      samples= hsamples, n = names(hsamples))
+    out<-do.call(rbind, list.wind)
+    names(out)[1] <- "s"
+    out
+}
+
+# Get data from samples object
+data.E1 <- get.hdata.dmc(samples)
+rm(samples)
+
+# head(data.E1)
+# save(data.E1, file="data.E1.RData")
+# all.equal(datE1[order(datE1$s),], data2)  # Check recovered data matches original data
+
+# # # Add logical S-R match factor 'C' # # #
+#
+data.E1$C <- rep(0,length(data.E1$RT))
+for(i in 1:length(data.E1$RT)){
+    if(data.E1$S[i]=="cc" & data.E1$R[i]=="C"){
+        data.E1$C[i] <- 1
+    } else if(data.E1$S[i]=="nn" & data.E1$R[i]=="N"){
+        data.E1$C[i] <- 1
+    } else if(data.E1$S[i]=="pc" & data.E1$R[i]=="P"){
+        data.E1$C[i] <- 1
+    } else if(data.E1$S[i]=="pn" & data.E1$R[i]=="P"){
+        data.E1$C[i] <- 1
+    }
+}
+
+
+
+
+
+
+# # # Prep dataframes for analysis # # #
+#
+# Conflict Detection Task trials only (no PM)
+CDT <- data.E1[!(data.E1$S=="pc" | data.E1$S=="pn"),]
+CDT$S <- factor(as.character(CDT$S)); CDT$R <- factor(as.character(CDT$R))
+str(CDT)
+head(CDT)
+
+# PM Task trials only
+PMT <- data.E1[(data.E1$S=="pc" | data.E1$S=="pn"),]
+PMT$S <- factor(as.character(PMT$S)); PMT$block <- factor(as.character(PMT$block))
+str(PMT)
+head(PMT)
+
+
+
+tlx <- read.csv("data/E1_TLX.csv", header = TRUE)
+tlx$s <- factor(tlx$s)
+str(tlx)
+head(tlx)
+
+
+TLX.lmer.E1 <- lmer(mental ~ block*cond+(1|s), data=tlx)
+TLX.lm.E1 <- Anova(TLX.lmer.E1,type="II")
+TLX.lm.E1
+TLX.lmer.E1 <- lmer(physical ~ block*cond+(1|s), data=tlx)
+TLX.lm.E1 <- Anova(TLX.lmer.E1,type="II")
+TLX.lm.E1
+TLX.lmer.E1 <- lmer(temporal ~ block*cond+(1|s), data=tlx)
+TLX.lm.E1 <- Anova(TLX.lmer.E1,type="II")
+TLX.lm.E1
+TLX.lmer.E1 <- lmer(performance ~ block*cond+(1|s), data=tlx)
+TLX.lm.E1 <- Anova(TLX.lmer.E1,type="II")
+TLX.lm.E1
+TLX.lmer.E1 <- lmer(effort ~ block*cond+(1|s), data=tlx)
+TLX.lm.E1 <- Anova(TLX.lmer.E1,type="II")
+TLX.lm.E1
+TLX.lmer.E1 <- lmer(frustration ~ block*cond+(1|s), data=tlx)
+TLX.lm.E1 <- Anova(TLX.lmer.E1,type="II")
+TLX.lm.E1
+
+ddply(tlx, summarise, .~block, M=mean(tlx$effort))
+
+mean(tlx[ tlx$block=="Control", "mental"])
+mean(tlx[ tlx$block=="PM", "mental"])
+mean(tlx[ tlx$block=="Control", "physical"])
+mean(tlx[ tlx$block=="PM", "physical"])
+mean(tlx[ tlx$block=="Control", "temporal"])
+mean(tlx[ tlx$block=="PM", "temporal"])
+mean(tlx[ tlx$block=="Control", "performance"])
+mean(tlx[ tlx$block=="PM", "performance"])
+mean(tlx[ tlx$block=="Control", "effort"])
+mean(tlx[ tlx$block=="PM", "effort"])
+mean(tlx[ tlx$block=="Control", "frustration"])
+mean(tlx[ tlx$block=="PM", "frustration"])
+
+
+mean(tlx[ tlx$cond=="A", "mental"] )
+mean(tlx[ tlx$cond=="B", "mental"] )
+mean(tlx[ tlx$cond=="C", "mental"] )
+mean(tlx[ tlx$cond=="D", "mental"] )
+mean(tlx[ tlx$cond=="A", "physical"] )
+mean(tlx[ tlx$cond=="B", "physical"] )
+mean(tlx[ tlx$cond=="C", "physical"] )
+mean(tlx[ tlx$cond=="D", "physical"] )
+mean(tlx[ tlx$cond=="A", "temporal"] )
+mean(tlx[ tlx$cond=="B", "temporal"] )
+mean(tlx[ tlx$cond=="C", "temporal"] )
+mean(tlx[ tlx$cond=="D", "temporal"] )
+mean(tlx[ tlx$cond=="A", "performance"] )
+mean(tlx[ tlx$cond=="B", "performance"] )
+mean(tlx[ tlx$cond=="C", "performance"] )
+mean(tlx[ tlx$cond=="D", "performance"] )
+mean(tlx[ tlx$cond=="A", "effort"] )
+mean(tlx[ tlx$cond=="B", "effort"] )
+mean(tlx[ tlx$cond=="C", "effort"] )
+mean(tlx[ tlx$cond=="D", "effort"] )
+mean(tlx[ tlx$cond=="A", "frustration"] )
+mean(tlx[ tlx$cond=="B", "frustration"] )
+mean(tlx[ tlx$cond=="C", "frustration"] )
+mean(tlx[ tlx$cond=="D", "frustration"] )
 
 # Check how many runs it took to converge
 # If any say "FAIL" then it didn't converge
@@ -65,8 +187,8 @@ data <- do.call(rbind, data)
 # Levels for graphing
 lev.S <- c("Conflict", "Nonconflict", "PM (Conflict)", "PM (Nonconflict)")
 lev.PM <- c("Control", "PM")
-lev.cond <- c("LL.LT", "LL.HT",
-              "HL.LT", "HL.HT")
+# lev.cond <- c("LL.LT", "LL.HT",
+#               "HL.LT", "HL.HT")
 lev.R <- c("CR", "NR", "PMR")
 
 # Get a gglist as stored in the PP object.
@@ -129,7 +251,9 @@ oRT.obj <- GGLIST[[2]][(GGLIST[[2]]$S=="nn"|
                             GGLIST[[2]]$S=="cc") & GGLIST[[2]]$R!="P",]
 
 oRT.obj <- oRT.obj[,c(1,3,2,4,5,6,7,8,9)]
-# head(oRT.obj)
+str(oRT.obj)
+head(oRT.obj)
+
 
 levels(oRT.obj$S) <- lev.S
 levels(oRT.obj$block) <- lev.PM
@@ -283,7 +407,7 @@ load("data/after_sampling/av.thetas.E1.RData")
 msds <- cbind(apply(av.thetas.E1, 2, mean), apply(av.thetas.E1, 2, sd))
 colnames(msds) <- c("M", "SD")
 msds <- data.frame(msds)
-# msds
+msds
 
 # # # Nondecision Time # # #
 t0 <- msds[grep("t0", rownames(msds)),]
