@@ -3,18 +3,18 @@ title: "Results and Modelling for ATC Experiment E1"
 author: "R. Boag"
 date: ''
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 geometry: margin=1in
 fontsize: 11pt
 fig_caption: yes
 ---
 
 ```{r setup, include=FALSE}
-
+# wd <- "C:/Users/Russell Boag/Documents/GitHub/DMCATC"
+wd <- "D:/Software/DMC_ATCPMDC"
 knitr::opts_chunk$set(echo = FALSE)
-setwd("C:/Users/Russell Boag/Documents/GitHub/DMCATC")
-# setwd("~/Software/DMCATC")
+setwd(wd)
 source("dmc/dmc.R")
 source("dmc/dmc_ATC.R")
 source("LSAnova.R")
@@ -30,9 +30,8 @@ sapply(pkgs, require, character.only = T) #load
 
 ```{r Nonresponses and Excluded Data, echo=FALSE, include=FALSE}
 
-rm(list=ls())
-setwd("C:/Users/Russell Boag/Documents/GitHub/DMCATC")
-# setwd("~/Software/DMCATC")
+# rm(list=ls())
+setwd(wd)
 pkgs <- c("plyr", "dplyr", "tidyr", "broom", "pander", "xtable")
 # install.packages(pkgs) #install
 sapply(pkgs, require, character.only = T) #load
@@ -145,8 +144,12 @@ percent.cleaned
 ```
 
 Conventional statistical analyses are reported first in order to check whether 
-our experimental manipulations had the expected effects on manifest RT and accuracy. Data from two particpants was excluded from the analyses; one who failed to complete all experimental blocks and one who made no PM responses at all for the entire experiment. We excluded trials with outlying RTs, defined as less than 0.2s or 3 times the 
+our experimental manipulations had the expected effects on manifest RT and accuracy. Data from two participants was excluded from the analyses; one who failed to complete all experimental blocks and one who made no PM responses at all for the entire experiment. We excluded trials with outlying RTs, defined as less than 0.2s or 3 times the 
 interquartile range / 1.349 (a robust measure of standard deviation) above the mean (`r options(digits = 2); percent.cleaned`% of responses overall). PM keypresses occurring during the control condition (which contained no PM stimuli) were also excluded (`r options(digits = 2); percent.PM.in.Control`% of responses overall). 
+
+```{r echo=FALSE, eval=FALSE}
+Were there no PM keypresses during control? If so just delete this
+```
 
 The following analyses compare mean accuracy and RT by stimulus type (Conflict, Nonconflict, PM) PM block (Control, PM) and time pressure (Low, High) across 2 levels of trial load (2 vs 5 decisions per trial). It should be noted that our time pressure factor was not crossed orthogonally with the trial load factor. Specifically, under low trial load (2 decisions per trial), low time pressure corresponded to a response deadline of 12 seconds (i.e., 6 seconds per decision on average) while high time pressure corresponded to a response deadline of 8 seconds (i.e., 4 seconds per decision on average). In contrast, under high trial load (5 decisions per trial), low time pressure corresponded to a response deadline of 20 seconds (i.e., 4 seconds per decision on average) while high time pressure corresponded to a response deadline of 10 seconds (i.e., 2 seconds per decision on average). As such, the following analyses compare the low and high time pressure levels separately for the low and high trial load conditions.
 
@@ -251,6 +254,11 @@ trials (`r options(digits = 2); CDT.Reactive.S$PM_Conflict[1]`s) than on non-PM 
 
 However, it should be noted that reactive control on PM trials is confounded in 
 raw RT by statistical facilitation from the PM response. Specifically, on PM trials the accumulators for the ongoing task responses must compete with a much faster PM response accumulator. Overt ongoing task responses on PM trials are therefore more likely to be fast errors which outpace the PM accumulation process. As such, this comparison of mean RT is not sufficient to rule out reactive control. Rather, the critical test of reactive control is a comparison of accumulation rates, and is presented in the modelling section below.
+
+```{r echo=FALSE, eval=FALSE}
+LUKE:I still think we could consider dumping this. It's not the right test and 
+the results are already long. Maybe leave it in and see what S & AH think though?
+```
 
 
 # Model Analysis
