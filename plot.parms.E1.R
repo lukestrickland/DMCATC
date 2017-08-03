@@ -346,7 +346,28 @@ for (i in 1:length(samples)) {
 
 # h.ordermatched.sims <- h.post.predict.dmc.MATCHORDER(samples)
 # save(h.ordermatched.sims,file="data/after_sampling/E1NRPP.RData")
-load("data/after_sampling/E1NRPP.RData")
+
+
+
+#Luke addition 4/08 - sim NR with thresholds fixed.
+av.posts.thresholdscond  <- c(
+  "B.*2C", "B.*3C", "B.*2N" ,"B.*3N", "B.*3P"
+)
+
+av.posts.thresholdscond <- unique(av.posts.thresholdscond)
+av.posts.thresholdscond <- glob2rx(av.posts.thresholdscond)
+
+
+h.ordermatched.sims.AVGcond <- h.post.predict.dmc.MATCHORDER.AVG(samples, av.posts=
+                                     av.posts.thresholdscond)
+save(h.ordermatched.sims.AVGcond,file="data/after_sampling/E1NRPP_AVGcond.RData")
+
+load("data/after_sampling/E1NRPP_AVGcond.RData")
+h.ordermatched.sims <- h.ordermatched.sims.AVGcond
+
+### End 4/08 addition
+
+# load("data/after_sampling/E1NRPP.RData")
 
 NRsim <- do.call(rbind, h.ordermatched.sims)
 getNRdata <- lapply(h.ordermatched.sims, function(x) attr(x, "data"))

@@ -161,6 +161,7 @@ post.predict.dmc.MATCHORDER <- function(samples,n.post=100,probs=c(1:99)/100,ran
   }
 }
 
+
 #this function merely lapplys the function above.
 h.post.predict.dmc.MATCHORDER <- function(hsamples, n.post=100) {
   lapply(hsamples, post.predict.dmc.MATCHORDER, save.simulation=TRUE, n.post=n.post)
@@ -1162,3 +1163,154 @@ finish.conddf.E1_A4 <- function(effects) {
 #   out
 #
 # }
+
+##LUKE additions 04/08 at Russ request- so we can sim proportion of NRs with parameters
+#avgd
+
+
+post.predict.dmc.MATCHORDER.AVG <- function(samples,n.post=100,probs=c(1:99)/100,random=TRUE,
+                                            bw="nrd0",report=10,save.simulation=FALSE,factors=NA,
+                                            save.simulation.as.attribute=FALSE,ignore.R2=FALSE,
+                                            gglist=FALSE, probs.gglist=c(0.1, 0.5, 0.9),CI.gglist=c(0.025, 0.975), av.posts=c())
+  # make list of posterior preditive density, quantiles and response p(robability)
+  # NB: quantiles only calcualted for 2 or more RTs
+{
+  
+  model <- attributes(samples$data)$model
+  facs <- names(attr(model,"factors"))
+  cvs <- samples$data[,attr(model,"cvs")]
+  attr(cvs,"row.facs") <- apply(apply(
+    samples$data[,facs,drop=FALSE],2,as.character),1,paste,collapse=".")
+  if ( ignore.R2 & any(names(samples$data)=="R2") )
+    samples$data <- samples$data[,names(samples$data)[names(samples$data)!="R2"]]
+  if (!is.null(factors) ) {
+    if (any(is.na(factors))) factors <- facs
+    if (!all(factors %in% facs))
+      stop(paste("Factors argument must contain one or more of:",paste(facs,collapse=",")))
+  }
+  resp <- names(attr(model,"responses"))
+  ##LUKE: plug in data size from okdats.noNR
+  data <- attr(samples, "NRdata")
+  ns <- table(data[,facs])
+  # ns <- table(samples$data[,facs],dnn=facs)
+  n.par <- dim(samples$theta)[2]
+  thetas <- matrix(aperm(samples$theta,c(3,1,2)),ncol=n.par)
+  colnames(thetas) <- dimnames(samples$theta)[[2]]
+  if (is.na(n.post)) use <- c(1:dim(thetas)[1]) else {
+    if (random) use <- sample(c(1:dim(thetas)[1]),n.post,replace=F) else
+      use <- round(seq(1,dim(thetas)[1],length.out=n.post))
+  }
+  n.post <- length(use)
+  posts <- thetas[use,]
+  ###Plug in averaging 
+  cat("Below is how I'm averaging (each row is averaged). If this is wrong, adjust your
+      av.posts to grep correctly.")
+  for (q in 1:length(av.posts)) print(colnames(posts[, grep(av.posts[q], colnames(posts))]))
+  ###tweak to average av.posts
+  q=1
+  
+  if(length(av.posts)!= 0) {
+    ### loop through all the averaged posts
+    for (q in 1:length(av.posts)) {
+      
+      num.params <- dim(posts[, grep(av.posts[q], colnames(posts))])[2]
+      average.params <- rowMeans(posts[, grep(av.posts[q], colnames(posts))])
+      posts[, grep(av.posts[q], colnames(posts))] <- matrix(average.params,nrow=length(average.params),ncol=num.params,byrow=F)
+      
+    }
+  }
+  ######  
+  
+  
+  n.rep <- sum(ns)
+  sim <- data.frame(matrix(nrow=n.post*n.rep,ncol=dim(data)[2]))
+  names(sim) <- names(data)
+  # Tweaks for Stop Signal
+  if ( !any(names(samples$data)=="SSD") ) {
+    SSD <- rep(Inf,sum(ns))
+    leave.out <- -c(1:dim(samples$data)[2])[names(samples$data) %in% c("RT",names(cvs),"R2")]
+  } else {
+    # Assumes last two are SSD and RT! FIX ME. EG WONT WORK IF THERE ARE CVS
+    if (is.null(facs)) SSD <- samples$data$SSD else
+      SSD <- unlist(tapply(samples$data$SSD,samples$data[,facs],identity))
+    leave.out <- -c((dim(samples$data)[2]-1):dim(samples$data)[2])
+  }
+  cat("\n")
+  cat(paste("Simulating (\'.\'=",report,"): ",sep=""))
+  for (i in names(samples$data)[leave.out])
+    sim[[i]] <- factor(rep(NA,n.post*n.rep),levels=levels(samples$data[[i]]))
+  for (i in 1:n.post) {
+    tmp <- simulate.dmc(posts[i,],model,n=ns,SSD=SSD,cvs=NULL)
+    
+    if ( (i %% report) == 0) cat(".")
+    ###Luke plug in order matching
+    
+    #getting the factor structure of whatever design you feed in
+    callargs.data <- list()
+    callargs.sim <- list()
+    for (p in 1:length(facs)) {callargs.data[[p]] <- data[,facs[p]]
+    callargs.sim[[p]] <- tmp[,facs[p]]
+    }
+    
+    data.ind <- factor(do.call(paste, callargs.data))
+    sim.ind <- factor(do.call(paste, callargs.sim))
+    swappedsim <- data
+    for(q in levels(data.ind)){swappedsim$R[data.ind==q] <- tmp$R[sim.ind==q]
+    swappedsim$RT[data.ind==q] <- tmp$RT[sim.ind==q]
+    }
+    tmp <- swappedsim
+    
+    if (ignore.R2) tmp <- tmp[,names(tmp)[names(tmp)!="R2"]]
+    sim[(1+(i-1)*n.rep):(i*n.rep),names(tmp)] <- tmp
+    
+    ########
+  }
+  if ( any(names(sim)=="R2") ) { # MTR model
+    sim$R <- paste(as.character(sim$R),as.character(sim$R2),sep="")
+    sim$R[sim$R2=="DK"] <- "DK"
+    sim$R <- factor(sim$R)
+    samples$data$R <- paste(as.character(samples$data$R),as.character(samples$data$R2),sep="")
+    samples$data$R[samples$data$R2=="DK"] <- "DK"
+    samples$data$R <- factor(samples$data$R)
+  }
+  reps <- rep(1:n.post,each=dim(data)[1])
+  if ( save.simulation ) {
+    sim <- cbind(reps,sim)
+    attr(sim,"data") <- data
+    # attr(sim,"data") <- samples$data
+    sim
+  } else {
+    sim.dqp <- get.dqp(sim,facs=factors,probs,n.post,ns=ns,bw=bw)
+    dat.dqp <- get.dqp(sim=samples$data,factors,probs,bw=bw)
+    names(dat.dqp) <- paste("data",names(dat.dqp),sep=".")
+    out <- c(sim.dqp,dat.dqp)
+    dpqs <- vector(mode="list",length=length(n.post))
+    for (i in 1:n.post) {
+      simi <- sim[reps==i,]
+      dpqs[[i]] <- get.dqp(simi,factors,probs,1)
+    }
+    attr(out,"dpqs") <- dpqs
+    if (save.simulation.as.attribute)
+      attr(out,"sim") <- cbind(reps,sim)
+    if (gglist) attr(out, "gglist") <-
+      get.fitgglist.dmc(cbind(reps,sim),samples$data,factors=factors, noR=FALSE,
+                        quantiles.to.get= probs.gglist, CI = CI.gglist)
+    out
+  }
+}
+
+
+
+
+
+
+#this function merely lapplys the function above.
+h.post.predict.dmc.MATCHORDER.AVG <- function(hsamples, n.post=100, av.posts=c()) {
+  lapply(hsamples, post.predict.dmc.MATCHORDER.AVG, save.simulation=TRUE, n.post=n.post, av.posts=av.posts)
+}
+
+
+
+
+
+
