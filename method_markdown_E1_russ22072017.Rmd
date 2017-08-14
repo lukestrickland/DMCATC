@@ -98,7 +98,9 @@ pander(Spatial.Vars.Table, justify = c('left','center','center','center','center
 
 Aircraft with callsigns containing two of the same letter (e.g., APA169, RTR451) were designated as PM targets. This is an ecologically valid PM cue, since ATCos may be asked to look out for a specific flight number and perform an intended action (e.g., put the aircraft in a holding pattern) when that cue occurs. We note that this PM cue is completely non-focal, meaning the evidence used to make PM decisions (i.e., particular letters in an aircraft callsign) is independent of evidence used to make ongoing task conflict/nonconflict decisions (e.g., airspeed, relative distance, and motion information). In our experiment, 20% of PM block trials contained a PM target. On PM target trials only one of the aircraft on screen ever contained a PM cue, never both. Participants were instructed to respond to PM targets by pressing an alternate PM key instead of the typical ongoing task (i.e., conflict/nonconflict) keys. 
 
+### NASA-TLX
 
+Subjective task demand was assessed using the NASA Task Load Index (NASA-TLX; Hart & Staveland, 1988). The NASA-TLX comprises six items: three that tap different aspects of task demand (i.e., mental, physical, and temporal demand) and three which tap the operator's subjective level of exertion and task performance (i.e., performance, effort, and frustration). Each item is rated on a 21-point Likert scale, with higher scores being indicative of a more demanding or effortful task. The NASA-TLX is a sensitive, reliable, and valid measure of workload (Hart & Staveland, 1988; Xiao, et al., 2005), and has been used in a wide variety of basic and applied tasks (Hart, 2006).
 
 ### Experimental Design
 
@@ -140,7 +142,7 @@ Before each block of trials, participants saw visual instructions reminding them
 
 Four response key assignments were counterbalanced across participants; 1) _s_ = conflict, _d_ = nonconflict, _j_ = PM, 2) _d_ = conflict, _s_ = nonconflict, _j_ = PM, 3) _k_ = conflict, _j_ = nonconflict, _d_ = PM, and 4) _j_ = conflict, _k_ = nonconflict, _d_ = PM. Participants were instructed to rest their fingers on their particular response key combination throughout the task. A screen with the text 'Press [Space] to continue' preceeded each trial, and each trial began once the spacebar was pressed. Within each trial, pairs of aircraft were presented sequentially; each pair disappearing from the screen once a response was made. 
 
-Trials ended when either all aircraft pairs had been responded to (2 pairs during low-load trials; 5 pairs during high-load trials) or when the response deadline expired (i.e., the timer counted down to zero). Aircraft pairs not responded to within the response deadline were recorded as nonresponses. Aside from the training trials, no further feedback was given concerning task performance. Participants took self-paced breaks between each block of trials and were also permitted short breaks at any point between-trials if required. 
+Trials ended when either all aircraft pairs had been responded to (2 pairs during low-load trials; 5 pairs during high-load trials) or when the response deadline expired (i.e., the timer counted down to zero). Aircraft pairs not responded to within the response deadline were recorded as nonresponses. Aside from the training trials, no further feedback was given concerning task performance. Participants completed a NASA-TLX workload questionnaire after each block. Participants took self-paced breaks between each block of trials and were also permitted short breaks at any point between-trials if required. 
 
 
 
