@@ -3,16 +3,17 @@ title: "Results and Modelling for ATC Experiment E1"
 author: "R. Boag"
 date: ''
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 geometry: margin=1in
+header-includes: \usepackage{setspace}\doublespacing
 fontsize: 11pt
 fig_caption: yes
 ---
 
 ```{r setup, include=FALSE}
-# wd <- "C:/Users/Russell Boag/Documents/GitHub/DMCATC"
-wd <- "D:/Software/DMC_ATCPMDC"
+wd <- "C:/Users/Russell Boag/Documents/GitHub/DMCATC"
+# wd <- "D:/Software/DMC_ATCPMDC"
 knitr::opts_chunk$set(echo = FALSE)
 setwd(wd)
 source("dmc/dmc.R")
@@ -321,7 +322,7 @@ To evaluate fit, we sampled 100 posterior predictions for each participant and
 then averaged over participants. The model provided good fits to both ongoing task and PM accuracy (Figures \ref{fig:Fits.Accuracy.Ongoing} & \ref{fig:Fits.Accuracy.PM}), and gave a good account of the entire distribution of response times (Figures \ref{fig:Fits.RT.Ongoing.2}, \ref{fig:Fits.RT.Ongoing.5} & \ref{fig:Fits.RT.PM}). The model provided a close fit to the differences in manifest RT and accuracy observed across PM and control conditions and across different levels of time pressure. The next section explains how the model fit the data in terms of model parameters.
 
 
-```{r Fit Plot: Accuracy Ongoing, echo=FALSE, out.width='100%', fig.cap="\\label{fig:Fits.Accuracy.Ongoing}Model Fits to Ongoing Task Accuracy"}
+```{r Fit Plot: Accuracy Ongoing, echo=FALSE, out.width='100%', fig.cap="\\label{fig:Fits.Accuracy.Ongoing}Model Fits to Ongoing Task Accuracy. Data effects are represented by white dots. Model predictions are represented by black dots with 95% credible intervals."}
 
 knitr::include_graphics("figures/E1/E1.Fits.Accuracy.Ongoing.png")
 
@@ -329,7 +330,7 @@ knitr::include_graphics("figures/E1/E1.Fits.Accuracy.Ongoing.png")
 
 ```
 
-```{r Fit Plot: Accuracy PM, echo=FALSE, out.width='100%', fig.cap="\\label{fig:Fits.Accuracy.PM}Model Fits to PM Accuracy"}
+```{r Fit Plot: Accuracy PM, echo=FALSE, out.width='100%', fig.cap="\\label{fig:Fits.Accuracy.PM}Model Fits to PM Accuracy. Data effects are represented by white dots. Model predictions are represented by black dots with 95% credible intervals."}
 
 knitr::include_graphics("figures/E1/E1.Fits.Accuracy.PM.png")
 
@@ -337,7 +338,7 @@ knitr::include_graphics("figures/E1/E1.Fits.Accuracy.PM.png")
 
 ```
 
-```{r Fit Plot: RT Ongoing Low Load, echo=FALSE, out.width='100%', fig.cap="\\label{fig:Fits.RT.Ongoing.2}Model Fits to Ongoing Task RT (Low Trial Load)"}
+```{r Fit Plot: RT Ongoing Low Load, echo=FALSE, out.width='100%', fig.cap="\\label{fig:Fits.RT.Ongoing.2}Model Fits to Ongoing Task RT (Low Trial Load). Data effects are represented by white dots. Model predictions are represented by black dots with 95% credible intervals. RT distributions are summarised with three order statistics: the 0.1 quantile which captures the leading edge of the distribution, the 0.5 quantile (i.e., the median), and the 0.9 quantile which captures the tail of the distribution."}
 
 knitr::include_graphics("figures/E1/E1.Fits.RT.Ongoing.2.png")
 
@@ -345,7 +346,7 @@ knitr::include_graphics("figures/E1/E1.Fits.RT.Ongoing.2.png")
 
 ```
 
-```{r Fit Plot: RT Ongoing High Load, echo=FALSE, out.width='100%', fig.cap="\\label{fig:Fits.RT.Ongoing.5}Model Fits to Ongoing Task RT (High Trial Load)"}
+```{r Fit Plot: RT Ongoing High Load, echo=FALSE, out.width='100%', fig.cap="\\label{fig:Fits.RT.Ongoing.5}Model Fits to Ongoing Task RT (High Trial Load). Data effects are represented by white dots. Model predictions are represented by black dots with 95% credible intervals. RT distributions are summarised with three order statistics: the 0.1 quantile which captures the leading edge of the distribution, the 0.5 quantile (i.e., the median), and the 0.9 quantile which captures the tail of the distribution."}
 
 knitr::include_graphics("figures/E1/E1.Fits.RT.Ongoing.5.png")
 
@@ -353,7 +354,7 @@ knitr::include_graphics("figures/E1/E1.Fits.RT.Ongoing.5.png")
 
 ```
 
-```{r Fit Plot: RT PM, echo=FALSE, out.width='100%', fig.cap="\\label{fig:Fits.RT.PM}Model Fits to PM RT"}
+```{r Fit Plot: RT PM, echo=FALSE, out.width='100%', fig.cap="\\label{fig:Fits.RT.PM}Model Fits to PM RT. Data effects are represented by white dots. Model predictions are represented by black dots with 95% credible intervals. RT distributions are summarised with three order statistics: the 0.1 quantile which captures the leading edge of the distribution, the 0.5 quantile (i.e., the median), and the 0.9 quantile which captures the tail of the distribution."}
 
 knitr::include_graphics("figures/E1/E1.Fits.RT.PM.png")
 
@@ -371,7 +372,7 @@ Since the model was fit without explicit information about nonresponses, we were
 
 Figure \ref{fig:Fits.NR} shows observed versus predicted nonresponse proportions. As shown, the model's predicted nonresponse proportions closely match the empirical nonresponse proportions. This gives us confidence that the slight model misspecification due to fitting to truncated data is not of concern in terms of the models predictive validity. 
 
-```{r Fit Plot: Nonresponses, echo=FALSE, out.width='100%', fig.cap="\\label{fig:Fits.NR}Model Fits to Nonresponse Proportions"}
+```{r Fit Plot: Nonresponses, echo=FALSE, out.width='100%', fig.cap="\\label{fig:Fits.NR}Model Fits to Nonresponse Proportions. Data effects are represented by white dots. Model predictions are represented by black dots with 95% credible intervals."}
 
 knitr::include_graphics("figures/E1/E1.Fits.NR.png")
 
@@ -850,7 +851,7 @@ panderOptions('table.alignment.default', function(df) ifelse(sapply(df, is.numer
 LMER.CDT.Acc <- read.csv("analysis/LMER.CDT.Acc.E1.csv")
 colnames(LMER.CDT.Acc) <- c("Factor", "Chi-square", "df", "p")
 
-set.caption("Generalised Linear Mixed Effects Model: Ongoing Task Accuracy")
+set.caption("Significance testing linear predictors of ongoing task accuracy. Accuracies were analysed with a generalised linear model with a binomial probit link function which predicts the outcome of every trial. Tests for significance use Wald's chi-square test with an alpha level of .05.")
 pander(LMER.CDT.Acc, justify = c('left','right','right','right'))
 
 ```
@@ -860,7 +861,7 @@ pander(LMER.CDT.Acc, justify = c('left','right','right','right'))
 LMER.CDT.RT <- read.csv("analysis/LMER.CDT.RT.E1.csv")
 colnames(LMER.CDT.RT) <- c("Factor", "Chi-square", "df", "p")
 
-set.caption("General Linear Mixed Effects Model: Ongoing Task RT")
+set.caption("Significance testing linear predictors of ongoing task RT. RT was analysed with a general linear model which predicted mean correct RT for each participant. Tests for significance use Wald's chi-square test with an alpha level of .05.")
 pander(LMER.CDT.RT, justify = c('left','right','right','right'))
 
 ```
@@ -870,7 +871,7 @@ pander(LMER.CDT.RT, justify = c('left','right','right','right'))
 LMER.PMT.Acc <- read.csv("analysis/LMER.PMT.Acc.E1.csv")
 colnames(LMER.PMT.Acc) <- c("Factor", "Chi-square", "df", "p")
 
-set.caption("Generalised Linear Mixed Effects Model: PM Accuracy")
+set.caption("Significance testing linear predictors of PM accuracy. Accuracies were analysed with a generalised linear model with a binomial probit link function which predicts the outcome of every trial. Tests for significance use Wald's chi-square test with an alpha level of .05.")
 pander(LMER.PMT.Acc, justify = c('left','right','right','right'))
 
 ```
@@ -880,7 +881,7 @@ pander(LMER.PMT.Acc, justify = c('left','right','right','right'))
 LMER.PMT.RT <- read.csv("analysis/LMER.PMT.RT.E1.csv")
 colnames(LMER.PMT.RT) <- c("Factor", "Chi-square", "df", "p")
 
-set.caption("General Linear Mixed Effects Model: PM RT")
+set.caption("Significance testing linear predictors of PM RT. PM RT was analysed with a general linear model which predicted mean PM RT for each participant. Tests for significance use Wald's chi-square test with an alpha level of .05.")
 pander(LMER.PMT.RT, justify = c('left','right','right','right'))
 
 ```
@@ -890,7 +891,7 @@ pander(LMER.PMT.RT, justify = c('left','right','right','right'))
 LMER.CDT.Reactive <- read.csv("analysis/LMER.CDT.Reactive.E1.csv")
 colnames(LMER.CDT.Reactive) <- c("Factor", "Chi-square", "df", "p")
 
-set.caption("Generalised Linear Mixed Effects Model: Manifest Reactive Control Check")
+set.caption("Significance testing for differences in ongoing task RTs between PM and non-PM trials. RT was analysed with a general linear model which predicted mean correct RT for each participant. Tests for significance use Wald's chi-square test with an alpha level of .05.")
 pander(LMER.CDT.Reactive, justify = c('left','right','right','right'))
 
 ```
@@ -1010,19 +1011,19 @@ pander(Z.Effort.Table, justify = c('left','right','right','right'))
 
 
 
-```{r Plot: Model Exploration PM Contrasts, echo=FALSE, out.width='100%', fig.cap="\\label{fig:PM.Control.Contrast.Plots}Model Exploration: Comparison of Accuracy and RT Fits for Models with Thresholds or Rates Averaged over PM-Control Blocks"}
+```{r Plot: Model Exploration PM Contrasts, echo=FALSE, out.width='100%', fig.cap="\\label{fig:PM.Control.Contrast.Plots}Model Exploration: Comparison of Accuracy and RT Fits for Models with Thresholds or Rates Averaged over PM-Control Blocks. Data effects are represented by white dots. Model predictions are represented by black dots with 95% credible intervals."}
 
 knitr::include_graphics("figures/E1/E1.PM.Control.Contrast.Plots.png")
 
 ```
 
-```{r Plot: Model Exploration TP Contrasts, echo=FALSE, out.width='100%', fig.cap="\\label{fig:ModelExpTPContrastsOngoing}Model Exploration: Comparison of Ongoing Task Accuracy and RT Fits for Models with Thresholds or Rates Averaged over Time Pressure Conditions"}
+```{r Plot: Model Exploration TP Contrasts, echo=FALSE, out.width='100%', fig.cap="\\label{fig:ModelExpTPContrastsOngoing}Model Exploration: Comparison of Ongoing Task Accuracy and RT Fits for Models with Thresholds or Rates Averaged over Time Pressure Conditions. Data effects are represented by white dots. Model predictions are represented by black dots with 95% credible intervals."}
 
 knitr::include_graphics("figures/E1/E1.ModelExpTPContrastsOngoing.png")
 
 ```
 
-```{r Plot: Model Exploration TP Contrasts PM & Control Mechanisms, echo=FALSE, out.width='100%', fig.cap="\\label{fig:ModelExpTPContrastsPM_ControlMech}Top Panel: Model Exploration: Comparison of PM Accuracy and RT Fits for Models with Thresholds or Rates Averaged over Time Pressure Conditions. Bottom Panel: Model Exploration: Comparison of Accuracy and RT Fits for Models with Cognitive Control Mechanisms Selectively Removed."}
+```{r Plot: Model Exploration TP Contrasts PM & Control Mechanisms, echo=FALSE, out.width='100%', fig.cap="\\label{fig:ModelExpTPContrastsPM_ControlMech}Top Panel: Model Exploration: Comparison of PM Accuracy and RT Fits for Models with Thresholds or Rates Averaged over Time Pressure Conditions. Bottom Panel: Model Exploration: Comparison of Accuracy and RT Fits for Models with Cognitive Control Mechanisms Selectively Removed. Data effects are represented by white dots. Model predictions are represented by black dots with 95% credible intervals."}
 
 knitr::include_graphics("figures/E1/E1.ModelExpTPContrastsPM_ControlMech.png")
 

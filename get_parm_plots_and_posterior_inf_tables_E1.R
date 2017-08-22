@@ -870,6 +870,72 @@ av.Bs.TP.Table$Time_Pressure[grep ("\\.D", rownames(av.Bs.TP.Table))] <- "D"
 av.Bs.TP.Table
 
 
+# # # Threshold Bias by Time Pressure # # #
+#
+av.B.A2diff <- function (thetas) (thetas[,"B.A2C",, drop=F] - thetas[,"B.A2N",, drop=F])
+av.B.B2diff <- function (thetas) (thetas[,"B.B2C",, drop=F] - thetas[,"B.B2N",, drop=F])
+av.B.C2diff <- function (thetas) (thetas[,"B.C2C",, drop=F] - thetas[,"B.C2N",, drop=F])
+av.B.D2diff <- function (thetas) (thetas[,"B.D2C",, drop=F] - thetas[,"B.D2N",, drop=F])
+
+av.B.A3diff <- function (thetas) (thetas[,"B.A3C",, drop=F] - thetas[,"B.A3N",, drop=F])
+av.B.B3diff <- function (thetas) (thetas[,"B.B3C",, drop=F] - thetas[,"B.B3N",, drop=F])
+av.B.C3diff <- function (thetas) (thetas[,"B.C3C",, drop=F] - thetas[,"B.C3N",, drop=F])
+av.B.D3diff <- function (thetas) (thetas[,"B.D3C",, drop=F] - thetas[,"B.D3N",, drop=F])
+
+av.B.AP <- function (thetas) thetas[,"B.A3P",, drop=F]
+av.B.BP <- function (thetas) thetas[,"B.B3P",, drop=F]
+av.B.CP <- function (thetas) thetas[,"B.C3P",, drop=F]
+av.B.DP <- function (thetas) thetas[,"B.D3P",, drop=F]
+
+zandp(samples.E1,av.B.A2diff)
+zandp(samples.E1,av.B.B2diff)
+zandp(samples.E1,av.B.C2diff)
+zandp(samples.E1,av.B.D2diff)
+
+zandp(samples.E1,av.B.A3diff)
+zandp(samples.E1,av.B.B3diff)
+zandp(samples.E1,av.B.C3diff)
+zandp(samples.E1,av.B.D3diff)
+
+
+B.A2d <- mean.sd(samples.E1,av.B.A2diff)
+B.B2d <- mean.sd(samples.E1,av.B.B2diff)
+B.C2d <- mean.sd(samples.E1,av.B.C2diff)
+B.D2d <- mean.sd(samples.E1,av.B.D2diff)
+
+B.A3d <- mean.sd(samples.E1,av.B.A3diff)
+B.B3d <- mean.sd(samples.E1,av.B.B3diff)
+B.C3d <- mean.sd(samples.E1,av.B.C3diff)
+B.D3d <- mean.sd(samples.E1,av.B.D3diff)
+
+B.AP <- mean.sd(samples.E1,av.B.AP)
+B.BP <- mean.sd(samples.E1,av.B.BP)
+B.CP <- mean.sd(samples.E1,av.B.CP)
+B.DP <- mean.sd(samples.E1,av.B.DP)
+
+av.Bs.TP.Bias.Table <- data.frame(rbind(B.A_2_Diff=B.A2d,
+                                       B.B_2_Diff=B.B2d,
+                                       B.C_2_Diff=B.C2d,
+                                       B.D_2_Diff=B.D2d,
+
+                                       B.A_3_Diff=B.A3d,
+                                       B.B_3_Diff=B.B3d,
+                                       B.C_3_Diff=B.C3d,
+                                       B.D_3_Diff=B.D3d,
+
+                                       B.A_PM=B.AP,
+                                       B.B_PM=B.BP,
+                                       B.C_PM=B.CP,
+                                       B.D_PM=B.DP))
+av.Bs.TP.Bias.Table$Time_Pressure <- NA;
+av.Bs.TP.Bias.Table <- av.Bs.TP.Bias.Table[ , c("Time_Pressure", "M", "SD")]
+av.Bs.TP.Bias.Table$Time_Pressure[grep ("\\.C", rownames(av.Bs.TP.Bias.Table))] <- "C";
+av.Bs.TP.Bias.Table$Time_Pressure[grep ("\\.A", rownames(av.Bs.TP.Bias.Table))] <- "A";
+av.Bs.TP.Bias.Table$Time_Pressure[grep ("\\.B", rownames(av.Bs.TP.Bias.Table))] <- "B";
+av.Bs.TP.Bias.Table$Time_Pressure[grep ("\\.D", rownames(av.Bs.TP.Bias.Table))] <- "D"
+av.Bs.TP.Bias.Table
+
+
 # # # Rates by PM Block (averaged over Time Pressure) # # #
 #
 av.V.cor2o <- function (thetas) (thetas[,"mean_v.ccA2C",, drop=F] + thetas[,"mean_v.ccB2C",, drop=F] +
@@ -1216,6 +1282,53 @@ Proactive.Plots <- grid.arrange(Proactive.PM.Plot, Proactive.TP.Plot, layout_mat
     c(1,1,1,2,2,2,2,2), c(1,1,1,2,2,2,2,2)))
 
 
+
+# Response Bias by Time Pressure Plot
+av.Bs.TP.Bias.Table
+pcTP.plot.df <- av.Bs.TP.Bias.Table
+pcTP.plot.df
+pcTP.plot.df$S <- NA;
+pcTP.plot.df$PM <- NA;
+pcTP.plot.df$TP <- NA; pcTP.plot.df$Load <- NA
+pcTP.plot.df$S[grep ("Diff", rownames(pcTP.plot.df))] <- "Threshold Difference"
+pcTP.plot.df$S[grep ("PM", rownames(pcTP.plot.df))] <- "PM Threshold"
+pcTP.plot.df$TP[grep ("B.A_", rownames(pcTP.plot.df))] <- "Low"
+pcTP.plot.df$TP[grep ("B.B_", rownames(pcTP.plot.df))] <- "High"
+pcTP.plot.df$TP[grep ("B.C_", rownames(pcTP.plot.df))] <- "Low"
+pcTP.plot.df$TP[grep ("B.D_", rownames(pcTP.plot.df))] <- "High"
+pcTP.plot.df$Load[grep ("B.A_", rownames(pcTP.plot.df))] <- "2 decisions per trial"
+pcTP.plot.df$Load[grep ("B.B_", rownames(pcTP.plot.df))] <- "2 decisions per trial"
+pcTP.plot.df$Load[grep ("B.C_", rownames(pcTP.plot.df))] <- "5 decisions per trial"
+pcTP.plot.df$Load[grep ("B.D_", rownames(pcTP.plot.df))] <- "5 decisions per trial"
+pcTP.plot.df$PM[grep ("_2", rownames(pcTP.plot.df))] <- "Control"
+pcTP.plot.df$PM[grep ("_3", rownames(pcTP.plot.df))] <- "PM"
+pcTP.plot.df
+pcTP.plot.df$TP <- factor(pcTP.plot.df$TP, levels=c("Low","High"))
+
+Proactive.TP.Bias.Plot <- ggplot(pcTP.plot.df[ pcTP.plot.df$S=="Threshold Difference", ], aes(factor(TP),M, shape=PM)) +
+    geom_point(stat = "identity",aes(), size=3) +
+    geom_errorbar(aes(ymax = M + SD, ymin = M - SD, width = 0.2)) +
+    geom_rect(data=NULL,aes(xmin=-Inf,xmax=Inf,ymin=0,ymax=Inf),alpha=0.05,
+              fill="forestgreen") +
+    geom_rect(data=NULL,aes(xmin=-Inf,xmax=Inf,ymin=-Inf,ymax=0),alpha=0.05,
+              fill="red") +
+    geom_hline(yintercept = 0, linetype="dashed") +
+    xlab("Time Pressure") + ylab("Threshold Difference") +
+    scale_shape_discrete("PM Block:") +
+    annotate(geom="text", x=1.5, y=0.2, label="Nonconflict \nBias", color="forestgreen") +
+    annotate(geom="text", x=1.5, y=-0.19, label="Conflict \nBias", color="orangered") +
+
+    ylim(-0.25,0.25) +
+    theme(text = element_text()) +
+    theme(
+        axis.line.x = element_line(),
+        axis.line.y = element_line()
+    ) + geom_line(aes(group=PM, y=M), linetype=2) +
+    ggtitle("Proactive Response Bias: \nConflict-Nonconflict Threshold Differences by Time Pressure and Trial Load") +
+    facet_grid(. ~ Load)
+Proactive.TP.Bias.Plot
+
+
 # # # Save Plots and Tables # # #
 #
 ## Nondecision Time
@@ -1264,6 +1377,10 @@ ggsave("figures/E1/E1.Proactive.Control.PM.png", plot = plot, height = 4, width 
 
 plot <- Proactive.TP.Plot
 ggsave("figures/E1/E1.Proactive.Control.TP.png", plot = plot, height = 6.5, width = 9)
+# plot(plot)
+
+plot <- Proactive.TP.Bias.Plot
+ggsave("figures/E1/E1.Proactive.Bias.TP.png", plot = plot, height = 6.5, width = 9)
 # plot(plot)
 
 

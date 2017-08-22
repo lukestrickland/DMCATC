@@ -56,7 +56,39 @@ for(i in 1:length(data.E1$RT)){
 
 
 
+# # # Correct vs Error RT # # #
+#
+# Ongoing task
+mean(data.E1$RT[ data.E1$C==1 & (data.E1$S=="cc" | data.E1$S=="nn") ], na.rm=TRUE)
+mean(data.E1$RT[ data.E1$C==0 & (data.E1$S=="cc" | data.E1$S=="nn") ], na.rm=TRUE)
 
+t.test(data.E1$RT[ data.E1$C==1 & (data.E1$S=="cc" | data.E1$S=="nn") ],data.E1$RT[ data.E1$C==0 & (data.E1$S=="cc" | data.E1$S=="nn") ])
+cohensD(data.E1$RT[ data.E1$C==1 & (data.E1$S=="cc" | data.E1$S=="nn") ],data.E1$RT[ data.E1$C==0 & (data.E1$S=="cc" | data.E1$S=="nn") ])
+
+# PM repsonses
+mean(data.E1$RT[ data.E1$C==1 & (data.E1$S=="pc" | data.E1$S=="pn") ], na.rm=TRUE)
+mean(data.E1$RT[ data.E1$C==0 & (data.E1$S=="pc" | data.E1$S=="pn") ], na.rm=TRUE)
+
+t.test(data.E1$RT[ data.E1$C==1 & (data.E1$S=="pc" | data.E1$S=="pn") ],data.E1$RT[ data.E1$C==0 & (data.E1$S=="pc" | data.E1$S=="pn") ])
+cohensD(data.E1$RT[ data.E1$C==1 & (data.E1$S=="pc" | data.E1$S=="pn") ],data.E1$RT[ data.E1$C==0 & (data.E1$S=="pc" | data.E1$S=="pn") ])
+
+
+mean(data.E1$RT[ data.E1$C==1 & data.E1$S=="cc" ], na.rm=TRUE)
+mean(data.E1$RT[ data.E1$C==0 & data.E1$S=="cc" ], na.rm=TRUE)
+
+mean(data.E1$RT[ data.E1$C==1 & data.E1$S=="nn" ], na.rm=TRUE)
+mean(data.E1$RT[ data.E1$C==0 & data.E1$S=="nn" ], na.rm=TRUE)
+
+mean(data.E1$RT[ data.E1$C==1 & data.E1$S=="pc" ], na.rm=TRUE)
+mean(data.E1$RT[ data.E1$C==0 & data.E1$S=="pc" ], na.rm=TRUE)
+
+mean(data.E1$RT[ data.E1$C==1 & data.E1$S=="pn" ], na.rm=TRUE)
+mean(data.E1$RT[ data.E1$C==0 & data.E1$S=="pn" ], na.rm=TRUE)
+
+t.test(data.E1$RT[ data.E1$C==1 & data.E1$S=="cc" ],data.E1$RT[ data.E1$C==0 & data.E1$S=="cc" ])
+t.test(data.E1$RT[ data.E1$C==1 & data.E1$S=="nn" ],data.E1$RT[ data.E1$C==0 & data.E1$S=="nn" ])
+t.test(data.E1$RT[ data.E1$C==1 & data.E1$S=="pc" ],data.E1$RT[ data.E1$C==0 & data.E1$S=="pc" ])
+t.test(data.E1$RT[ data.E1$C==1 & data.E1$S=="pn" ],data.E1$RT[ data.E1$C==0 & data.E1$S=="pn" ])
 
 
 # # # Prep dataframes for analysis # # #
