@@ -3,6 +3,7 @@ title: "Results and Modelling for ATC Experiment E1"
 author: "R. Boag"
 date: ''
 output:
+  word_document: default
   pdf_document: default
   html_document: default
 geometry: margin=0.75in
