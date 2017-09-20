@@ -6,7 +6,7 @@ output:
   pdf_document: default
   html_document: default
   word_document: default
-geometry: margin=1in
+geometry: margin=0.75in
 header-includes: \usepackage{setspace}\doublespacing
 fontsize: 11pt
 fig_caption: yes

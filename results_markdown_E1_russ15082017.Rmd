@@ -5,7 +5,8 @@ date: ''
 output:
   pdf_document: default
   html_document: default
-geometry: margin=1in
+geometry: margin=0.75in
+header-includes: \usepackage{setspace}\doublespacing
 fontsize: 11pt
 fig_caption: yes
 ---
@@ -161,7 +162,7 @@ linear mixed models with a probit link function. In our omnibus significance tes
 for mean correct RTs we used general linear mixed models. Significance was assessed with Wald's chi-square tests, and an alpha level of 
 0.05 was used in all analyses. The results of our omnibus analyses are tabulated 
 in the supplementary materials. All standard errors reported in text and 
-displayed in graphs were calculated using the bias corrected method.
+displayed in graphs were calculated using the bias-corrected method (Morey, 2008).
 
 
 ## Ongoing Task (Non-PM) Trials
@@ -322,7 +323,7 @@ To evaluate fit, we sampled 100 posterior predictions for each participant and
 then averaged over participants. The model provided good fits to both ongoing task and PM accuracy (Figures \ref{fig:Fits.Accuracy.Ongoing} & \ref{fig:Fits.Accuracy.PM}), and gave a good account of the entire distribution of response times (Figures \ref{fig:Fits.RT.Ongoing.2}, \ref{fig:Fits.RT.Ongoing.5} & \ref{fig:Fits.RT.PM}). The model provided a close fit to the differences in manifest RT and accuracy observed across PM and control conditions and across different levels of time pressure. The next section explains how the model fit the data in terms of model parameters.
 
 
-```{r Fit Plot: Accuracy Ongoing, echo=FALSE, out.width='100%', fig.cap="\\label{fig:Fits.Accuracy.Ongoing}Model Fits to Ongoing Task Accuracy. Data effects are represented by white dots. Model predictions are represented by black dots with 95% credible intervals."}
+```{r Fit Plot: Accuracy Ongoing, echo=FALSE, out.width='80%', fig.cap="\\label{fig:Fits.Accuracy.Ongoing}Model Fits to Ongoing Task Accuracy. Data effects are represented by white dots. Model predictions are represented by black dots with 95% credible intervals."}
 
 knitr::include_graphics("figures/E1/E1.Fits.Accuracy.Ongoing.png")
 
@@ -330,7 +331,7 @@ knitr::include_graphics("figures/E1/E1.Fits.Accuracy.Ongoing.png")
 
 ```
 
-```{r Fit Plot: Accuracy PM, echo=FALSE, out.width='100%', fig.cap="\\label{fig:Fits.Accuracy.PM}Model Fits to PM Accuracy. Data effects are represented by white dots. Model predictions are represented by black dots with 95% credible intervals."}
+```{r Fit Plot: Accuracy PM, echo=FALSE, out.width='80%', fig.cap="\\label{fig:Fits.Accuracy.PM}Model Fits to PM Accuracy. Data effects are represented by white dots. Model predictions are represented by black dots with 95% credible intervals."}
 
 knitr::include_graphics("figures/E1/E1.Fits.Accuracy.PM.png")
 
@@ -338,7 +339,7 @@ knitr::include_graphics("figures/E1/E1.Fits.Accuracy.PM.png")
 
 ```
 
-```{r Fit Plot: RT Ongoing Low Load, echo=FALSE, out.width='100%', fig.cap="\\label{fig:Fits.RT.Ongoing.2}Model Fits to Ongoing Task RT (Low Trial Load). Data effects are represented by white dots. Model predictions are represented by black dots with 95% credible intervals. RT distributions are summarised with three order statistics: the 0.1 quantile which captures the leading edge of the distribution, the 0.5 quantile (i.e., the median), and the 0.9 quantile which captures the tail of the distribution."}
+```{r Fit Plot: RT Ongoing Low Load, echo=FALSE, out.width='80%', fig.cap="\\label{fig:Fits.RT.Ongoing.2}Model Fits to Ongoing Task RT (Low Trial Load). Data effects are represented by white dots. Model predictions are represented by black dots with 95% credible intervals. RT distributions are summarised with three order statistics: the 0.1 quantile which captures the leading edge of the distribution, the 0.5 quantile (i.e., the median), and the 0.9 quantile which captures the tail of the distribution."}
 
 knitr::include_graphics("figures/E1/E1.Fits.RT.Ongoing.2.png")
 
@@ -346,7 +347,7 @@ knitr::include_graphics("figures/E1/E1.Fits.RT.Ongoing.2.png")
 
 ```
 
-```{r Fit Plot: RT Ongoing High Load, echo=FALSE, out.width='100%', fig.cap="\\label{fig:Fits.RT.Ongoing.5}Model Fits to Ongoing Task RT (High Trial Load). Data effects are represented by white dots. Model predictions are represented by black dots with 95% credible intervals. RT distributions are summarised with three order statistics: the 0.1 quantile which captures the leading edge of the distribution, the 0.5 quantile (i.e., the median), and the 0.9 quantile which captures the tail of the distribution."}
+```{r Fit Plot: RT Ongoing High Load, echo=FALSE, out.width='80%', fig.cap="\\label{fig:Fits.RT.Ongoing.5}Model Fits to Ongoing Task RT (High Trial Load). Data effects are represented by white dots. Model predictions are represented by black dots with 95% credible intervals. RT distributions are summarised with three order statistics: the 0.1 quantile which captures the leading edge of the distribution, the 0.5 quantile (i.e., the median), and the 0.9 quantile which captures the tail of the distribution."}
 
 knitr::include_graphics("figures/E1/E1.Fits.RT.Ongoing.5.png")
 
@@ -354,7 +355,7 @@ knitr::include_graphics("figures/E1/E1.Fits.RT.Ongoing.5.png")
 
 ```
 
-```{r Fit Plot: RT PM, echo=FALSE, out.width='100%', fig.cap="\\label{fig:Fits.RT.PM}Model Fits to PM RT. Data effects are represented by white dots. Model predictions are represented by black dots with 95% credible intervals. RT distributions are summarised with three order statistics: the 0.1 quantile which captures the leading edge of the distribution, the 0.5 quantile (i.e., the median), and the 0.9 quantile which captures the tail of the distribution."}
+```{r Fit Plot: RT PM, echo=FALSE, out.width='80%', fig.cap="\\label{fig:Fits.RT.PM}Model Fits to PM RT. Data effects are represented by white dots. Model predictions are represented by black dots with 95% credible intervals. RT distributions are summarised with three order statistics: the 0.1 quantile which captures the leading edge of the distribution, the 0.5 quantile (i.e., the median), and the 0.9 quantile which captures the tail of the distribution."}
 
 knitr::include_graphics("figures/E1/E1.Fits.RT.PM.png")
 
@@ -372,7 +373,7 @@ Since the model was fit without explicit information about nonresponses, we were
 
 Figure \ref{fig:Fits.NR} shows observed versus predicted nonresponse proportions. As shown, the model's predicted nonresponse proportions closely match the empirical nonresponse proportions. This gives us confidence that the slight model misspecification due to fitting to truncated data is not of concern in terms of the models predictive validity. To verify this result, we also predicted nonresponses via a second method in which RT truncation was built-in to the simulation rather than RTs being censored after simulation. The fits produced by this method were not noticeably different than the fits presented.
 
-```{r Fit Plot: Nonresponses, echo=FALSE, out.width='100%', fig.cap="\\label{fig:Fits.NR}Model Fits to Nonresponse Proportions. Data effects are represented by white dots. Model predictions are represented by black dots with 95% credible intervals."}
+```{r Fit Plot: Nonresponses, echo=FALSE, out.width='80%', fig.cap="\\label{fig:Fits.NR}Model Fits to Nonresponse Proportions. Data effects are represented by white dots. Model predictions are represented by black dots with 95% credible intervals."}
 
 knitr::include_graphics("figures/E1/E1.Fits.NR.png")
 
@@ -604,7 +605,19 @@ knitr::include_graphics("figures/E1/E1.Proactive.Control.TP.png")
 
 #### Proactive Control of Response Bias under Time Pressure
 
-Figure \ref{fig:Proactive.Bias.TP} plots response threshold bias (i.e., the difference between conflict and nonconflict thresholds) by time pressure. The dotted horizontal line represents the zero-bias point; the point where conflict and nonconflict thresholds are equal. Values above the zero-line indicate that nonconflict thresholds were lower than conflict thresholds (i.e., a bias toward responding 'nonconflict'). Likewise, values below the zero-line indicate that conflict thresholds were lower than nonconflict thresholds (i.e., a bias toward responding 'conflict'). As shown, response bias flips from favoring nonconflict responses under low time pressure to favoring conflict responses under high time pressure during PM blocks. The same trend occurs (i.e., increased bias towards responding 'conflict') during control blocks but does not completely reverse direction. This indicates that under high time pressure, participants lower their conflict thresholds relative to their nonconflict thresholds. This facilitates faster conflict responses but increases the frequency of conflict false alarms. This finding gels with the findings of Loft, Bolland, Humphreys, and Neal (2009) which suggest that air-traffic controllers apply larger safety margins by deliberately shifting bias towards conflict responses when placed under time pressure. Loft et al. (2009) argued that although this strategy increases the false alarm rate, the bias has the effect of ensuring safety over strict accuracy.
+```{r Z Table: Bias Shifts with Time Pressure (in-text), echo=FALSE, include=FALSE}
+
+Z.Bias.TP.Table <- read.csv("analysis/Z.Proactive.Bias.E1.csv")
+Z.Bias.TP.Table <- data.frame(Z.Bias.TP.Table)
+
+pander(Z.Bias.TP.Table)
+
+# set.caption("_Z_-values (with associated posterior predictive _p_-values in brackets) for response threshold contrasts relevant to proactive shifts in threshold bias under time pressure. The difference distribution was calculated by subtracting the difference between conflict and nonconflict thresholds in low time pressure blocks from the difference between conflict and nonconflict thresholds in high time pressure ongoing task thresholds. A positive difference indicates a shift from nonconflict bias to conflict bias under high time pressure.")
+# pander(Z.Bias.TP.Table.Collapsed, justify = c('left','right','right'))
+
+```
+
+Figure \ref{fig:Proactive.Bias.TP} plots response threshold bias (i.e., the difference between conflict and nonconflict thresholds) by time pressure. The dotted horizontal line represents the zero-bias point; the point where conflict and nonconflict thresholds are equal. Values above the zero-line indicate that nonconflict thresholds were lower than conflict thresholds (i.e., a bias toward responding 'nonconflict'). Likewise, values below the zero-line indicate that conflict thresholds were lower than nonconflict thresholds (i.e., a bias toward responding 'conflict'). As shown, response bias flips from favoring nonconflict responses under low time pressure to favoring conflict responses under high time pressure during PM blocks. This occurs under both low trial load (_Z_ = 2.85, _p_ = 0.002) and high trial load conditions (_Z_ = 2.92, _p_ = 0.002). The same trend occurs (i.e., increased bias towards responding 'conflict') during control blocks but only reaches significance under high trial load (_Z_ = 2.17, _p_ = 0.016) and does not completely reverse direction (i.e., does not completely flip from a nonconflict to a conflict bias). This indicates that under high time pressure, participants lower their conflict thresholds relative to their nonconflict thresholds. This facilitates faster conflict responses but increases the frequency of conflict false alarms. This finding gels with the findings of Loft, Bolland, Humphreys, and Neal (2009) which suggest that air-traffic controllers apply larger safety margins by deliberately shifting bias towards conflict responses when placed under time pressure. Loft et al. (2009) argued that although this strategy increases the false alarm rate, the bias has the effect of ensuring safety over strict accuracy.
 
 
 ```{r Plot: Threshold Bias TP, echo=FALSE, out.width='100%', fig.cap="\\label{fig:Proactive.Bias.TP}Response Threshold Bias by Time Pressure.  Central symbols represent posterior mean difference between Conflict and Nonconflict thresholds. Error bars represent +/- 1 posterior standard deviation. Dotted horizontal line represents the zero-bias point (i.e., equal thresholds). Above the zero-line indicates lower Nonconflict than Conflict thresholds. Below indicates lower Conflict than Nonconflict thresholds."}
@@ -819,9 +832,9 @@ pander(PM.Control.Contrast.Percent.Table)
 
 As shown in Figure \ref{fig:PM.Control.Contrast.Plots}, the full (selected) model accounted for the accuracy and RT costs associated with PM demand fairly well, providing close fits to the difference between control and PM accuracy for both conflict and nonconflict stimuli, and closely fit the cost to both correct and error RT for both ongoing task responses. 
 
-Averaging the ongoing task thresholds between control and PM blocks made the model overpredict the cost to ongoing task accuracy, more so for conflicts than nonconflicts, and dramatically underpredict the cost to both correct and error ongoing task RT (so much so that the model in fact predicted a PM advantage to ongoing task RT rather than a cost). This further indicates that proactive control of thresholds is an important mechanism in explaining PM costs effects, in particular costs to ongoing task RT. 
+Averaging the ongoing task thresholds between control and PM blocks made the model overpredict the cost to ongoing task accuracy, more so for conflicts than nonconflicts, and dramatically underpredict the cost to both correct and error ongoing task RT (so much so that the model in fact predicted a PM advantage to ongoing task RT rather than a cost). That is, adopting higher ongoing task thresholds under PM load facilitated accurate ongoing task performance under PM load, but was also the primary driver of the PM costs in terms of ongoing task RT. This further indicates that proactive control of thresholds is an important mechanism in explaining PM costs effects, in particular costs to ongoing task RT. 
 
-In contrast, averaging the ongoing task accumulation rates between control and PM blocks caused the model to underpredict costs to ongoing task accuracy (predicting an accuracy advantage for conflicts) and overpredict costs to both correct and error ongoing task RT. This suggests that reactive inhibition of accumulation rates is also an important mechanism in explaining the differences in ongoing task accuracy and RT that occur under PM demand.
+In contrast, averaging the ongoing task accumulation rates between control and PM blocks caused the model to underpredict costs to ongoing task accuracy (predicting an accuracy advantage for conflicts) and overpredict costs to both correct and error ongoing task RT. That is, rate increases between control and PM blocks improved the speed but reduced the accuracy of ongoing task performance under PM load. This supports the idea that modulation of accumulation rates is also an important mechanism in explaining the differences in ongoing task accuracy and RT that occur under PM demand.
 
 
 ### Time Pressure Effects
@@ -849,11 +862,11 @@ In terms of time pressure effects, the full model provided a very close account 
 
 Averaging the ongoing task thresholds made the model overpredict the cost to ongoing task accuracy under increased time pressure for conflcits, that is, it predicted lower conflict accuracy in the high time pressure blocks than was observed. Conversely, the model underpredicted the cost to ongoing task accuracy under increased time pressure for nonconflcits, that is, it predicted higher nonconflict accuracy in the high time pressure blocks than was observed. 
 
-Similarly, the averaged-threshold model underpredicted RT differences between high and low time pressure blocks for both correct and error conflict and nonconflict responses (i.e., it predicted less of a speed-up from low to high time pressure than was observed). This provides further evidence that proactive control mechanisms are critical for explaining empirical speed-accuracy trade-off effects under different levels of time pressure. 
+Similarly, the averaged-threshold model underpredicted RT differences between high and low time pressure blocks for both correct and error conflict and nonconflict responses (i.e., it predicted less of a speed-up from low to high time pressure than was observed). That is, the primary consequence of lowering thresholds under high time pressure was an overall increase in the speed of responding. This provides further evidence that proactive control mechanisms are critical for explaining empirical speed-accuracy trade-off effects under different levels of time pressure. 
 
-Averaging the ongoing task accumulation rates resulted in a model that underpredicts the cost to ongoing task accuracy under increased time pressure (actually predicting an accuracy advantage for conflicts under high time pressure instead of the observed cost). Likewise, the averaged-rates model underpredicts RT differences between high and low time pressure blocks for both correct and error conflict and nonconflict responses, predicteding less of a speed-up from low to high time pressure than was observed. 
+Averaging the ongoing task accumulation rates resulted in a model that underpredicts the cost to ongoing task accuracy under increased time pressure (actually predicting an accuracy advantage for conflicts under high time pressure instead of the observed cost). Likewise, the averaged-rates model underpredicts RT differences between high and low time pressure blocks for both correct and error conflict and nonconflict responses, predicteding less of a speed-up from low to high time pressure than was observed. That is, rate increases between low and high time pressure conditions improved the speed but reduced the accuracy of ongoing task responses under high time pressure. 
 
-In terms of PM responses, the averaged-threshold model maintained close fits to PM accuracy, but severely underpredicted RT differences between high and low time pressure blocks. In contrast, the averaged-rates model maintained close fits with PM RT, but underpredicted accuracy differences between high and low time pressure blocks (i.e., predicted higher PM accuracy under high time pressure than was observed). Taken together, both proactive and reactive control mechanisms appear necessary to account for the full range of RT and accuracy differences under different levels of time pressure. 
+In terms of PM responses, the averaged-threshold model maintained close fits to PM accuracy, but severely underpredicted RT differences between high and low time pressure blocks. In contrast, the averaged-rates model maintained close fits with PM RT, but underpredicted accuracy differences between high and low time pressure blocks (i.e., predicted higher PM accuracy under high time pressure than was observed). That is, PM RT was more related to thresholds than accumulation rates, whereas PM accuracy was more related to accumulation rates than thresholds. Taken together, both proactive and reactive control mechanisms appear necessary to account for the full range of RT and accuracy differences under different levels of time pressure. 
 
 
 ### Importance of Cognitive Control Mechanisms
@@ -995,6 +1008,21 @@ pander(Z.Proactive.TP.Table, justify = c('left','right','right'))
 
 ```
 
+
+```{r Z Table: Bias Shifts with Time Pressure (supplementary), echo=FALSE, include=TRUE}
+
+Z.Bias.TP.Table <- read.csv("analysis/Z.Proactive.Bias.E1.csv")
+Z.Bias.TP.Table <- data.frame(Z.Bias.TP.Table)
+colnames(Z.Bias.TP.Table) <- c("Contrast","Control","PM")
+levels(Z.Bias.TP.Table$Contrast) <- c("Shift in Bias: A-B","Shift in Bias: B-C","Shift in Bias: C-D")
+pander(Z.Bias.TP.Table)
+
+set.caption("_Z_-values (with associated posterior predictive _p_-values in brackets) for response threshold difference contrasts relevant to proactive shifts in threshold bias under time pressure. The difference distribution was calculated by subtracting the difference between conflict and nonconflict thresholds in low time pressure blocks from the difference between conflict and nonconflict thresholds in high time pressure ongoing task thresholds. A positive difference indicates a shift from nonconflict bias to conflict bias under high time pressure.")
+pander(Z.Bias.TP.Table, justify = c('left','right','right'))
+
+```
+
+
 ```{r Z Table: Reactive Inhibition (supplementary), echo=FALSE, include=TRUE}
 
 panderOptions('table.alignment.default', function(df) ifelse(sapply(df, is.numeric), 'center', 'left'))
@@ -1045,19 +1073,19 @@ pander(Z.Effort.Table, justify = c('left','right','right','right'))
 
 
 
-```{r Plot: Model Exploration PM Contrasts, echo=FALSE, out.width='50%', fig.cap="\\label{fig:PM.Control.Contrast.Plots}Model Exploration: Comparison of Accuracy and RT Fits for Models with Thresholds or Rates Averaged over PM-Control Blocks. Data effects are represented by white dots. Model predictions are represented by black dots with 95% credible intervals."}
+```{r Plot: Model Exploration PM Contrasts, echo=FALSE, out.width='80%', fig.cap="\\label{fig:PM.Control.Contrast.Plots}Model Exploration: Comparison of Accuracy and RT Fits for Models with Thresholds or Rates Averaged over PM-Control Blocks. Data effects are represented by white dots. Model predictions are represented by black dots with 95% credible intervals."}
 
 knitr::include_graphics("figures/E1/E1.PM.Control.Contrast.Plots.png")
 
 ```
 
-```{r Plot: Model Exploration TP Contrasts, echo=FALSE, out.width='50%', fig.cap="\\label{fig:ModelExpTPContrastsOngoing}Model Exploration: Comparison of Ongoing Task Accuracy and RT Fits for Models with Thresholds or Rates Averaged over Time Pressure Conditions. Data effects are represented by white dots. Model predictions are represented by black dots with 95% credible intervals."}
+```{r Plot: Model Exploration TP Contrasts, echo=FALSE, out.width='80%', fig.cap="\\label{fig:ModelExpTPContrastsOngoing}Model Exploration: Comparison of Ongoing Task Accuracy and RT Fits for Models with Thresholds or Rates Averaged over Time Pressure Conditions. Data effects are represented by white dots. Model predictions are represented by black dots with 95% credible intervals."}
 
 knitr::include_graphics("figures/E1/E1.ModelExpTPContrastsOngoing.png")
 
 ```
 
-```{r Plot: Model Exploration TP Contrasts PM & Control Mechanisms, echo=FALSE, out.width='50%', fig.cap="\\label{fig:ModelExpTPContrastsPM_ControlMech}Top Panel: Model Exploration: Comparison of PM Accuracy and RT Fits for Models with Thresholds or Rates Averaged over Time Pressure Conditions. Bottom Panel: Model Exploration: Comparison of Accuracy and RT Fits for Models with Cognitive Control Mechanisms Selectively Removed. Data effects are represented by white dots. Model predictions are represented by black dots with 95% credible intervals."}
+```{r Plot: Model Exploration TP Contrasts PM & Control Mechanisms, echo=FALSE, out.width='80%', fig.cap="\\label{fig:ModelExpTPContrastsPM_ControlMech}Top Panel: Model Exploration: Comparison of PM Accuracy and RT Fits for Models with Thresholds or Rates Averaged over Time Pressure Conditions. Bottom Panel: Model Exploration: Comparison of Accuracy and RT Fits for Models with Cognitive Control Mechanisms Selectively Removed. Data effects are represented by white dots. Model predictions are represented by black dots with 95% credible intervals."}
 
 knitr::include_graphics("figures/E1/E1.ModelExpTPContrastsPM_ControlMech.png")
 

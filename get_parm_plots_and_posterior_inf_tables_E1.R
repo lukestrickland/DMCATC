@@ -936,6 +936,28 @@ av.Bs.TP.Bias.Table$Time_Pressure[grep ("\\.D", rownames(av.Bs.TP.Bias.Table))] 
 av.Bs.TP.Bias.Table
 
 
+av.B.AB2diff <- function (thetas) ((thetas[,"B.A2C",, drop=F] - thetas[,"B.A2N",, drop=F]) -
+                                      (thetas[,"B.B2C",, drop=F] - thetas[,"B.B2N",, drop=F]))
+av.B.BC2diff <- function (thetas) ((thetas[,"B.B2C",, drop=F] - thetas[,"B.B2N",, drop=F]) -
+                                       (thetas[,"B.C2C",, drop=F] - thetas[,"B.C2N",, drop=F]))
+av.B.CD2diff <- function (thetas) ((thetas[,"B.C2C",, drop=F] - thetas[,"B.C2N",, drop=F]) -
+                                       (thetas[,"B.D2C",, drop=F] - thetas[,"B.D2N",, drop=F]))
+
+av.B.AB3diff <- function (thetas) ((thetas[,"B.A3C",, drop=F] - thetas[,"B.A3N",, drop=F]) -
+                                       (thetas[,"B.B3C",, drop=F] - thetas[,"B.B3N",, drop=F]))
+av.B.BC3diff <- function (thetas) ((thetas[,"B.B3C",, drop=F] - thetas[,"B.B3N",, drop=F]) -
+                                       (thetas[,"B.C3C",, drop=F] - thetas[,"B.C3N",, drop=F]))
+av.B.CD3diff <- function (thetas) ((thetas[,"B.C3C",, drop=F] - thetas[,"B.C3N",, drop=F]) -
+                                       (thetas[,"B.D3C",, drop=F] - thetas[,"B.D3N",, drop=F]))
+
+
+Bias.Z.Table <- data.frame(rbind(
+    A.minus.B=c(zandp(samples.E1, av.B.AB2diff),zandp(samples.E1, av.B.AB3diff)),
+    B.minus.C=c(zandp(samples.E1, av.B.BC2diff),zandp(samples.E1, av.B.BC3diff)),
+    C.minus.D=c(zandp(samples.E1, av.B.CD2diff),zandp(samples.E1, av.B.CD3diff))))
+colnames(Bias.Z.Table) <- c("Control","PM")
+Bias.Z.Table
+
 # # # Rates by PM Block (averaged over Time Pressure) # # #
 #
 av.V.cor2o <- function (thetas) (thetas[,"mean_v.ccA2C",, drop=F] + thetas[,"mean_v.ccB2C",, drop=F] +
@@ -1392,6 +1414,10 @@ write.csv(table, file = "analysis/Z.Proactive.PM.E1.csv")
 table <- Proactive.PM.Table.Collapsed
 pander(table)
 write.csv(table, file = "analysis/Z.Proactive.PM.Collapsed.E1.csv")
+
+table <- Bias.Z.Table
+pander(table)
+write.csv(table, file = "analysis/Z.Proactive.Bias.E1.csv")
 
 
 
