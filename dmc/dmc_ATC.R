@@ -758,8 +758,8 @@ cond.effects <- function (currentsim) {
 }
 
 
-#The below function picks certain parameters from a list called pickps_set,
-# and replaces them with pickps_other, before performing posterior prediciton.
+#The below function picks certain parameters from a vector called pickps_other,
+# and replaces them with pickps_set, before performing posterior prediciton.
 # We use it to turn control mechanisms off in the model. To turn off proactive
 # control, we set the ongoing task thresholds equal in the PM block to the control
 #threshols. To turn off reactive, we set the ongiong rates on PM trials (PM block)
@@ -780,23 +780,23 @@ cond.effects <- function (currentsim) {
 
 
 pickps.post.predict.dmc = function(samples,n.post=100,probs=c(1:99)/100,random=TRUE,
-                                 bw="nrd0",report=10,save.simulation=TRUE,factors=NA, pickps_others, pickps_set)
+                                   bw="nrd0",report=10,save.simulation=TRUE,factors=NA, pickps_others, pickps_set)
   # make list of posterior preditive density, quantiles and response p(robability)
 {
-
-
+  
+  
   get.dqp <- function(sim,facs,probs,n.post=NA) {
-
+    
     quantile.names <- function(x,probs=seq(0, 1, 0.25),na.rm=FALSE,type=7, ...) {
       out <- quantile(x,probs=probs,na.rm=na.rm,type=type,names=FALSE,...)
       names(out) <- probs*100
       if (all(is.na(out))) NULL else out
     }
-
+    
     qs <- tapply(sim$RT,sim[,c(facs,"R")],quantile.names,probs=probs,na.rm=TRUE)
     #     qs <- apply(qs,1:length(dim(qs)),function(x){
     #       if ( is.null(x[[1]]) || all(is.na(x[[1]]))) NULL else x[[1]]})
-
+    
     # get probabilities given not na
     simOK <- sim[!is.na(sim$RT),]
     p <- tapply(simOK$RT,simOK[,c(facs,"R")],length)
@@ -810,7 +810,7 @@ pickps.post.predict.dmc = function(samples,n.post=100,probs=c(1:99)/100,random=T
     pNA <- tapply(is.na(sim$RT),sim[,c(facs,"R")],sum)
     pNA[is.na(pNA)] <- 0 # In case some cells are empty
     pNA <- pNA/npNA
-
+    
     # For a simulation get proability replicates
     if (!is.na(n.post)) {
       repfac <- rep(1:n.post,each=sum(ns))
@@ -826,7 +826,7 @@ pickps.post.predict.dmc = function(samples,n.post=100,probs=c(1:99)/100,random=T
       ps=NULL
       pNAs=NULL
     }
-
+    
     # cell names
     cell.names <- dimnames(qs)[[1]]
     n.cell <- length(facs)+1
@@ -863,7 +863,7 @@ pickps.post.predict.dmc = function(samples,n.post=100,probs=c(1:99)/100,random=T
     }
     list(pdf=dens,cdf=qs,p=p,ps=ps,pNA=pNA,pNAs=pNAs)
   }
-
+  
   model <- attributes(samples$data)$model
   facs <- names(attr(model,"factors"))
   if (any(is.na(factors))) factors <- facs
@@ -880,10 +880,14 @@ pickps.post.predict.dmc = function(samples,n.post=100,probs=c(1:99)/100,random=T
   }
   n.post <- length(use)
   posts <- thetas[use,]
-
+  
+  #more robust
+  
+  
   ###Replace some parameter vlaues with others.
-  posts[,colnames(posts) %in% pickps_others] <- posts[,colnames(posts) %in% pickps_set]
-
+  posts[,colnames(posts) %in% pickps_others][,pickps_others] <- 
+    posts[,colnames(posts) %in% pickps_set][,pickps_set] 
+  
   ########
   n.rep <- sum(ns)
   sim <- data.frame(matrix(nrow=n.post*n.rep,ncol=dim(samples$data)[2]))
